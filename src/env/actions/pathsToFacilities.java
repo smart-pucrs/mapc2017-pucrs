@@ -1,4 +1,4 @@
-package pucrs.agentcontest2017.actions;
+package actions;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,7 +9,7 @@ import jason.asSyntax.ListTerm;
 import jason.asSyntax.ListTermImpl;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Term;
-import pucrs.agentcontest2017.env.MapHelper;
+import env.MapHelper;
 
 public class pathsToFacilities extends DefaultInternalAction {
 
@@ -36,7 +36,7 @@ public class pathsToFacilities extends DefaultInternalAction {
 		
 		for (Term term : ids) {
 			String to = term.toString();
-			len 	= MapHelper.getNewRoute(from, to, type).getRouteLength();
+//			len 	= MapHelper.getNewRoute(from, to, type).getRouteLength();
 			
 			steps 	= (len / speed);
 			BigDecimal bd = new BigDecimal(steps).setScale(1, RoundingMode.UP);

@@ -1,7 +1,7 @@
-package pucrs.agentcontest2017.cnp;
+package cnp;
 
 import jason.asSyntax.Literal;
-import pucrs.agentcontest2017.env.EISArtifact;
+import env.EISArtifact;
 
 import java.util.ArrayList;
 import java.util.List;

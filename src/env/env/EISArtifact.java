@@ -1,4 +1,4 @@
-package pucrs.agentcontest2017.env;
+package env;
 
 import jason.JasonException;
 import jason.NoValueException;
@@ -26,15 +26,13 @@ import cartago.OPERATION;
 import cartago.ObsProperty;
 import eis.EILoader;
 import eis.EnvironmentInterfaceStandard;
-import eis.exceptions.ActException;
-import eis.exceptions.NoEnvironmentException;
-import eis.exceptions.PerceiveException;
-import eis.iilang.Action;
-import eis.iilang.EnvironmentState;
-import eis.iilang.Parameter;
-import eis.iilang.Percept;
+import eis.AgentListener;
+import eis.EnvironmentListener;
+import eis.exceptions.*;
+import eis.iilang.*;
+import massim.eismassim.EnvironmentInterface;
 
-public class EISArtifact extends Artifact {
+public class EISArtifact extends Artifact implements AgentListener {
 
 	private Logger logger = Logger.getLogger(EISArtifact.class.getName());
 
@@ -51,24 +49,25 @@ public class EISArtifact extends Artifact {
 	public EISArtifact() {
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
-		MapHelper.init(maps[round], 0.001, 0.0002);
+//		MapHelper.init(maps[round], 0.001, 0.0002);
 	}
 
 	protected void init() throws IOException, InterruptedException {
-		try {
-			ei = EILoader.fromClassName("massim.eismassim.EnvironmentInterface");
-			if (ei.isInitSupported())
-				ei.init(new HashMap<String, Parameter>());
-			if (ei.getState() != EnvironmentState.PAUSED)
-				ei.pause();
-			if (ei.isStartSupported())
-				ei.start();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		receiving = true;
-		execInternalOp("receiving");
+//			ei = EILoader.fromClassName("massim.eismassim.EnvironmentInterface");
+			ei = new EnvironmentInterface("conf/eismassimconfig.json");
+	        try {
+	            ei.start();
+	        } catch (ManagementException e) {
+	            e.printStackTrace();
+	        }
+        ei.attachEnvironmentListener(new EnvironmentListener() {
+            public void handleNewEntity(String entity) {}
+            public void handleStateChange(EnvironmentState s) {
+                logger.info("new state "+s);
+            }
+            public void handleDeletedEntity(String arg0, Collection<String> arg1) {}
+            public void handleFreeEntity(String arg0, Collection<String> arg1) {}
+    });
 	}
 	
 	public static Set<String> getRegisteredAgents(){
@@ -78,12 +77,13 @@ public class EISArtifact extends Artifact {
 	@OPERATION
 	void register(String entity)  {
 		try {
-			String agent = getOpUserId().getAgentName();
+			String agent = getCurrentOpAgentId().getAgentName();
 			agents.add(agent);
 			ei.registerAgent(agent);
 			ei.associateEntity(agent, entity);
+			ei.attachAgentListener(agent, this);
 			agentToEntity.put(agent, entity);
-			agentIds.put(agent, getOpUserId());
+			agentIds.put(agent, getCurrentOpAgentId());
 			logger = Logger.getLogger(EISArtifact.class.getName()+"_"+agent);
 			logger.info("Registering " + agent + " to entity " + entity);
 		} catch (Exception e) {
@@ -102,12 +102,12 @@ public class EISArtifact extends Artifact {
 		}
 	}
 	
-	@INTERNAL_OPERATION
-	void setMap(){
-		round++;
-		MapHelper.init(maps[round], 0.001, 0.0002);
-		System.out.println("$> MAP: " + maps[round]);
-	}
+//	@INTERNAL_OPERATION
+//	void setMap(){
+//		round++;
+//		MapHelper.init(maps[round], 0.001, 0.0002);
+//		System.out.println("$> MAP: " + maps[round]);
+//	}
 	
 	@INTERNAL_OPERATION
 	void receiving() throws JasonException {
@@ -346,5 +346,8 @@ public class EISArtifact extends Artifact {
 		if(!Double.isNaN(agLat) && !Double.isNaN(agLon)){
 			MapHelper.addLocation(agent, new Location(agLon, agLat));
 		}
-	}	
+	}
+
+    @Override
+    public void handlePercept(String agent, Percept percept) {}
 }

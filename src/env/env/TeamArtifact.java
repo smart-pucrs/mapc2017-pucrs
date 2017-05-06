@@ -1,4 +1,4 @@
-package pucrs.agentcontest2017.env;
+package env;
 
 import java.util.ArrayList;
 import java.util.HashMap;

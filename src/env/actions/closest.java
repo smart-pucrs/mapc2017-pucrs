@@ -1,4 +1,4 @@
-package pucrs.agentcontest2017.actions;
+package actions;
 
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -9,7 +9,7 @@ import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 import massim.scenario.city.data.Location;
 import massim.scenario.city.data.Route;
-import pucrs.agentcontest2017.env.MapHelper;
+import env.MapHelper;
 
 public class closest extends DefaultInternalAction {
 
@@ -35,10 +35,10 @@ public class closest extends DefaultInternalAction {
 			for (Term term : ids) {
 				String to = term.toString();
 				Route route = MapHelper.getNewRoute(from, to, type);
-				if(route.getRouteLength() < len){
-					closest = to;
-					len = route.getRouteLength();
-				}
+//				if(route.getRouteLength() < len){
+//					closest = to;
+//					len = route.getRouteLength();
+//				}
 			}
 		}
 		else {
@@ -53,10 +53,10 @@ public class closest extends DefaultInternalAction {
 			for (Term term : ids) {
 				String to = term.toString();
 				Route route = MapHelper.getNewRoute(from, to, type);
-				if(route.getRouteLength() < len){
-					closest = to;
-					len = route.getRouteLength();
-				}
+//				if(route.getRouteLength() < len){
+//					closest = to;
+//					len = route.getRouteLength();
+//				}
 			}
 		}
 		boolean ret = true;

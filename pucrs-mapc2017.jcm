@@ -49,7 +49,8 @@ mas scenario {
 		goals: register("connectionA16")
 	}*/
 
-	asl-path: src/pucrs/agentcontest2017/agt
+    asl-path: src/agt
+              src/agt/inc
 	
 	platform: cartago("infrastructure")
 

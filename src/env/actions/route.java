@@ -1,4 +1,4 @@
-package pucrs.agentcontest2017.actions;
+package actions;
 
 import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
@@ -7,7 +7,7 @@ import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 import massim.scenario.city.data.Location;
 import massim.scenario.city.data.Route;
-import pucrs.agentcontest2017.env.MapHelper;
+import env.MapHelper;
 
 public class route extends DefaultInternalAction {
 
@@ -55,7 +55,7 @@ public class route extends DefaultInternalAction {
 
 		boolean ret = true;
 		// Return parameter (route length) is always the last parameter (args.length - 1)
-		ret = ret & un.unifies(args[args.length - 1], new NumberTermImpl(route.getRouteLength()));
+//		ret = ret & un.unifies(args[args.length - 1], new NumberTermImpl(route.getRouteLength()));
 		return ret;
 	}
 }

@@ -1,4 +1,4 @@
-package pucrs.agentcontest2017.cnp;
+package cnp;
 
 import java.util.logging.Logger;
 
@@ -20,7 +20,7 @@ public class TaskBoard extends Artifact {
 		taskId++;
 		try {
 			String artifactName = "cnp_board_"+taskId;
-			makeArtifact(artifactName, "pucrs.agentcontest2016.cnp.ContractNetBoard", new ArtifactConfig(taskDescr,duration));
+			makeArtifact(artifactName, "cnp.ContractNetBoard", new ArtifactConfig(taskDescr,duration));
 			defineObsProperty("task", Literal.parseLiteral(taskDescr), artifactName, storageId, taskId);
 			id.set(artifactName);
 		} catch (Exception ex){

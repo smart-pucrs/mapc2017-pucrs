@@ -6,5 +6,6 @@ Run the server first in a terminal (e.g., java -jar server-2017-0.2-jar-withepen
 
 NOT WORKING
 If you wish to run the server, and our code all with one click, just right-click test/pucrs.agentcontest2017/ScenarioRunServer.java file, "Run as", "jUnit Test".
+
 NOT WORKING
 If you prefer to run the server separately, do so and then right-click test/pucrs.agentcontest2017/ScenarioConnectToServer.java file, "Run as", "jUnit Test".

@@ -1,4 +1,4 @@
-package pucrs.agentcontest2017.env;
+package env;
 
 import jason.JasonException;
 import jason.NoValueException;

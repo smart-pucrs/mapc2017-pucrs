@@ -2,7 +2,7 @@ package env;
 
 import jason.JasonException;
 import jason.NoValueException;
-import jason.asSyntax.Literal;
+import jason.asSyntax.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,6 +68,9 @@ public class EISArtifact extends Artifact implements AgentListener {
             public void handleDeletedEntity(String arg0, Collection<String> arg1) {}
             public void handleFreeEntity(String arg0, Collection<String> arg1) {}
     });
+        
+        receiving = true;
+		execInternalOp("receiving");
 	}
 	
 	public static Set<String> getRegisteredAgents(){
@@ -94,7 +97,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	@OPERATION
 	void action(String action) throws NoValueException {
 		try {
-			String agent = getOpUserName();
+			String agent = getCurrentOpAgentId().getAgentName();
 			Action a = Translator.literalToAction(action);
 			ei.performAction(agent, a, agentToEntity.get(agent));
 		} catch (ActException e) {
@@ -126,7 +129,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 					int currentStep = getCurrentStep(percepts);
 					if (lastStep != currentStep) { // only updates if it is a new step
 						lastStep = currentStep;
-						filterLocations(agent, percepts);
+//						filterLocations(agent, percepts);
 						//logger.info("Agent "+agent);
 						updatePerception(agent, previousPercepts, percepts);
 						previousPercepts = percepts;
@@ -276,6 +279,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"simStart",
 		"map",
 		"chargingStation",
+		"actionID",
 //		"visibleChargingStation",
 		"shop",			
 		"storage",
@@ -350,4 +354,5 @@ public class EISArtifact extends Artifact implements AgentListener {
 
     @Override
     public void handlePercept(String agent, Percept percept) {}
+   
 }

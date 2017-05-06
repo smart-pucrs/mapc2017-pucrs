@@ -50,7 +50,7 @@ public class Translator {
 		if (t.isNumeric()) {
 			return new Numeral(((NumberTerm) t).solve());
 		} else if (t.isList()) {
-			Collection<Parameter> terms = new ArrayList<Parameter>();
+			Collection<Parameter> terms = new ArrayList<>();
 			for (Term listTerm : (ListTerm) t)
 				terms.add(termToParameter(listTerm));
 			return new ParameterList(terms);
@@ -127,11 +127,13 @@ public class Translator {
 				act = act + "item" + index + "=" + item.getTerm(0) + " amount" + index + "=" + item.getTerm(1) + " ";
 				index++;
 			}
-		} else {
+		} else if (literal.hasTerm()) {
 			for (Term term : literal.getTerms()) {
 				Literal termlit = (Literal) term;
 				act = act + termlit.getFunctor() + "=" + termlit.getTerm(0) + " ";
 			}
+		} else {
+			act = literal.getFunctor();
 		}
 		list.add(new Identifier(act));
 		return new Action(literal.getFunctor(), list);

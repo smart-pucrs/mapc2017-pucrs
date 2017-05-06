@@ -1,4 +1,5 @@
 { include("$jacamoJar/templates/common-cartago.asl") }
+{ include("common-actions.asl") }
 
 /* Initial beliefs and rules */
 
@@ -26,4 +27,4 @@
 	
 +actionID(X) : true <- 
 	.print("Determining my action");
-	skip.
+	!skip.

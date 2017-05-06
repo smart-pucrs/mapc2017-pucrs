@@ -309,27 +309,32 @@
 	.	
  
  
++!commitAction(Action)
+<-
+	action(Action);
+	.
+ 
 //+!commitAction(Action)
 //    : step(S) & stepLast(SL) & S == SL
 //<- 
 //	.print("@@@@@@@@@@@@@@@@@@ Already did an action last step! @@@@@@@@@@@@@@@@@@")
+////	.
+//+!commitAction(Action)
+//    : step(S)
+//<- 
+//	-+stepLast(S);
+//	-+lastActionReal(Action);
+//    action(Action); // the action in the artifact
+//	.wait({ +step(_) }); // wait next step to continue
+//	if (Action \== skip & Action \== continue) {
+//	    .print("Action: ",Action, "   -   Step: ",S);
+//    }
+//	.wait(500); 
 //	.
-+!commitAction(Action)
-    : step(S)
-<- 
-	-+stepLast(S);
-	-+lastActionReal(Action);
-    action(Action); // the action in the artifact
-	.wait({ +step(_) }); // wait next step to continue
-	if (Action \== skip & Action \== continue) {
-	    .print("Action: ",Action, "   -   Step: ",S);
-    }
-	.wait(500); 
-	.
-
-+!commitAction(Action)
-    : not step(S) 
-<- 
-	.wait({ +step(_) }); // wait the first step to continue
-	!commitAction(Action)  
-	.
+//
+//+!commitAction(Action)
+//    : not step(S) 
+//<- 
+//	.wait({ +step(_) }); // wait the first step to continue
+//	!commitAction(Action)  
+//	.

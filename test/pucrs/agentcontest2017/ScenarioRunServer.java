@@ -27,7 +27,6 @@ public class ScenarioRunServer {
 		}).start();
 
 		try {			
-			System.out.println("FEITO");
 			JaCaMoLauncher.main(new String[] { "test/pucrs/agentcontest2017/scenario.jcm"});
 		} catch (JasonException e) {
 			System.out.println("Exception: "+e.getMessage());

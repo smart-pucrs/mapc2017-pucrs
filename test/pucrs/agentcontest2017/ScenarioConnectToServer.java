@@ -11,12 +11,18 @@ public class ScenarioConnectToServer {
 	@Before
 	public void setUp() {
 		
-		try {
-			JaCaMoLauncher runner = new JaCaMoLauncher();
-			runner.init(new String[] { "test/pucrs/agentcontest2017/scenario.jcm" });
-			runner.getProject().addSourcePath("./src/pucrs/agentcontest2017/agt");
-			runner.create();
-			runner.finish();
+//		try {
+//			JaCaMoLauncher runner = new JaCaMoLauncher();
+//			runner.init(new String[] { "test/pucrs/agentcontest2017/scenario.jcm" });
+//			runner.getProject().addSourcePath("./src/pucrs/agentcontest2017/agt");
+//			runner.create();
+//			runner.finish();
+//		} catch (JasonException e) {
+//			e.printStackTrace();
+//		}
+		
+		try {			
+			JaCaMoLauncher.main(new String[] { "test/pucrs/agentcontest2017/scenario.jcm"});
 		} catch (JasonException e) {
 			e.printStackTrace();
 		}

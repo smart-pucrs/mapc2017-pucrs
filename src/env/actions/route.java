@@ -55,7 +55,7 @@ public class route extends DefaultInternalAction {
 
 		boolean ret = true;
 		// Return parameter (route length) is always the last parameter (args.length - 1)
-//		ret = ret & un.unifies(args[args.length - 1], new NumberTermImpl(route.getRouteLength()));
+		ret = ret & un.unifies(args[args.length - 1], new NumberTermImpl(route.getRouteLength()));
 		return ret;
 	}
 }

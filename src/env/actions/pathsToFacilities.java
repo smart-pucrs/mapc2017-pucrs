@@ -36,7 +36,7 @@ public class pathsToFacilities extends DefaultInternalAction {
 		
 		for (Term term : ids) {
 			String to = term.toString();
-//			len 	= MapHelper.getNewRoute(from, to, type).getRouteLength();
+			len 	= MapHelper.getNewRoute(from, to, type).getRouteLength();
 			
 			steps 	= (len / speed);
 			BigDecimal bd = new BigDecimal(steps).setScale(1, RoundingMode.UP);

@@ -35,10 +35,10 @@ public class closest extends DefaultInternalAction {
 			for (Term term : ids) {
 				String to = term.toString();
 				Route route = MapHelper.getNewRoute(from, to, type);
-//				if(route.getRouteLength() < len){
-//					closest = to;
-//					len = route.getRouteLength();
-//				}
+				if(route.getRouteLength() < len){
+					closest = to;
+					len = route.getRouteLength();
+				}
 			}
 		}
 		else {
@@ -53,10 +53,10 @@ public class closest extends DefaultInternalAction {
 			for (Term term : ids) {
 				String to = term.toString();
 				Route route = MapHelper.getNewRoute(from, to, type);
-//				if(route.getRouteLength() < len){
-//					closest = to;
-//					len = route.getRouteLength();
-//				}
+				if(route.getRouteLength() < len){
+					closest = to;
+					len = route.getRouteLength();
+				}
 			}
 		}
 		boolean ret = true;

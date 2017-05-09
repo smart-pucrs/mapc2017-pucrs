@@ -1,7 +1,5 @@
 package pucrs.agentcontest2017;
 
-import java.io.IOException;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,7 +25,7 @@ public class ScenarioRunServer {
 		}).start();
 
 		try {			
-			JaCaMoLauncher.main(new String[] { "test/pucrs/agentcontest2017/scenario.jcm"});
+			JaCaMoLauncher.main(new String[] {"pucrs-mapc2017.jcm"});
 		} catch (JasonException e) {
 			System.out.println("Exception: "+e.getMessage());
 			e.printStackTrace();

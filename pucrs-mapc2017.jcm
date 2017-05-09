@@ -1,53 +1,48 @@
 mas scenario {
 		
 	agent vehicle1: test.asl {
+		join: vehicleart, cnp
+		focus: vehicleart.eis_art_vehicle1, cnp.task_board
 		goals: register("connectionA1")
 	}
 	agent vehicle2: test.asl {
+		join: vehicleart, cnp
+		focus: vehicleart.eis_art_vehicle2, cnp.task_board
 		goals: register("connectionA2")
 	}
 	agent vehicle3: test.asl {
+		join: vehicleart, cnp
+		focus: vehicleart.eis_art_vehicle3, cnp.task_board
 		goals: register("connectionA3")
 	}
 	agent vehicle4: test.asl {
+		join: vehicleart, cnp
+		focus: vehicleart.eis_art_vehicle4, cnp.task_board
 		goals: register("connectionA4")
 	}
 	agent vehicle5: test.asl {
+		join: vehicleart, cnp
+		focus: vehicleart.eis_art_vehicle5, cnp.task_board
 		goals: register("connectionA5")
 	}
 	agent vehicle6: test.asl {
+		join: vehicleart, cnp
+		focus: vehicleart.eis_art_vehicle6, cnp.task_board
 		goals: register("connectionA6")
-	}/* 
-	agent vehicle7: vehicle.asl {
-		goals: register("connectionA7")
 	}
-	agent vehicle8: vehicle.asl {
-		goals: register("connectionA8")
+	
+	workspace vehicleart {
+		artifact eis_art_vehicle1: env.EISArtifact()
+		artifact eis_art_vehicle2: env.EISArtifact()
+		artifact eis_art_vehicle3: env.EISArtifact()
+		artifact eis_art_vehicle4: env.EISArtifact()
+		artifact eis_art_vehicle5: env.EISArtifact()
+		artifact eis_art_vehicle6: env.EISArtifact()
 	}
-	agent vehicle9: vehicle.asl {
-		goals: register("connectionA9")
+
+	workspace cnp {
+		artifact task_board: cnp.TaskBoard()
 	}
-	agent vehicle10: vehicle.asl {
-		goals: register("connectionA10")
-	}	
-	agent vehicle11: vehicle.asl {
-		goals: register("connectionA11")
-	}
-	agent vehicle12: vehicle.asl {
-		goals: register("connectionA12")
-	}
-	agent vehicle13: vehicle.asl {
-		goals: register("connectionA13")
-	}
-	agent vehicle14: vehicle.asl {
-		goals: register("connectionA14")
-	}
-	agent vehicle15: vehicle.asl {
-		goals: register("connectionA15")
-	}
-	agent vehicle16: vehicle.asl {
-		goals: register("connectionA16")
-	}*/
 
     asl-path: src/agt
               src/agt/inc

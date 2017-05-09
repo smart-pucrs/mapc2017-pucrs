@@ -5,22 +5,14 @@
 
 /* Initial goals */
 
-!start.
 
 /* Plans */
 +!register(E)
-	: .my_name(Me)
 <-
     .print("Registering...");
-    .concat("eis_art_", Me, ArtName);
-    .term2string(Me, MeS);
-    makeArtifact(ArtName, "env.EISArtifact", [], AId);
-    focus(AId);
     register(E);
 	.
 
-+!start : true <- 
-	.print("hello massim world.").
 
 +step(X) : true <-
 	.print("Received step percept.").

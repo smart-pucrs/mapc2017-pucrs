@@ -45,11 +45,11 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private boolean receiving;
 	private int lastStep = -1;
 	private int round = 0;
-	private String maps[] = new String[] { "london", "hannover", "sanfrancisco" };
+	private String maps[] = new String[] { "london" };
 	public EISArtifact() {
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
-//		MapHelper.init(maps[round], 0.001, 0.0002);
+		MapHelper.init(maps[round], 200, 5);
 	}
 
 	protected void init() throws IOException, InterruptedException {

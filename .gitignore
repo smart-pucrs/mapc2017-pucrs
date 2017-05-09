@@ -5,6 +5,7 @@ cache/
 graphs/
 /perceptlog/
 perceptlog/
+replays/
 log/
 *.raw
 *.log

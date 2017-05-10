@@ -268,7 +268,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	}
 
 	static Set<String> match_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
-		"simStart",
+//		"simStart",
 		"map",
 		"steps",
 		"item",
@@ -276,28 +276,30 @@ public class EISArtifact extends Artifact implements AgentListener {
 	}));
 	
 	static Set<String> step_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
-		"simStart",
-		"map",
+//		"simStart",
+//		"map",
 		"chargingStation",
 		"actionID",
 //		"visibleChargingStation",
 		"shop",			
 		"storage",
 //		"workshop",
-		"dump",
+//		"resourceNode",		
+//		"dump",
 		"lat",
 		"lon",
 		"charge",
 		"load",
-		"inFacility",
-		"items",
+		"facility",
+//		"items",
 //		"jobTaken",
 		"step",
-		"simEnd",		
+//		"simEnd",
+//		"ranking",		
 //		"pricedJob",
 //		"auctionJob",
 		"lastAction",
-		"lastActionResult",
+//		"lastActionResult",
 	}));
 	
 //	static Set<String> step_obs_propv1 = new HashSet<String>( Arrays.asList(new String[] {

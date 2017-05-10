@@ -8,6 +8,7 @@ perceptlog/
 replays/
 log/
 logs/
+resuts/
 *.raw
 *.log
 xmls/

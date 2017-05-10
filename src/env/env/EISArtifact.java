@@ -164,10 +164,21 @@ public class EISArtifact extends Artifact implements AgentListener {
 	}
 
 	private void updatePerception(String agent, Collection<Percept> previousPercepts, Collection<Percept> percepts) throws JasonException {
-		if (agent.equals("vehicle15")) {
-			// compute removed perception
+//		if (agent.equals("vehicle15")) {
+//			// compute removed perception
+//			for (Percept old: previousPercepts) {
+//				if (step_obs_propv1.contains(old.getName())) {
+//					if (!percepts.contains(old)) { // not perceived anymore
+//						Literal literal = Translator.perceptToLiteral(old);
+//						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
+////						logger.info("removing old perception "+literal);
+//					}
+//				}
+//			}
+//		}
+//		else {
 			for (Percept old: previousPercepts) {
-				if (step_obs_propv1.contains(old.getName())) {
+				if (step_obs_prop.contains(old.getName())) {
 					if (!percepts.contains(old)) { // not perceived anymore
 						Literal literal = Translator.perceptToLiteral(old);
 						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
@@ -175,50 +186,39 @@ public class EISArtifact extends Artifact implements AgentListener {
 					}
 				}
 			}
-		}
-		else {
-			for (Percept old: previousPercepts) {
-				if (step_obs_prop.contains(old.getName())) {
-					if (!percepts.contains(old)) { // not perceived anymore
-						Literal literal = Translator.perceptToLiteral(old);
-						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
-						//logger.info("removing old perception "+literal);
-					}
-				}
-			}
-		}
+//		}
 		
 		// compute new perception
 		Literal step = null;
-		if (agent.equals("vehicle15")) {
-			for (Percept percept: percepts) {
-				if (step_obs_propv1.contains(percept.getName())) {
-					if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction")) { // really new perception 
-						Literal literal = Translator.perceptToLiteral(percept);
-						if (percept.getName().equals("step")) {
-							step = literal;
-						} else if (percept.getName().equals("simEnd")) {
-//							cleanObsProps(step_obs_propv1);
-							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
-							cleanObsProps(match_obs_prop);
-							lastStep = -1;
-							break;
-						} else {
-//							logger.info("adding "+literal);
-							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
-						}
-					}
-				} if (match_obs_prop.contains(percept.getName())) {
-					Literal literal = Translator.perceptToLiteral(percept);
-//					logger.info("adding "+literal);
-					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());				
-				}
-			}
-		}
-		else {
+//		if (agent.equals("vehicle15")) {
+//			for (Percept percept: percepts) {
+//				if (step_obs_propv1.contains(percept.getName())) {
+//					if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction")) { // really new perception 
+//						Literal literal = Translator.perceptToLiteral(percept);
+//						if (percept.getName().equals("step")) {
+//							step = literal;
+//						} else if (percept.getName().equals("simEnd")) {
+////							cleanObsProps(step_obs_propv1);
+//							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
+//							cleanObsProps(match_obs_prop);
+//							lastStep = -1;
+//							break;
+//						} else {
+////							logger.info("adding "+literal);
+//							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
+//						}
+//					}
+//				} if (match_obs_prop.contains(percept.getName())) {
+//					Literal literal = Translator.perceptToLiteral(percept);
+////					logger.info("adding "+literal);
+//					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());				
+//				}
+//			}
+//		}
+//		else {
 			for (Percept percept: percepts) {
 				if (step_obs_prop.contains(percept.getName())) {
-					if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction")) { // really new perception 
+					if (!previousPercepts.contains(percept) ) { // really new perception 
 						Literal literal = Translator.perceptToLiteral(percept);
 						if (percept.getName().equals("step")) {
 							step = literal;
@@ -238,7 +238,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());				
 				}
 			}
-		}
+//		}
 		
 		if (step != null) {
 //			logger.info("adding "+step);
@@ -271,7 +271,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"simStart",
 		"map",
 		"steps",
-		"product",
+		"item",
 		"role",
 	}));
 	
@@ -290,7 +290,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"charge",
 		"load",
 		"inFacility",
-		"item",
+		"items",
 //		"jobTaken",
 		"step",
 		"simEnd",		
@@ -300,29 +300,29 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"lastActionResult",
 	}));
 	
-	static Set<String> step_obs_propv1 = new HashSet<String>( Arrays.asList(new String[] {
-			"simStart",
-			"map",
-			"chargingStation",
-//			"visibleChargingStation",
-			"shop",			
-			"storage",
-//			"workshop",
-			"dump",
-			"lat",
-			"lon",
-			"charge",
-			"load",
-			"inFacility",
-			"item",
-//			"jobTaken",
-			"step",
-			"simEnd",		
-			"pricedJob",
-//			"auctionJob",
-			"lastAction",
-			"lastActionResult",
-		}));	
+//	static Set<String> step_obs_propv1 = new HashSet<String>( Arrays.asList(new String[] {
+//			"simStart",
+//			"map",
+//			"chargingStation",
+////			"visibleChargingStation",
+//			"shop",			
+//			"storage",
+////			"workshop",
+//			"dump",
+//			"lat",
+//			"lon",
+//			"charge",
+//			"load",
+//			"inFacility",
+//			"item",
+////			"jobTaken",
+//			"step",
+//			"simEnd",		
+//			"pricedJob",
+////			"auctionJob",
+//			"lastAction",
+//			"lastActionResult",
+//		}));	
 	
 	static List<String> location_perceptions = Arrays.asList(new String[] { "shop", "storage", "workshop", "chargingStation", "dump", "entity" });
 

@@ -32,6 +32,7 @@ public class MapHelper {
 		locations = new HashMap<String, Location>();
 		hopper = new GraphHopper().forDesktop();
 		hopper.setOSMFile("osm" + File.separator + mapName + ".osm.pbf");
+		hopper.setCHEnabled(false); // CH does not work with shortest weighting (at the moment)
 		hopper.setGraphHopperLocation("graphs" + File.separator + mapName);
 		hopper.setEncodingManager(new EncodingManager("car"));
 		hopper.importOrLoad();
@@ -82,7 +83,7 @@ public class MapHelper {
 
 	private static Route getNewCarRoute(Location from, Location to) {
 
-		GHRequest req = new GHRequest(from.getLat(), from.getLon(), to.getLat(), to.getLon()).setWeighting("fastest").setVehicle("car");
+		GHRequest req = new GHRequest(from.getLat(), from.getLon(), to.getLat(), to.getLon()).setWeighting("shortest").setVehicle("car");
 		GHResponse rsp = MapHelper.getHopper().route(req);
 
 		if (rsp.hasErrors()) {

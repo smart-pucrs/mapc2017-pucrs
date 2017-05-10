@@ -49,7 +49,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	public EISArtifact() {
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
-//		MapHelpesr.init("paris", 200, 5);
+		MapHelper.init("paris", 200, 5);
 	}
 
 	protected void init() throws IOException, InterruptedException {
@@ -129,7 +129,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 					int currentStep = getCurrentStep(percepts);
 					if (lastStep != currentStep) { // only updates if it is a new step
 						lastStep = currentStep;
-//						filterLocations(agent, percepts);
+						filterLocations(agent, percepts);
 						//logger.info("Agent "+agent);
 						updatePerception(agent, previousPercepts, percepts);
 						previousPercepts = percepts;

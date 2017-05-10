@@ -20,11 +20,11 @@
 //	.print("Received step percept.").
 	
 +actionID(X) : true <- 
-//	.print("Determining my action");
+//	.print("Determining my action ",X);
 	!skip.
 
 +lastAction(Action)
-	: Action == noAction & noActionCount(Count)
+	: step(S) & S \== 0 & Action == noAction & noActionCount(Count)
 <-
 	-+noActionCount(Count+1);
 	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");

@@ -27,13 +27,13 @@ public class MapHelper {
 			return;
 		}
 		MapHelper.cellSize = cellSize;
-//		Location.setProximity(proximity);
+		Location.setProximity(proximity);
 		mapName = newMapName;
 		locations = new HashMap<String, Location>();
 		hopper = new GraphHopper().forDesktop();
 		hopper.setOSMFile("osm" + File.separator + mapName + ".osm.pbf");
 		hopper.setGraphHopperLocation("graphs" + File.separator + mapName);
-//		hopper.setEncodingManager(new EncodingManager(EncodingManager.CAR));
+		hopper.setEncodingManager(new EncodingManager("car"));
 		hopper.importOrLoad();
 	}
 
@@ -61,7 +61,7 @@ public class MapHelper {
 		if (type.equals("air")) {
 			route = getNewAirRoute(from, to);
 		} else if (type.equals("road")) {
-//			route = getNewCarRoute(from, to);
+			route = getNewCarRoute(from, to);
 		}
 		return route;
 	}
@@ -80,49 +80,49 @@ public class MapHelper {
 		return route;
 	}
 
-//	private static Route getNewCarRoute(Location from, Location to) {
-//
-//		GHRequest req = new GHRequest(from.getLat(), from.getLon(), to.getLat(), to.getLon()).setWeighting("shortest").setVehicle("car");
-//		GHResponse rsp = MapHelper.getHopper().route(req);
-//
-//		if (rsp.hasErrors()) {
-//			return null;
-//		}
-//
-//		Route route = new Route();
-//		PointList pointList = rsp.getPoints();
-//		Iterator<GHPoint3D> pIterator = pointList.iterator();
-//		if (!pIterator.hasNext())
-//			return null;
-//		GHPoint prevPoint = pIterator.next();
-//
-//		double remainder = 0;
-//		Location loc = null;
-//		while (pIterator.hasNext()) {
-//			GHPoint nextPoint = pIterator.next();
-//			double length = getLength(prevPoint, nextPoint);
-//			if (length == 0) {
-//				prevPoint = nextPoint;
-//				continue;
-//			}
-//
-//			long i = 0;
-//			for (; i * MapHelper.cellSize + remainder < length; i++) {
-//				loc = getIntermediateLoc(prevPoint, nextPoint, length, i * MapHelper.cellSize + remainder);
-//				if (!from.equals(loc)) {
-//					route.addPoint(loc);
-//				}
-//			}
-//			remainder = i * MapHelper.cellSize + remainder - length;
-//			prevPoint = nextPoint;
-//		}
-//
-//		if (!to.equals(loc)) {
-//			route.addPoint(to);
-//		}
-//
-//		return route;
-//	}
+	private static Route getNewCarRoute(Location from, Location to) {
+
+		GHRequest req = new GHRequest(from.getLat(), from.getLon(), to.getLat(), to.getLon()).setWeighting("fastest").setVehicle("car");
+		GHResponse rsp = MapHelper.getHopper().route(req);
+
+		if (rsp.hasErrors()) {
+			return null;
+		}
+
+		Route route = new Route();
+		PointList pointList = rsp.getBest().getPoints();
+		Iterator<GHPoint3D> pIterator = pointList.iterator();
+		if (!pIterator.hasNext())
+			return null;
+		GHPoint prevPoint = pIterator.next();
+
+		double remainder = 0;
+		Location loc = null;
+		while (pIterator.hasNext()) {
+			GHPoint nextPoint = pIterator.next();
+			double length = getLength(prevPoint, nextPoint);
+			if (length == 0) {
+				prevPoint = nextPoint;
+				continue;
+			}
+
+			long i = 0;
+			for (; i * MapHelper.cellSize + remainder < length; i++) {
+				loc = getIntermediateLoc(prevPoint, nextPoint, length, i * MapHelper.cellSize + remainder);
+				if (!from.equals(loc)) {
+					route.addPoint(loc);
+				}
+			}
+			remainder = i * MapHelper.cellSize + remainder - length;
+			prevPoint = nextPoint;
+		}
+
+		if (!to.equals(loc)) {
+			route.addPoint(to);
+		}
+
+		return route;
+	}
 
 	public static double getLength(Location loc1, Location loc2) {
 		return Math.sqrt(Math.pow(loc1.getLon() - loc2.getLon(), 2) + Math.pow(loc1.getLat() - loc2.getLat(), 2));

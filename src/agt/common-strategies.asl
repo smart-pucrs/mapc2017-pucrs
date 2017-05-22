@@ -186,7 +186,7 @@
 +!calculate_steps_required_all_shops
 	: .my_name(Me) & role(Role, Speed, _, _, _) & shopList(List) & find_shops_id(List,[],ShopsList)
 <- 	
-	pucrs.agentcontest2016.actions.pathsToFacilities(Me, Role, Speed, ShopsList, Proposal);
+	actions.pathsToFacilities(Me, Role, Speed, ShopsList, Proposal);
 	-+myProposal(Proposal);
 	.
 +!calculate_steps_required_all_shops

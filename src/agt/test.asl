@@ -1,6 +1,7 @@
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("common-actions.asl") }
 { include("new-round.asl") }
+{ include("strategy/strategies.asl", ringing) }
 
 /* Initial beliefs and rules */
 
@@ -9,10 +10,16 @@
 
 /* Plans */
 +!register(E)
-<-
+	: .my_name(Me)
+<- 
 	!new_round;
     .print("Registering...");
     register(E);
+    
+    .wait({ +step(_) });
+	if (Me == vehicle6) {
+		!ringing::execute_ringing;	
+	}
 	.
 
 

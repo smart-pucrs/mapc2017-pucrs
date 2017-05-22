@@ -47,8 +47,14 @@
 //	.print("Failed to execute action ",Action," on step ",Step-1," due to the 1% random error.");
 //	.
 	
+//@shopList[atomic]
+//+shop(ShopId, Lat, Lng, Items)
+//	: shopList(List) & not .member(shop(ShopId,_),List)
+//<-
+//	-+shopList([shop(ShopId,Items)|List]);
+//	.
 @shopList[atomic]
-+shop(ShopId, Lat, Lng, Items)
++shop(ShopId, Lat, Lng, _, Items)
 	: shopList(List) & not .member(shop(ShopId,_),List)
 <-
 	-+shopList([shop(ShopId,Items)|List]);

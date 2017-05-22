@@ -96,9 +96,10 @@ public class EISArtifact extends Artifact implements AgentListener {
 
 	@OPERATION
 	void action(String action) throws NoValueException {
+		Literal literal = Literal.parseLiteral(action);
 		try {
 			String agent = getCurrentOpAgentId().getAgentName();
-			Action a = Translator.literalToAction(action);
+			Action a = Translator.literalToAction(literal);
 			ei.performAction(agent, a, agentToEntity.get(agent));
 		} catch (ActException e) {
 			e.printStackTrace();
@@ -288,6 +289,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //		"dump",
 		"lat",
 		"lon",
+		"lastActionParams",
 		"charge",
 		"load",
 		"facility",

@@ -21,7 +21,9 @@
 	
 +actionID(X) : true <- 
 //	.print("Determining my action ",X);
-	!skip.
+	action(goto(workshop0));
+//	action(skip);
+	.
 
 +lastAction(Action)
 	: step(S) & S \== 0 & Action == noAction & noActionCount(Count)
@@ -29,3 +31,6 @@
 	-+noActionCount(Count+1);
 	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
 	.
+	
++lastActionParams(List)
+<- .print(List).	

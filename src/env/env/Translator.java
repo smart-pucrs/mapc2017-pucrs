@@ -45,6 +45,8 @@ public class Translator {
 			pars[i] = termToParameter(action.getTerm(i));
 		return new Action(action.getFunctor(), pars);
 	}
+	
+
 
 	public static Parameter termToParameter(Term t) throws NoValueException {
 		if (t.isNumeric()) {
@@ -111,31 +113,32 @@ public class Translator {
 		return l;		
 	}
 
-	public static Action literalToAction(String actionlitstr) {
-		Literal literal = Literal.parseLiteral(actionlitstr);
-		LinkedList<Parameter> list = new LinkedList<Parameter>();
-		String act = "";
-		if(literal.getFunctor().equals("post_job")){
-			ListTerm items = (ListTerm) literal.getTerms().remove(literal.getTerms().size()-1);
-			for (Term term : literal.getTerms()) {
-				Literal termlit = (Literal) term;
-				act = act + termlit.getFunctor() + "=" + termlit.getTerm(0) + " ";
-			}
-			int index = 1;
-			for(Term t: items.getAsList()){
-				Literal item = (Literal) t;
-				act = act + "item" + index + "=" + item.getTerm(0) + " amount" + index + "=" + item.getTerm(1) + " ";
-				index++;
-			}
-		} else if (literal.hasTerm()) {
-			for (Term term : literal.getTerms()) {
-				Literal termlit = (Literal) term;
-				act = act + termlit.getFunctor() + "=" + termlit.getTerm(0) + " ";
-			}
-		} else {
-			act = literal.getFunctor();
-		}
-		list.add(new Identifier(act));
-		return new Action(literal.getFunctor(), list);
-	}
+//	public static Action literalToAction(String actionlitstr) {
+//		Literal literal = Literal.parseLiteral(actionlitstr);
+//		LinkedList<Parameter> list = new LinkedList<Parameter>();
+//		String act = "";
+//		if(literal.getFunctor().equals("post_job")){
+//			ListTerm items = (ListTerm) literal.getTerms().remove(literal.getTerms().size()-1);
+//			for (Term term : literal.getTerms()) {
+//				Literal termlit = (Literal) term;
+//				act = act + termlit.getFunctor() + "=" + termlit.getTerm(0) + " ";
+//			}
+//			int index = 1;
+//			for(Term t: items.getAsList()){
+//				Literal item = (Literal) t;
+//				act = act + "item" + index + "=" + item.getTerm(0) + " amount" + index + "=" + item.getTerm(1) + " ";
+//				index++;
+//			}
+//		} else if (literal.hasTerm()) {
+//			for (Term term : literal.getTerms()) {
+//				Literal termlit = (Literal) term;
+//				act = act + termlit.getFunctor() + "=" + termlit.getTerm(0) + " ";
+//			}
+//		} else {
+//			act = literal.getFunctor();
+//		}
+//		list.add(new Identifier(act));
+////		System.out.println("Action: "+literal.getFunctor()+list);
+//		return new Action(literal.getFunctor(), list);
+//	}
 }

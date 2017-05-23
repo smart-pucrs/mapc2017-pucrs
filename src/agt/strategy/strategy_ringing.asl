@@ -11,6 +11,11 @@ next_agent([agents(Agent)|List],Result) :- Result = Agent.
 agents_into_the_ring([],Result) :- Result = [].
 agents_into_the_ring([agents(Agent)|List],Result) :- Result = List.
 
+find_shop_my_tool(Tool,[],Temp,Result):- Result = Temp.
+find_shop_my_tool(Tool,[shop(ShopId,ListItens)|List],Temp,Result):- .member(item(Tool,_,_,_,_,_),ListItems) /*& not .member(ShopId,Temp)*/ & find_shop_my_tool(Tool,List,[ShopId|Temp],Result).
+find_shop_my_tools([],ShopList,Temp,Result) :- Result = Temp.
+find_shop_my_tools([Tool | Tools],ShopList,Temp,Result):- find_shop_my_tool(Tool,ShopList,Temp,ResultTool) & find_shop_my_tools(Tools,ShopList,[ResultTool|Temp],Result).
+
 +!ringingFinished
 	: not .desire(goto(_))
 <-
@@ -38,11 +43,19 @@ agents_into_the_ring([agents(Agent)|List],Result) :- Result = List.
 
 
 +!calculate_steps_required_all_shops
-	: .my_name(Me) & default::role(Role, Speed, _, _, _) & default::shopList(List) & default::find_shops_id(List,[],ShopsList)
+	: .my_name(Me) & default::role(Role, Speed, _, _, Tools) & default::shopList(List) & default::find_shops_id(List,[],ShopsList)
 <- 	
 	actions.pathsToFacilities(Me, Role, Speed, ShopsList, Proposal);
-	-+myProposal(Proposal);
+	-+myProposal(Proposal);	
 	.print("My Proposal: ", Proposal);
+	
+//	.print("#### Calculate My Tools");
+//	.findall(shop(ShopId,ListaItens),default::shop(ShopId,_,_,_,ListaItens),Shops)
+//
+////	?find_shop_my_tools(Tools,Shops,[],ShopsToLook);
+//	?find_shop_my_tool(tool1,Shops,[],ShopsToLook);
+//	.print("#### ShopsTools: ",ShopsToLook);
+//	.print("#### Fim");
 	.
 +!calculate_steps_required_all_shops
 <- 	
@@ -53,7 +66,7 @@ agents_into_the_ring([agents(Agent)|List],Result) :- Result = List.
 	: tempAgentsSendProposals(ListShopAgent)
 <-
 	for (.member(proposalAgent(Shop,Agent,_),ListShopAgent) ){
-		.send(Agent,achieve,default::go_to_facility(Shop));
+		.send(Agent,achieve,globalStrategies::go_to_facility(Shop));
 	}
 	.
 +!calculateBestShopToEachAgent

@@ -7,19 +7,11 @@
 { include("common-strategies.asl") }
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("strategy/strategy_ringing.asl",ringing) }
+{ include("action/actions.asl",action) }
 
-{begin namespace(priv, local)}
-
-+!go_to_facility(Facility)
-<-
-	!goto(Facility);
-	?step(S);
-	.print("I have arrived at ", Facility, "   -   Step: ",S);
-	.send(vehicle15,tell,doneExploration);
-	!free;
-	.
+{begin namespace(localStrategies, local)}
 	 	
- +!generateListOfAgents(ListOfAgents)
+ +!generate_list_of_agents(ListOfAgents)
 	: true /* not initiatorShopChoice */
 <-	
 //	ListOfAgents = [agents(vehicle1),agents(vehicle2),agents(vehicle3),agents(vehicle4),agents(vehicle5),agents(vehicle6),agents(vehicle7),agents(vehicle8),agents(vehicle9),agents(vehicle10),agents(vehicle11),agents(vehicle12),agents(vehicle13),agents(vehicle14),agents(vehicle15),agents(vehicle16)];
@@ -28,19 +20,43 @@
 
 {end}
 
+{begin namespace(globalStrategies, global)}
+
++!go_to_facility(Facility)
+<-
+	.print("Going to facility ", Facility);
+	!action::goto(Facility);
+	?default::step(S);
+	.print("I have arrived at ", Facility, "   -   Step: ",S);
+//	.send(vehicle15,tell,doneExploration);
+//	!free;
+	.
+	
+{end}
+
 +!execute_ringing
 	: .my_name(Me) & default::shopList(List) & default::find_shops_id(List,[],ListOfShops)
-//	: .my_name(Me) 
 <-
 	.print("Setting up ringing");
-	.print("Lista: ",List);
 	+numberAwarded(.length(List));
 	
-	!priv::generateListOfAgents(ListOfAgents);
+	!localStrategies::generate_list_of_agents(ListOfAgents);
 	
 	!ringing::start_ringing(Me, ListOfAgents, ListOfShops);
 	.
 
++!choose_my_action(Step)
+	: default::going(Facility) & not default::facility(Facility)
+<-
+	.print("I'm going to facility ",Facility," at step ",Step);
+	!action::continue;
+	.
++!choose_my_action(Step)
+	: true
+<-
+	.print("I'm doing nothing at step ",Step);
+	!action::skip;
+	.
 
 
 

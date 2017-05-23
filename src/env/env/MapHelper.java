@@ -81,8 +81,16 @@ public class MapHelper {
 		return route;
 	}
 
+//	private GHResponse queryGH(Location from, Location to){
+//        GHRequest req = new GHRequest(from.getLat(), from.getLon(), to.getLat(), to.getLon())
+//                .setWeighting("shortest")
+//                .setVehicle("car");
+//        return MapHelper.getHopper().route(req);
+//    }
+	
 	private static Route getNewCarRoute(Location from, Location to) {
 
+//		GHResponse rsp = queryGH(from, to);
 		GHRequest req = new GHRequest(from.getLat(), from.getLon(), to.getLat(), to.getLon()).setWeighting("shortest").setVehicle("car");
 		GHResponse rsp = MapHelper.getHopper().route(req);
 

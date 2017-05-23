@@ -54,7 +54,7 @@
 +!choose_my_action(Step)
 	: true
 <-
-	.print("I'm doing nothing at step ",Step);
+//	.print("I'm doing nothing at step ",Step);
 	!action::skip;
 	.
 

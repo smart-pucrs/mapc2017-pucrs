@@ -61,9 +61,11 @@
 //	.
 
 +step(X) 
-	: true 
+	: role(Role, Speed, _, _, Tools) 
 <-
 	!strategies::choose_my_action(X);
+//	actions.route(Role,shop0,Route);
+//	.print("Route lenght to shop0: ",Route);
 	.
 	
 
@@ -73,6 +75,3 @@
 	-+noActionCount(Count+1);
 	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
 	.
-	
-+lastActionParams(List)
-<- .print(List).	

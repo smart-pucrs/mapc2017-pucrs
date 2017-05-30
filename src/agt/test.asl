@@ -4,7 +4,7 @@
 { include("common-rules.asl") }
 { include("new-round.asl") }
 { include("strategy/strategies.asl", strategies) }
-{ include("server/server.asl", strategies) }
+//{ include("server/server.asl", strategies) }
 
 
 //{ include("new-round.asl") }
@@ -76,6 +76,8 @@
 ////	!commitAction(goto(shop0));
 ////	actions.route(Role,shop0,Route);
 ////	.print("Route lenght to shop0: ",Route);
+//	actions.route(Role,shop0,Route);
+//	.print("Route lenght to shop0: ",Route);
 //	.
 //
 //+hasItem(Item,Qty)
@@ -86,12 +88,17 @@
 //<-	.print(Result).
 
 +step(X) 
-	: role(Role, Speed, _, _, Tools) 
+	: true
 <-
 	!strategies::choose_my_action(X);
-//	actions.route(Role,shop0,Route);
-//	.print("Route lenght to shop0: ",Route);
 	.
+	
++!ringingFinished
+<-
+	-myProposal(_);
+	.
+	
+//+actionID(X) : true <- !commitAction(goto(skip)).
 	
 
 +lastAction(Action)

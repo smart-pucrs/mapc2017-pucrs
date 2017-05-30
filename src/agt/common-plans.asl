@@ -1,16 +1,16 @@
-+lastAction(Action)
-	: Action == noAction & lastActionReal(ActionReal) & noActionCount(Count)
-<-
-	-+noActionCount(Count+1);
-	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
-	!commitAction(ActionReal);
-	.
-+lastAction(Action)
-	: Action == noAction & noActionCount(Count)
-<-
-	-+noActionCount(Count+1);
-	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
-	.
+//+lastAction(Action)
+//	: Action == noAction & lastActionReal(ActionReal) & noActionCount(Count)
+//<-
+//	-+noActionCount(Count+1);
+//	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
+//	!commitAction(ActionReal);
+//	.
+//+lastAction(Action)
+//	: Action == noAction & noActionCount(Count)
+//<-
+//	-+noActionCount(Count+1);
+//	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
+//	.
 
 +simEnd
 	: .my_name(Me)

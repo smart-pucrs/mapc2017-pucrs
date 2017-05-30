@@ -16,12 +16,12 @@ find_shop_my_tool(Tool,[shop(ShopId,ListItens)|List],Temp,Result):- .member(item
 find_shop_my_tools([],ShopList,Temp,Result) :- Result = Temp.
 find_shop_my_tools([Tool | Tools],ShopList,Temp,Result):- find_shop_my_tool(Tool,ShopList,Temp,ResultTool) & find_shop_my_tools(Tools,ShopList,[ResultTool|Temp],Result).
 
-+!ringingFinished
-	: not .desire(goto(_))
-<-
-	-myProposal(_);
-	!free;
-	.
+//+!ringingFinished
+//	: not .desire(goto(_))
+//<-
+//	-myProposal(_);
+//	!free;
+//	.
 +!ringingFinished
 <-
 	-myProposal(_);

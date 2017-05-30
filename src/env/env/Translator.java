@@ -41,16 +41,43 @@ public class Translator {
 
 	public static Action literalToAction(Literal action) throws NoValueException {
 		Parameter[] pars = new Parameter[action.getArity()];
-		for (int i = 0; i < action.getArity(); i++)
-			pars[i] = termToParameter(action.getTerm(i));
+		if (action.getFunctor().equals("goto")) {
+			for (int i = 0; i < action.getArity(); i++)
+				pars[i] = termToParameterLatLon(action.getTerm(i));
+		} else {
+			for (int i = 0; i < action.getArity(); i++)
+				pars[i] = termToParameter(action.getTerm(i));
+		}
 		return new Action(action.getFunctor(), pars);
 	}
 	
-
+	public static Parameter termToParameterLatLon(Term t) throws NoValueException {
+		if (t.isNumeric()) {
+			return new Numeral(((NumberTerm) t).solve());
+		} else if (t.isList()) {
+			Collection<Parameter> terms = new ArrayList<>();
+			for (Term listTerm : (ListTerm) t)
+				terms.add(termToParameter(listTerm));
+			return new ParameterList(terms);
+		} else if (t.isString()) {
+			return new Identifier(((StringTerm) t).getString());
+		} else if (t.isLiteral()) {
+			Literal l = (Literal) t;
+			if (!l.hasTerm()) {
+				return new Identifier(l.getFunctor());
+			} else {
+				Parameter[] terms = new Parameter[l.getArity()];
+				for (int i = 0; i < l.getArity(); i++)
+					terms[i] = termToParameter(l.getTerm(i));
+				return new Function(l.getFunctor(), terms);
+			}
+		}
+		return new Identifier(t.toString());
+	}
 
 	public static Parameter termToParameter(Term t) throws NoValueException {
 		if (t.isNumeric()) {
-			return new Numeral(((NumberTerm) t).solve());
+			return new Numeral((int)((NumberTerm) t).solve());
 		} else if (t.isList()) {
 			Collection<Parameter> terms = new ArrayList<>();
 			for (Term listTerm : (ListTerm) t)

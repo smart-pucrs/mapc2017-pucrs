@@ -59,6 +59,31 @@
 //	action(goto(workshop0));
 //	action(skip);
 //	.
+//+step(X) 
+//	: .my_name(Me) & Me == vehicle1 & shop(shop0,Lat,Lon,_,_) & not lat(Lat) & not lon(Lon)
+//<-
+//	!commitAction(goto(Lat,Lon));
+////	actions.route(Role,shop0,Route);
+////	.print("Route lenght to shop0: ",Route);
+//	.
+//	
+//+step(X) 
+//	: .my_name(Me) & Me == vehicle1 & facility(shop0) & shop(shop0,_,_,_,[item(ItemId,_,_,_,_,_)|Items]) & not done
+//<-
+//	.print("Items ",ItemId);
+//	!commitAction(buy(ItemId,2));
+//	+done;
+////	!commitAction(goto(shop0));
+////	actions.route(Role,shop0,Route);
+////	.print("Route lenght to shop0: ",Route);
+//	.
+//
+//+hasItem(Item,Qty)
+//<- .print("I have ",Qty," of the item ",Item).
+//
+//+lastActionResult(Result)
+//	: .my_name(Me) & Me == vehicle1 
+//<-	.print(Result).
 
 +step(X) 
 	: role(Role, Speed, _, _, Tools) 

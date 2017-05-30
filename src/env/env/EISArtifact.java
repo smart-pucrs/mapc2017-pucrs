@@ -301,7 +301,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //		"pricedJob",
 //		"auctionJob",
 		"lastAction",
-//		"lastActionResult",
+		"lastActionResult",
 	}));
 	
 //	static Set<String> step_obs_propv1 = new HashSet<String>( Arrays.asList(new String[] {

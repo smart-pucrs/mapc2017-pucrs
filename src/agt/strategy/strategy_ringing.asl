@@ -189,7 +189,7 @@ find_shop_my_tools([Tool | Tools],ShopList,Temp,Result):- find_shop_my_tool(Tool
 	.
 +!ringingFinished
 <-
-	-myProposal(_);
+	-privRinging::myProposal(_);
 	.
 {end}
 

@@ -22,10 +22,6 @@ find_shop_my_tools([Tool | Tools],ShopList,Temp,Result):- find_shop_my_tool(Tool
 //	-myProposal(_);
 //	!free;
 //	.
-+!ringingFinished
-<-
-	-myProposal(_);
-	.
 	
 +!create_list_of_proposals(ListOfShops, ListOfProposals)
 <-
@@ -114,11 +110,11 @@ find_shop_my_tools([Tool | Tools],ShopList,Temp,Result):- find_shop_my_tool(Tool
 		.send(NextAgent,achieve,globalRinging::speak_proposal(NewAvailableShops,ListOfProposals,ListAgentsRing,NewAvailableAgents));
 	} else{
 		.print("Ringing is Done");
-		.broadcast(achieve,ringingFinished);
+		.broadcast(achieve,globalRinging::ringingFinished);
 		
 		if(not .length(NewAvailableAgents, 0)) {
 			.nth(0, NewAvailableAgents, agents(FreeAgent));
-			.send(FreeAgent, tell, allowedToPostJobs);
+			.send(FreeAgent, tell, default::allowedToPostJobs);//DEPOIS ARRUMAR ISSO AQUI PARA O MODULO DESSA CRENÇA
 		}
 //		!!default::free;			
 	}	
@@ -190,6 +186,10 @@ find_shop_my_tools([Tool | Tools],ShopList,Temp,Result):- find_shop_my_tool(Tool
 <- 
 	.print("Received a request for making my proposal");
 	!privRinging::make_proposal(ListOfShops,ListOfProposals,ListOfAgentsWithoutMe,ListOfAgents);
+	.
++!ringingFinished
+<-
+	-myProposal(_);
 	.
 {end}
 

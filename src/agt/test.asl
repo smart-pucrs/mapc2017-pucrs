@@ -4,8 +4,6 @@
 { include("common-rules.asl") }
 { include("new-round.asl") }
 { include("strategy/strategies.asl", strategies) }
-//{ include("server/server.asl", strategies) }
-
 
 //{ include("new-round.asl") }
 //{ include("end-round.asl") }
@@ -91,11 +89,6 @@
 	: true
 <-
 	!strategies::choose_my_action(X);
-	.
-	
-+!ringingFinished
-<-
-	-myProposal(_);
 	.
 	
 //+actionID(X) : true <- !commitAction(goto(skip)).

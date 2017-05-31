@@ -39,14 +39,15 @@
 <- 
 	!new_round;
     .print("Registering...");
-    register(E);
+    register(E);    
     
     .wait({ +step(_) });
 	if (Me == vehicle6) {
+		!strategies::decomposeItem;
+		
 		!strategies::execute_ringing;	
 	}
 	.
-
 
 
 //+step(X) : true <-

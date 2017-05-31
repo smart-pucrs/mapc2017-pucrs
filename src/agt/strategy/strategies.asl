@@ -7,6 +7,7 @@
 { include("common-strategies.asl") }
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("strategy/strategy_ringing.asl",ringing) }
+{ include("strategy/strategy_taskallocation.asl",task) }
 { include("action/actions.asl",action) }
 
 {begin namespace(localStrategies, local)}
@@ -56,6 +57,13 @@
 <-
 //	.print("I'm doing nothing at step ",Step);
 	!action::skip;
+	.
+	
++!decomposeItem
+	: true
+<-
+	.print("Decomposing Item");
+	!task::test;
 	.
 
 

@@ -13,7 +13,6 @@ import jason.asSyntax.Term;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import eis.iilang.Action;
 import eis.iilang.Function;
@@ -41,43 +40,16 @@ public class Translator {
 
 	public static Action literalToAction(Literal action) throws NoValueException {
 		Parameter[] pars = new Parameter[action.getArity()];
-		if (action.getFunctor().equals("goto")) {
-			for (int i = 0; i < action.getArity(); i++)
-				pars[i] = termToParameterLatLon(action.getTerm(i));
-		} else {
-			for (int i = 0; i < action.getArity(); i++)
-				pars[i] = termToParameter(action.getTerm(i));
-		}
+		for (int i = 0; i < action.getArity(); i++)
+			pars[i] = termToParameter(action.getTerm(i));
 		return new Action(action.getFunctor(), pars);
-	}
-	
-	public static Parameter termToParameterLatLon(Term t) throws NoValueException {
-		if (t.isNumeric()) {
-			return new Numeral(((NumberTerm) t).solve());
-		} else if (t.isList()) {
-			Collection<Parameter> terms = new ArrayList<>();
-			for (Term listTerm : (ListTerm) t)
-				terms.add(termToParameter(listTerm));
-			return new ParameterList(terms);
-		} else if (t.isString()) {
-			return new Identifier(((StringTerm) t).getString());
-		} else if (t.isLiteral()) {
-			Literal l = (Literal) t;
-			if (!l.hasTerm()) {
-				return new Identifier(l.getFunctor());
-			} else {
-				Parameter[] terms = new Parameter[l.getArity()];
-				for (int i = 0; i < l.getArity(); i++)
-					terms[i] = termToParameter(l.getTerm(i));
-				return new Function(l.getFunctor(), terms);
-			}
-		}
-		return new Identifier(t.toString());
 	}
 
 	public static Parameter termToParameter(Term t) throws NoValueException {
 		if (t.isNumeric()) {
-			return new Numeral((int)((NumberTerm) t).solve());
+			double d = ((NumberTerm) t).solve();
+			if((d == Math.floor(d)) && !Double.isInfinite(d)) return new Numeral((int)d);
+			return new Numeral(d);
 		} else if (t.isList()) {
 			Collection<Parameter> terms = new ArrayList<>();
 			for (Term listTerm : (ListTerm) t)
@@ -139,33 +111,4 @@ public class Translator {
 		}
 		return l;		
 	}
-
-//	public static Action literalToAction(String actionlitstr) {
-//		Literal literal = Literal.parseLiteral(actionlitstr);
-//		LinkedList<Parameter> list = new LinkedList<Parameter>();
-//		String act = "";
-//		if(literal.getFunctor().equals("post_job")){
-//			ListTerm items = (ListTerm) literal.getTerms().remove(literal.getTerms().size()-1);
-//			for (Term term : literal.getTerms()) {
-//				Literal termlit = (Literal) term;
-//				act = act + termlit.getFunctor() + "=" + termlit.getTerm(0) + " ";
-//			}
-//			int index = 1;
-//			for(Term t: items.getAsList()){
-//				Literal item = (Literal) t;
-//				act = act + "item" + index + "=" + item.getTerm(0) + " amount" + index + "=" + item.getTerm(1) + " ";
-//				index++;
-//			}
-//		} else if (literal.hasTerm()) {
-//			for (Term term : literal.getTerms()) {
-//				Literal termlit = (Literal) term;
-//				act = act + termlit.getFunctor() + "=" + termlit.getTerm(0) + " ";
-//			}
-//		} else {
-//			act = literal.getFunctor();
-//		}
-//		list.add(new Identifier(act));
-////		System.out.println("Action: "+literal.getFunctor()+list);
-//		return new Action(literal.getFunctor(), list);
-//	}
 }

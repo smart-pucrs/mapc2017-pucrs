@@ -1,49 +1,104 @@
-{ include("new-round.asl") }
-{ include("end-round.asl") }
+{ include("$jacamoJar/templates/common-cartago.asl") }
+{ include("common-actions.asl") }
 { include("common-plans.asl") }
 { include("common-rules.asl") }
-{ include("common-actions.asl") }
-{ include("bidder.asl") }
-{ include("common-strategies.asl") }
-{ include("$jacamoJar/templates/common-cartago.asl") }
+{ include("new-round.asl") }
+//{ include("strategy/strategies.asl", strategies) }
 
-!start.
+//{ include("new-round.asl") }
+//{ include("end-round.asl") }
+//{ include("common-plans.asl") }
+//{ include("common-rules.asl") }
+//{ include("common-actions.asl") }
+//{ include("bidder.asl") }
+//{ include("common-strategies.asl") }
+//{ include("$jacamoJar/templates/common-cartago.asl") }
+//{ include("strategies.asl", strategies) }
 
-+!start
-	: .my_name(Me)
-<-
- 	.wait({ +step(_) });
-	if (Me == vehicle15) {
-		!start_ringing;	
-	}
-    .
 
+/* Initial beliefs and rules */
+
+/* Initial goals */
+
+
+/* Plans */
+//+!register(E)
+//	: .my_name(Me)
+//<- 
+//	!new_round;
+//    .print("Registering...");
+//    register(E);
+//    
+//    .wait({ +step(_) });
+//	if (Me == vehicle6) {
+//		!strategies::execute_ringing;	
+//	}
+//	.
 +!register(E)
 	: .my_name(Me)
-<-
+<- 
 	!new_round;
-	if (Me == vehicle15) {
-		makeArtifact("teamArtifact","pucrs.agentcontest2016.env.TeamArtifact",[]);
-		+max_bid_time(2000);
-		+chargingPrice(0,0);
-		+assembledInShops([]);
-		+agentsFree(16);
-		+shopExplorationInProgess;
-		.include("initiator.asl");
-		!create_taskboard;
-		focusWhenAvailable("teamArtifact");		
-	}
-	focusWhenAvailable("task_board");
     .print("Registering...");
-    .concat("eis_art_", Me, ArtName);
-    .term2string(Me, MeS);
-    makeArtifact(ArtName, "pucrs.agentcontest2016.env.EISArtifact", [], AId);
-    focus(AId);
     register(E);
+    
+//    .wait({ +step(_) });
+//	if (Me == vehicle6) {
+//		!strategies::decomposeItem;
+//		
+//		!strategies::execute_ringing;	
+//	}
 	.
 
-+role(Role, Speed, LoadCap, BatteryCap, Tools)
-	: .my_name(Me)
+
+//+step(X) : true <-
+//	.print("Received step percept.").
+	
+//+actionID(X) : true <- 
+//	.print("Determining my action ",X);
+//	action(goto(workshop0));
+//	action(skip);
+//	.
+//+step(X) 
+//	: .my_name(Me) & Me == vehicle1 & shop(shop0,Lat,Lon,_,_) & not lat(Lat) & not lon(Lon)
+//<-
+//	!commitAction(goto(Lat,Lon));
+////	actions.route(Role,shop0,Route);
+////	.print("Route lenght to shop0: ",Route);
+//	.
+//	
+//+step(X) 
+//	: .my_name(Me) & Me == vehicle1 & facility(shop0) & shop(shop0,_,_,_,[item(ItemId,_,_,_,_,_)|Items]) & not done
+//<-
+//	.print("Items ",ItemId);
+//	!commitAction(buy(ItemId,2));
+//	+done;
+////	!commitAction(goto(shop0));
+////	actions.route(Role,shop0,Route);
+////	.print("Route lenght to shop0: ",Route);
+//	actions.route(Role,shop0,Route);
+//	.print("Route lenght to shop0: ",Route);
+//	.
+//
+//+hasItem(Item,Qty)
+//<- .print("I have ",Qty," of the item ",Item).
+//
+//+lastActionResult(Result)
+//	: .my_name(Me) & Me == vehicle1 
+//<-	.print(Result).
+
++step(X) 
+	: true
 <-
-	addLoad(Me,LoadCap);
+	!commitAction(goto(shop0));
+//	!strategies::choose_my_action(X);
+	.
+	
+//+actionID(X) : true <- !commitAction(goto(skip)).
+	
+
++lastAction(Action)
+	: step(S) & S \== 0 & Action == noAction & noActionCount(Count)
+<-
+	-+noActionCount(Count+1);
+	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
 	.

@@ -1,10 +1,7 @@
 { include("new-round.asl", new) }
-{ include("end-round.asl") }
 { include("common-plans.asl") }
 { include("common-rules.asl") }
 { include("common-actions.asl") }
-{ include("bidder.asl") }
-{ include("common-strategies.asl") }
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("strategy/strategy_ringing.asl",ringing) }
 { include("strategy/strategy_taskallocation.asl",task) }
@@ -47,9 +44,9 @@
 	.
 
 +!choose_my_action(Step)
-	: default::going(Facility) & not default::facility(Facility)
+	: default::routeLength(R) & R \== 0
 <-
-	.print("I'm going to facility ",Facility," at step ",Step);
+//	.print("I'm going to continue my movement at step ",Step);
 	!action::continue;
 	.
 +!choose_my_action(Step)

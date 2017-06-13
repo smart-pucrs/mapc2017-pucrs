@@ -67,13 +67,7 @@
 +!goto(Lat, Lon)
 	: true
 <-
-	!localActions::commitAction(
-		goto(
-			lat(Lat),
-			lon(Lon)
-		)
-	);
-	+default::going(Lat,Lon);
+	!localActions::commitAction(goto(Lat,Lon));
 	.
 	
 // Charge

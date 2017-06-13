@@ -3,7 +3,8 @@
 { include("common-plans.asl") }
 { include("common-rules.asl") }
 { include("new-round.asl") }
-//{ include("strategy/strategies.asl", strategies) }
+{ include("strategy/coalition.asl", coalition) }
+{ include("strategy/strategies.asl", strategies) }
 
 //{ include("new-round.asl") }
 //{ include("end-round.asl") }
@@ -86,15 +87,17 @@
 //	: .my_name(Me) & Me == vehicle1 
 //<-	.print(Result).
 
-+step(X) 
-	: true
++actionID(X) 
+	: X \== 0
 <-
-	!commitAction(goto(shop0));
-//	!strategies::choose_my_action(X);
+//	!commitAction(goto(48.821,2.261)); bottom left
+//	!commitAction(goto(48.821,2.40999)); bottom right
+//	!commitAction(goto(48.89999,2.261)); top left
+//	!commitAction(goto(48.89999,2.40999)); top right
+//	!commitAction(goto(48.8802425,2.2982475));
+	!strategies::choose_my_action(X);
+//	action(goto(48.821,2.2609999999999997));
 	.
-	
-//+actionID(X) : true <- !commitAction(goto(skip)).
-	
 
 +lastAction(Action)
 	: step(S) & S \== 0 & Action == noAction & noActionCount(Count)

@@ -281,6 +281,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //		"map",
 		"chargingStation",
 		"actionID",
+		"routeLength",
 //		"visibleChargingStation",
 		"shop",			
 		"storage",

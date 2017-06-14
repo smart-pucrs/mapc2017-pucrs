@@ -123,7 +123,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 			for (String agent: agentIds.keySet()) {
 				try {
 					Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
-					populateTeamArtifact(percepts);
+//					populateTeamArtifact(percepts);
 					//logger.info("***"+percepts);
 					if (percepts.isEmpty())
 						break;
@@ -152,17 +152,17 @@ public class EISArtifact extends Artifact implements AgentListener {
 		return -10;
 	}
 	
-	private void populateTeamArtifact(Collection<Percept> percepts){
-		for (Percept percept : percepts) {
-			String name = percept.getName();
-			/*Verifying available items in a nearby shop*/
-			if(name.equals("shop")){
-				for(Parameter p: percept.getParameters())
-					if(p.toString().contains("availableItem"))
-						TeamArtifact.addShopItemsPrice(percept.getParameters().get(0).toString(), percept.getParameters().get(3).toString());
-			}
-		}
-	}
+//	private void populateTeamArtifact(Collection<Percept> percepts){
+//		for (Percept percept : percepts) {
+//			String name = percept.getName();
+//			/*Verifying available items in a nearby shop*/
+//			if(name.equals("shop")){
+//				for(Parameter p: percept.getParameters())
+//					if(p.toString().contains("availableItem"))
+//						TeamArtifact.addShopItemsPrice(percept.getParameters().get(0).toString(), percept.getParameters().get(3).toString());
+//			}
+//		}
+//	}
 
 	private void updatePerception(String agent, Collection<Percept> previousPercepts, Collection<Percept> percepts) throws JasonException {
 //		if (agent.equals("vehicle15")) {
@@ -290,7 +290,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"shop",			
 		"storage",
 		"workshop",
-//		"resourceNode",		
+		"resourceNode",		
 		"dump",
 		"lat",
 		"lon",

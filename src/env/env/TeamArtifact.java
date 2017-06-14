@@ -58,6 +58,19 @@ public class TeamArtifact extends Artifact {
 	@OPERATION void addLoad(String agent, int load){
 		this.defineObsProperty("load",agent,load);
 	}
+	
+	@OPERATION void addQuad1(double lat, double lon){
+		this.defineObsProperty("quad1",lat,lon);
+	}
+	@OPERATION void addQuad2(double lat, double lon){
+		this.defineObsProperty("quad2",lat,lon);
+	}
+	@OPERATION void addQuad3(double lat, double lon){
+		this.defineObsProperty("quad3",lat,lon);
+	}
+	@OPERATION void addQuad4(double lat, double lon){
+		this.defineObsProperty("quad4",lat,lon);
+	}
 
 	@OPERATION void updateLoad(String agent, int load){
 		this.removeObsPropertyByTemplate("load",agent,null);

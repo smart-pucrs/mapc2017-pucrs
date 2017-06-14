@@ -12,6 +12,9 @@
 	-+new::noActionCount(Count+1);
 	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
 	.
+	
++default::resourceNode(ResourceId,Lat,Lon,Resource)
+<- .print("@@@@@@ ResourceID ",ResourceId," Lat ",Lat," Long ",Lon," Resource ",Resource).
 
 +!choose_my_action(Step)
 	: default::routeLength(R) & R \== 0

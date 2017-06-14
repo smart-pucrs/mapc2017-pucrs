@@ -53,6 +53,10 @@ public class MapHelper {
 	public static Route getNewRoute(Location from, String to, String type) {
 		return getNewRoute(from, getLocation(to), type);
 	}
+	
+	public static Route getNewRoute(String from, Location to, String type) {
+		return getNewRoute(getLocation(from), to, type);
+	}
 
 	public static Route getNewRoute(Location from, Location to, String type) {
 		if (from == null || to == null) {

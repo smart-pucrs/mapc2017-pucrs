@@ -17,12 +17,12 @@ coalition4([vehicle4,vehicle11,vehicle12,vehicle19,vehicle20,vehicle27,vehicle28
 	: minLonReal(MinLon) & maxLonReal(MaxLon) & minLatReal(MinLat) & maxLatReal(MaxLat) 
 <- 
 	-countCenter(4);
-	+mapCenter((MinLat+MaxLat)/2,(MinLon+MaxLon)/2);
+	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
 	?mapCenter(CLat,CLon);
-	addQuad1((MaxLat+CLat)/2,(MinLon+CLon)/2);
-	addQuad2((MaxLat+CLat)/2,(MaxLon+CLon)/2);
-	addQuad3((MinLat+CLat)/2,(MinLon+CLon)/2);
-	addQuad4((MinLat+CLat)/2,(MaxLon+CLon)/2);
+	addQuad1(math.ceil(((MaxLat+CLat)/2) * 100000) / 100000,math.ceil(((MinLon+CLon)/2) * 100000) / 100000);
+	addQuad2(math.ceil(((MaxLat+CLat)/2) * 100000) / 100000,math.ceil(((MaxLon+CLon)/2) * 100000) / 100000);
+	addQuad3(math.ceil(((MinLat+CLat)/2) * 100000) / 100000,math.ceil(((MinLon+CLon)/2) * 100000) / 100000);
+	addQuad4(math.ceil(((MinLat+CLat)/2) * 100000) / 100000,math.ceil(((MaxLon+CLon)/2) * 100000) / 100000);
 	!gotoQuad1;
 	!gotoQuad2;
 	!gotoQuad3;

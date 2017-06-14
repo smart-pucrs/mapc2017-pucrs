@@ -200,6 +200,8 @@ The following percepts might be included in a `SIM-START` message:
   * parts : Function - all quantities of items required for assembly
     * item1 : Identifier - the first item required for assembly
     * qty1 : Numeral - quantity of 'item1' required for assembly
+* `{min,max}{Lat,Lon}(coordinate)`
+  * coordinate: Numeral - one of the 4 map bounds
 
 #### REQUEST-ACTION percepts
 
@@ -233,7 +235,7 @@ The following percepts might be included in a `REQUEST-ACTION` message. Most of 
   * param1 : Identifier - first parameter of the last executed action (list might be empty)
 * `lastActionResult(result)`
   * result : Identifier - result of the last executed action
-* `item(name, qty)`
+* `hasItem(name, qty)`
   * name : Identifier - name of a carried item
   * qty : Numeral - carried quantity
 * `route([wp(index, lat, lon), ...])`

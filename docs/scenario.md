@@ -67,6 +67,10 @@ Tools are special types of items.
 
 Facilities are placed randomly on the map. Each facility has a unique name and location.
 
+It is possible for blackouts to occur in the city causing some facilities to be out of order for a small number of steps. Agents are not able to recognize facilities that are affected by a blackout and will only be able to perceive that a facility is currently not working when they get the corresponding failure code after executing an action in this facility.
+
+Currently only charging stations are affected by blackouts.
+
 #### Shops
 
 In __shops__, items can be bought at prices specific to the particular shop. Each shop only offers limited quantities of a subset of all items. However, items are restocked after a number of steps.
@@ -312,6 +316,10 @@ failed_capacity | The agent does not have enough free space to carry the assembl
 
 Marks the agent as an assistant for assembly.
 
+If multiple agents could provide the same item for assembly, it is preferably taken from the agent that used the _assemble_ action. If that agent cannot provide the item, the assistants are sorted by name (i.e. first by length and then lexicographically, as the last part of the name is traditionally their number) as provided in the server's team config. Then, the item is taken from the assistants in that order.
+
+_Example:_ Imagine _agentA4_, _agentA3_ and _agentA20_ want to assemble an item that requires 5 pieces of _item1_. Further, let all agents carry 2 pieces of _item1_ and _agentA4_ be the "main" assembler (i.e. the one that uses the _assemble_ action). Then, the first 2 pieces of _item1_ are taken from _agentA4_ since it is the initiator. Another 2 pieces are taken from _agentA3_ and the last one is taken from _agentA20_ (since _agentA3_'s name is shorter).
+
 No | Parameter | Meaning
 --- | --- | ---
 0 | Agent | Name of an agent who uses the _assemble_ action and whom this agent should help.
@@ -428,6 +436,7 @@ Failure Code | Reason
 failed_wrong_param | Parameters have been given.
 failed_location | The agent is not in a facility.
 failed_wrong_facility | The agent is not in a charging station.
+failed_facility_state | The charging station is currently out of order due to a blackout.
 
 #### recharge
 
@@ -497,7 +506,8 @@ Example:
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <message timestamp="1489763697332" type="sim-start">
   <simulation id="2017-QuickTest-Sim" map="london"
-              seedCapital="10" steps="1000" team="A">
+              seedCapital="10" steps="1000" team="A"
+              minLat="1.1" maxLat="1.2" minLon="2.1" maxLon="2.3">
     <role battery="500" load="1000" name="SampleRole" speed="10">
       <tool name="tool0"/>
       <tool name="tool1"/>
@@ -514,7 +524,7 @@ Example:
 
 #### Simulation details
 
-The `simulation` tag has attributes for the simulation `id`, the name of the `map` that is used, the seed capital, the number of simulation `steps` to be played and the name of the agent's `team`.
+The `simulation` tag has attributes for the simulation `id`, the name of the `map` that is used and its bounds, the seed capital, the number of simulation `steps` to be played and the name of the agent's `team`.
 
 #### Role details
 

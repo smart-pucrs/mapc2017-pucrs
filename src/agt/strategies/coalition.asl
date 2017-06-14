@@ -33,27 +33,23 @@ coalition4([vehicle4,vehicle11,vehicle12,vehicle19,vehicle20,vehicle27,vehicle28
 	: quad1(Lat,Lon) & coalition1(L) 
 <- 
 	for ( .member(A,L) ) {
-		.send(A,achieve,action::goto(Lat,Lon))
-	}
-.
+		.send(A,achieve,action::goto(Lat,Lon))}
+	.
 +!gotoQuad2 
 	: quad2(Lat,Lon) & coalition2(L) 
 <- 
 	for ( .member(A,L) ) {
-		.send(A,achieve,action::goto(Lat,Lon))
-	}
-.
+		.send(A,achieve,action::goto(Lat,Lon))}
+	.
 +!gotoQuad3 
 	: quad3(Lat,Lon) & coalition3(L) 
 <- 
 	for ( .member(A,L) ) {
-		.send(A,achieve,action::goto(Lat,Lon))
-	}
-.
+		.send(A,achieve,action::goto(Lat,Lon))}
+	.
 +!gotoQuad4
 	: quad4(Lat,Lon) & coalition4(L) 
 <- 
 	for ( .member(A,L) ) {
-		.send(A,achieve,action::goto(Lat,Lon))
-	}
-.
+		.send(A,achieve,action::goto(Lat,Lon))}
+	.

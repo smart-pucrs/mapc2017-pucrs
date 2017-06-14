@@ -1,19 +1,53 @@
-{begin namespace(localActions, local)}
-
-+!commitAction(Action)
-	: true
-<-
-	action(Action);
-	.
-
-{end}
-
 // Goto (option 1)
 // FacilityId must be a string
++!goto(FacilityId) 
+	: inFacility(FacilityId)
+<-
+	-going(FacilityId);
+	.
+
++!goto(_) 
+	: lastActionResult(Result) & Result == failed_random & lastActionReal(Action) & .substring("goto",Action) & going(FacilityId)
+<-
+	!commitAction(goto(facility(FacilityId)));
+	!commitAction(goto(facility(FacilityId)));
+	!goto(FacilityId);
+	.
+	
 +!goto(FacilityId)
-	: true
+	: charge(Battery) & Battery == 0
+<-
+	!call_breakdown_service;
+	-going(FacilityId);
+	!goto(FacilityId);
+.
+
++!goto(FacilityId)
+	: going(FacilityId)
+<-
+	!continue;
+	!goto(FacilityId);
+	.
+	
+// Tests if there is enough battery to go to my goal AND to the nearest charging station around that goal
++!goto(FacilityId)
+: not .desire(go_charge(_)) & chargingList(List) & closest_facility(List, FacilityId, FacilityId2) & enough_battery(FacilityId, FacilityId2, Result)
+<-
+    if (not Result) {
+    	!go_charge(FacilityId);
+    }
+    else {+going(FacilityId); !commitAction(goto(facility(FacilityId))); !commitAction(goto(facility(FacilityId)));}
+//	!commitAction(goto(facility(FacilityId)));
+	!goto(FacilityId);
+	.
+ 	
++!goto(FacilityId)
+	: not going(FacilityId)
 <-	
-	!localActions::commitAction(goto(FacilityId));
+	+going(FacilityId);
+	!commitAction(goto(facility(FacilityId)));
+	!commitAction(goto(facility(FacilityId)));
+	!goto(FacilityId);
 	.
 
 // Goto (option 2)
@@ -21,32 +55,38 @@
 +!goto(Lat, Lon)
 	: true
 <-
-	!localActions::commitAction(goto(Lat,Lon));
+	!commitAction(
+		goto(
+			lat(Lat),
+			lon(Lon)
+		)
+	);
+	+going(Lat,Lon);
 	.
 	
 // Charge
 // No parameters
 +!charge
-	: default::charging & default::charge(Battery) & default::role(_, _, _, BatteryCap, _) & Battery = BatteryCap
+	: charging & charge(Battery) & role(_, _, _, BatteryCap, _) & Battery = BatteryCap
 <-
-	-default::charging.
+	-charging.
 +!charge
-	: default::lastActionResult(Result) & Result == default::failed_random & default::lastActionReal(Action) & .substring("charge",Action)
+	: lastActionResult(Result) & Result == failed_random & lastActionReal(Action) & .substring("charge",Action)
 <-
-	!localActions::commitAction(charge);
-	!localActions::commitAction(charge);
+	!commitAction(charge);
+	!commitAction(charge);
 	!charge;
 	.	
 +!charge
-	: not default::charging
+	: not charging
 <-
-	+default::charging;
-	!localActions::commitAction(charge);
-	!localActions::commitAction(charge);
+	+charging;
+	!commitAction(charge);
+	!commitAction(charge);
 	!charge;
 	.
 +!charge
-	: default::charge(Battery) & default::role(_, _, _, BatteryCap, _) & Battery < BatteryCap
+	: charge(Battery) & role(_, _, _, BatteryCap, _) & Battery < BatteryCap
 <-
 	!continue;
 	!charge;
@@ -58,7 +98,7 @@
 +!buy(ItemId, Amount)
 	: true
 <-	
-	!localActions::commitAction(buy(item(ItemId),amount(Amount)));
+		!commitAction(buy(item(ItemId),amount(Amount)));
 	.
 
 // Give
@@ -68,7 +108,7 @@
 +!give(AgentId, ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		give(
 			agent(AgentId),
 			item(ItemId),
@@ -84,7 +124,7 @@
 +!receive
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		receive
 	);
 	.
@@ -95,7 +135,7 @@
 +!store(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		store(
 			item(ItemId),
 			amount(Amount)
@@ -109,7 +149,7 @@
 +!retrieve(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		retrieve(
 			item(ItemId),
 			amount(Amount)
@@ -123,7 +163,7 @@
 +!retrieve_delivered(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		retrieve_delivered(
 			item(ItemId),
 			amount(Amount)
@@ -137,7 +177,7 @@
 +!dump(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		dump(
 			item(ItemId),
 			amount(Amount)
@@ -150,7 +190,7 @@
 +!assemble(ItemId)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		assemble(
 			item(ItemId)
 		)
@@ -162,7 +202,7 @@
 +!assist_assemble(AgentId)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		assist_assemble(
 			assembler(AgentId)
 		)
@@ -174,7 +214,7 @@
 +!deliver_job(JobId)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		deliver_job(
 			job(JobId)
 		)
@@ -187,7 +227,7 @@
 +!bid_for_job(JobId, Price)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		bid_for_job(
 			job(JobId),
 			price(Price)
@@ -206,7 +246,7 @@
 +!post_job_auction(MaxPrice, Fine, ActiveSteps, AuctionSteps, StorageId, Items)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		post_job(
 			type(auction),
 			max_price(MaxPrice),
@@ -228,7 +268,7 @@
 +!post_job_priced(Price, ActiveSteps, StorageId, Items)
 	: true
 <-
-	!localActions::commitAction(
+	!commitAction(
 		post_job(
 			type(priced),
 			price(Price),
@@ -244,7 +284,7 @@
 +!continue
 	: true
 <-
-	!localActions::commitAction(continue);
+	!commitAction(continue);
 	.
 
 // Skip
@@ -252,7 +292,7 @@
 +!skip
 	: true
 <-
-	!localActions::commitAction(skip);
+	!commitAction(skip);
 	.
 
 // Abort
@@ -260,10 +300,42 @@
 +!abort
 	: true
 <-
-	!localActions::commitAction(abort);
+	!commitAction(abort);
 	.
 
 +!call_breakdown_service
 <-
-	!localActions::commitAction(call_breakdown_service);
+	!commitAction(call_breakdown_service);
 	.	
+ 
+ 
+
++!commitAction(Action)
+<-
+	action(Action);
+	.
+ 
+//+!commitAction(Action)
+//    : step(S) & stepLast(SL) & S == SL
+//<- 
+//	.print("@@@@@@@@@@@@@@@@@@ Already did an action last step! @@@@@@@@@@@@@@@@@@")
+////	.
+//+!commitAction(Action)
+//    : step(S)
+//<- 
+//	-+stepLast(S);
+//	-+lastActionReal(Action);
+//    action(Action); // the action in the artifact
+//	.wait({ +step(_) }); // wait next step to continue
+//	if (Action \== skip & Action \== continue) {
+//	    .print("Action: ",Action, "   -   Step: ",S);
+//    }
+//	.wait(500); 
+//	.
+//
+//+!commitAction(Action)
+//    : not step(S) 
+//<- 
+//	.wait({ +step(_) }); // wait the first step to continue
+//	!commitAction(Action)  
+//	.

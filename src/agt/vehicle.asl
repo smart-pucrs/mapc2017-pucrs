@@ -3,7 +3,7 @@
 { include("common-plans.asl") }
 { include("common-rules.asl") }
 { include("new-round.asl") }
-{ include("strategy/coalition.asl", coalition) }
+//{ include("strategy/coalition.asl", coalition) }
 { include("strategy/strategies.asl", strategies) }
 
 //{ include("new-round.asl") }
@@ -41,6 +41,9 @@
 	!new_round;
     .print("Registering...");
     register(E);
+    if (Me == vehicle28) {
+    	.include("strategy/coalition.asl", coalition);
+    }
     
 //    .wait({ +step(_) });
 //	if (Me == vehicle6) {

@@ -1,10 +1,10 @@
 { include("action/actions.asl",action) }
 
-//+default::actionID(X) 
-//	: X \== 0
-//<-
-//	!strategies::choose_my_action(X);
-//	.
++default::actionID(X) 
+	: X \== 0
+<-
+	!strategies::choose_my_action(X);
+	.
 
 +default::lastAction(Action)
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)

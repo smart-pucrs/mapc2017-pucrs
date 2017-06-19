@@ -4,6 +4,7 @@ import jason.asSemantics.DefaultInternalAction;
 import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.NumberTermImpl;
+import jason.asSyntax.NumberTerm;
 import jason.asSyntax.Term;
 import massim.scenario.city.data.Location;
 import massim.scenario.city.data.Route;
@@ -18,6 +19,7 @@ public class routeLatLon extends DefaultInternalAction {
 
 		// Define role (always first parameter)
 		String role = args[0].toString();
+		int speed 	= (int) ((NumberTerm) args[1]).solve();
 		String type = "road";
 		if (role.equals("\"Drone\"")) {
 			type = "air";
@@ -26,15 +28,15 @@ public class routeLatLon extends DefaultInternalAction {
 		Route route = null;
 		String from = ts.getUserAgArch().getAgName();
 		// Create a location with Lat (1) and Lon (2) parameter
-		NumberTermImpl a1 = (NumberTermImpl) args[1];
-		NumberTermImpl a2 = (NumberTermImpl) args[2];
+		NumberTerm a1 = (NumberTerm) args[2];
+		NumberTerm a2 = (NumberTerm) args[3];
 		double locationLat = a1.solve();
 		double locationLon = a2.solve();
 		// Location is first LONGITUDE and then LATITUDE
 		Location to = new Location(locationLon, locationLat);
 		route = MapHelper.getNewRoute(from, to, type);
 
-		un.unifies(args[3], new NumberTermImpl(route.getRouteLength()));
+		un.unifies(args[4], new NumberTermImpl(route.getRouteDuration(speed)));
 		return true;
 	}
 }

@@ -49,7 +49,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	public EISArtifact() {
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
-		MapHelper.init("paris", 0.001, 4);
+		MapHelper.init("paris", 200, 5);
 	}
 
 	protected void init() throws IOException, InterruptedException {

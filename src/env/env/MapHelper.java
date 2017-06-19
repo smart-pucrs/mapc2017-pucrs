@@ -12,6 +12,7 @@ import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
 import com.graphhopper.util.shapes.GHPoint3D;
 
+import massim.protocol.scenario.city.util.LocationUtil;
 import massim.scenario.city.data.Location;
 import massim.scenario.city.data.Route;
 
@@ -138,23 +139,25 @@ public class MapHelper {
 	}
 
 	public static double getLength(Location loc1, Location loc2) {
-		return Math.sqrt(Math.pow(loc1.getLon() - loc2.getLon(), 2) + Math.pow(loc1.getLat() - loc2.getLat(), 2));
+        return LocationUtil.calculateRange(loc1.getLat(), loc1.getLon(), loc2.getLat(), loc2.getLon());
 	}
-
+	
+	
 	public static Location getIntermediateLoc(Location loc1, Location loc2, double fractions, long i) {
-		double lon = (loc2.getLon() - loc1.getLon()) * i / fractions + loc1.getLon();
-		double lat = (loc2.getLat() - loc1.getLat()) * i / fractions + loc1.getLat();
-		return new Location(lon, lat);
+		double lon = (loc2.getLon() - loc1.getLon())*i/fractions + loc1.getLon();
+		double lat = (loc2.getLat() - loc1.getLat())*i/fractions + loc1.getLat();
+		return new Location(lon,lat);
 	}
-
+	
+	
 	public static double getLength(GHPoint loc1, GHPoint loc2) {
-		return Math.sqrt(Math.pow(loc1.getLon() - loc2.getLon(), 2) + Math.pow(loc1.getLat() - loc2.getLat(), 2));
+        return LocationUtil.calculateRange(loc1.getLat(), loc1.getLon(), loc2.getLat(), loc2.getLon());
 	}
-
+	
 	public static Location getIntermediateLoc(GHPoint loc1, GHPoint loc2, double length, double i) {
-		double lon = (loc2.getLon() - loc1.getLon()) * i / length + loc1.getLon();
-		double lat = (loc2.getLat() - loc1.getLat()) * i / length + loc1.getLat();
-		return new Location(lon, lat);
+		double lon = (loc2.getLon() - loc1.getLon())*i/length + loc1.getLon();
+		double lat = (loc2.getLat() - loc1.getLat())*i/length + loc1.getLat();
+		return new Location(lon,lat);
 	}
 
 	public static boolean hasLocation(String name) {

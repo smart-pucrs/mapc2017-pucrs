@@ -124,7 +124,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 				try {
 					Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
 //					populateTeamArtifact(percepts);
-					//logger.info("***"+percepts);
+//					logger.info("***"+percepts);
 					if (percepts.isEmpty())
 						break;
 					int currentStep = getCurrentStep(percepts);
@@ -180,7 +180,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //		else {
 			for (Percept old: previousPercepts) {
 				if (step_obs_prop.contains(old.getName())) {
-					if (!percepts.contains(old)) { // not perceived anymore
+					if (!percepts.contains(old) || old.getName().equals("lastAction")) { // not perceived anymore
 						Literal literal = Translator.perceptToLiteral(old);
 						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
 //						logger.info("removing old perception "+literal);

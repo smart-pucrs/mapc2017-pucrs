@@ -38,7 +38,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 
 	private Map<String, AgentId> agentIds;
 	private Map<String, String> agentToEntity;
-	private static List<Literal> start = new ArrayList<Literal>();
+	private List<Literal> start = new ArrayList<Literal>();
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
 
@@ -236,7 +236,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 					}
 				} if (match_obs_prop.contains(percept.getName())) {
 					Literal literal = Translator.perceptToLiteral(percept);
-					//logger.info("adding "+literal);
+//					logger.info("adding "+literal);
 					start.add(literal);
 //					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());				
 				}
@@ -249,6 +249,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 			for (Literal lit: start) {
 				defineObsProperty(lit.getFunctor(), (Object[]) lit.getTermsArray());
 			}
+			start.clear();
 		}
 
 	}

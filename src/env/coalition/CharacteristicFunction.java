@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import coalition.CFArtefact.ICharacteristicFunction;
-import coalition.CFArtefact.Rule;
+import coalition.CFArtefact.cfRule;
 
 public class CharacteristicFunction implements ICharacteristicFunction
 {
 	private double[] coalitionValues; 
-    private ArrayList<Rule> rules;
+    private ArrayList<cfRule> rules;
     
     public CharacteristicFunction() {
-    	rules = new ArrayList<Rule>();
+    	rules = new ArrayList<cfRule>();
     }
     
     public void putAdditionalInformation(Object...information) {
-    	rules.add((Rule)information[0]);
+    	rules.add((cfRule)information[0]);
     }
     @Override
 	public void removeAdditionalInformation(Object information) {
@@ -43,7 +43,7 @@ public class CharacteristicFunction implements ICharacteristicFunction
     private double applyRules(int coalitionInBitFormat){
     	double value = 0;    	
     	
-    	for(Rule rule : rules)
+    	for(cfRule rule : rules)
     		if (((rule.positiveRule | coalitionInBitFormat) == coalitionInBitFormat) && (rule.negativeRule & coalitionInBitFormat) == 0)
     			value += rule.value;    	
     	

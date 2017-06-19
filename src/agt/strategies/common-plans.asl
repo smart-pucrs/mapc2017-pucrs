@@ -17,13 +17,13 @@
 <- .print("@@@@@@ ResourceID ",ResourceId," Lat ",Lat," Long ",Lon," Resource ",Resource).
 
 +default::quad1(Lat,Lon) :  default::role(Role, Speed, _, _, _)
-<- .wait(500); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad1 is: ",Route).
+<- .wait(1000); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad1 is: ",Route).
 +default::quad2(Lat,Lon) : default::role(Role, Speed, _, _, _)
-<- .wait(500); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad2 is: ",Route).
+<- .wait(1000); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad2 is: ",Route).
 +default::quad3(Lat,Lon) : default::role(Role, Speed, _, _, _)
-<- .wait(500); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad3 is: ",Route).
+<- .wait(1000); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad3 is: ",Route).
 +default::quad4(Lat,Lon) : default::role(Role, Speed, _, _, _)
-<- .wait(500); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad4 is: ",Route).
+<- .wait(1000); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad4 is: ",Route).
 
 +!choose_my_action(Step)
 	: default::routeLength(R) & R \== 0

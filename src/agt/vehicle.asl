@@ -8,7 +8,7 @@
 	!new::new_round;
     .print("Registering...");
     register(E);
-    if (Me == vehicle28) {
+    if (Me == vehicle1) {
     	.include("strategies/coalition.asl", coalition);
     }
 	.

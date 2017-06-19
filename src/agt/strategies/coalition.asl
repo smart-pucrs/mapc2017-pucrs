@@ -16,6 +16,22 @@ coalition4([vehicle4,vehicle11,vehicle12,vehicle19,vehicle20,vehicle27,vehicle28
 +countCenter(4) 
 	: minLonReal(MinLon) & maxLonReal(MaxLon) & minLatReal(MinLat) & maxLatReal(MaxLat) 
 <- 
+	.my_name(Me);
+	?default::role(Role, _, _, _, _);
+	.term2string(Me,StringMe);
+	.term2string(Role,StringRole);
+	.print("Agent: ",StringMe);
+	coalition::putAgent(StringMe,StringRole);
+	coalition::putAgent("quad1");
+	coalition::putAgent("quad2");
+	coalition::putAgent("quad3");
+	coalition::putAgent("quad4");
+	coalition::setPositiveConstraint(["quad1"]);
+	coalition::setPositiveConstraint(["quad2"]);
+	coalition::setPositiveConstraint(["quad3"]);
+	coalition::setPositiveConstraint(["quad4"]);
+	.print("Agent: ",StringMe);
+	
 	-countCenter(4);
 	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
 	?mapCenter(CLat,CLon);
@@ -28,6 +44,20 @@ coalition4([vehicle4,vehicle11,vehicle12,vehicle19,vehicle20,vehicle27,vehicle28
 	!gotoQuad3;
 	!gotoQuad4;
 	.
+	
++default::quad1(Lat,Lon) 
+	:  default::role(Role, Speed, _, _, _) & .my_name(Me) & .term2string(Me,StringMe)
+<- 
+	.wait(1000); 
+	actions.routeLatLon(Role,Speed,Lat,Lon,Route); 
+	.print("My route length to quad1 is: ",Route);
+	setMCRule([StringMe,"quad1"],[],Route).
++default::quad2(Lat,Lon) : default::role(Role, Speed, _, _, _) & .my_name(Me) & .term2string(Me,StringMe)
+<- .wait(1000); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad2 is: ",Route); setMCRule([StringMe,"quad2"],[],Route).
++default::quad3(Lat,Lon) : default::role(Role, Speed, _, _, _) & .my_name(Me) & .term2string(Me,StringMe)
+<- .wait(1000); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad3 is: ",Route); setMCRule([StringMe,"quad3"],[],Route).
++default::quad4(Lat,Lon) : default::role(Role, Speed, _, _, _) & .my_name(Me) & .term2string(Me,StringMe)
+<- .wait(1000); actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad4 is: ",Route); setMCRule([StringMe,"quad4"],[],Route).
 	
 +!gotoQuad1 
 	: default::quad1(Lat,Lon) & coalition1(L) 

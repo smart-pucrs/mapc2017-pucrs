@@ -23,19 +23,19 @@ public class CFArtefact extends Artifact {
 	
 	private int mNmbAgents, mNmbPconstraints, mNmbNconstraints;
 	
-	private static List<String[]> 	mCoalitionStructure		= new ArrayList<String[]>();
-	private static List<String> 	mSetAgents 				= new ArrayList<String>();
-	private static List<Object[]> 	mSetPositiveConstraints = new ArrayList<Object[]>();
-	private static List<Object[]> 	mSetNegativeConstraints = new ArrayList<Object[]>();
+	private List<String[]> 	mCoalitionStructure			= new ArrayList<String[]>();
+	private List<String> 	mAgentsTypes				= new ArrayList<String>();
+	private List<cfAgent> 	mSetAgents 					= new ArrayList<cfAgent>();
+	private List<Object[]> 	mSetPositiveConstraints 	= new ArrayList<Object[]>();
+	private List<Object[]> 	mSetNegativeConstraints 	= new ArrayList<Object[]>();
+	private List<cfSizeConstraint> 	mSetSizeConstraints = new ArrayList<cfSizeConstraint>();
 	
 	private ICoalitionFormationArtifact iSolver;
 	private ICharacteristicFunction 	iCharacteristicFunction;
 	
 	private boolean mRunning = false;
 	
-	void init(String owner, String algorithm, String characteristFunction, int nmbAgents, int nmbPconstraints, int nmbNconstraints) {
-		mLogger.info("The Coalition Formation Artefact was created");
-		
+	void init(String owner, String algorithm, String characteristFunction, int nmbAgents, int nmbPconstraints, int nmbNconstraints) {	
 		mNmbAgents 			= nmbAgents;
 		mNmbPconstraints 	= nmbPconstraints;
 		mNmbNconstraints 	= nmbNconstraints;
@@ -47,23 +47,28 @@ public class CFArtefact extends Artifact {
 		
 		for(int i=0; i<obsCS.length; i++)
 			defineObsProperty(obsCS[i], new ArrayList<String[]>());	
+		
+		mLogger.info("The Coalition Formation Artefact was created");
 	}
 	
 	@OPERATION
-	void putAgents(Object[] names){	
+	void putAgents(Object[] names){	//no types
 		for(String s: Arrays.copyOf(names, names.length, String[].class))
-			addAgent(s);
+			addAgent(s,"");
 			
 		updateSetOfAgents();
 	}
 	@OPERATION
-	void putAgent(String name){
-		addAgent(name);
+	void putAgent(String name,String type){
+		addAgent(name, type);
 		
 		updateSetOfAgents();
 	}
-	private void addAgent(String name){
-		mSetAgents.add(name);
+	private void addAgent(String name, String type){
+//		mSetAgents.add(name);
+		cfAgent agent = new cfAgent(name, type);
+		if(!mSetAgents.contains(agent))
+			mSetAgents.add(agent);
 	}
 	
 	@OPERATION (guard="everythingOk")
@@ -81,7 +86,10 @@ public class CFArtefact extends Artifact {
 			negativeConstraints[i] = convertRuleIntoMaskInt(mSetNegativeConstraints.get(i));
 		}
 		
-		List<Integer> coalitionStructure = iSolver.solveCoalitionStructureGeneration(mSetAgents.size(), iCharacteristicFunction, positiveConstraints, negativeConstraints, null);
+		cfAgent[] agents 				= mSetAgents.toArray(new cfAgent[mSetAgents.size()]);
+		cfSizeConstraint[] sizeConts 	= mSetSizeConstraints.toArray(new cfSizeConstraint[mSetSizeConstraints.size()]);
+		
+		List<Integer> coalitionStructure = iSolver.solveCoalitionStructureGeneration(agents, iCharacteristicFunction, positiveConstraints, negativeConstraints, sizeConts);
 		
 		updateCoalitionStructure(coalitionStructure);
 		
@@ -100,7 +108,7 @@ public class CFArtefact extends Artifact {
 	}
 	
 	private void updateSetOfAgents(){
-		getObsProperty(obspSetAgents).updateValue(mSetAgents.toArray());
+//		getObsProperty(obspSetAgents).updateValue(mSetAgents.toArray());
 	}
 	
 	private void updateCoalitionStructure(List<Integer> cs){
@@ -113,7 +121,7 @@ public class CFArtefact extends Artifact {
 				
 				String[] coalition = new String[curCoalition.length];
 				for(int j=0; j<curCoalition.length; j++){
-					coalition[j] = mSetAgents.get(curCoalition[j]-1);
+					coalition[j] = mSetAgents.get(curCoalition[j]-1).name;
 				}
 				
 				mLogger.info("Coalition: "+coalition);
@@ -129,6 +137,10 @@ public class CFArtefact extends Artifact {
 	}
 
 	@OPERATION
+	void setTypes(String type){
+		mAgentsTypes.add(type);
+	}
+	@OPERATION
 	void setPositiveConstraint(Object[] constraint){
 		mSetPositiveConstraints.add(constraint);
 	}
@@ -137,10 +149,19 @@ public class CFArtefact extends Artifact {
 	void setNegativeConstraint(Object[] constraint){
 		mSetNegativeConstraints.add(constraint);
 	}
+	
+//	@OPERATION
+//	void setSizeConstraint(Object constraint){
+//		mSetSizeConstraints.add((cfSizeConstraint)constraint);
+//	}
+	@OPERATION
+	void setSizeConstraint(Integer size, String type){
+		mSetSizeConstraints.add(new cfSizeConstraint(size, type));
+	}
 		
 	@OPERATION
 	void setMCRule(Object[] posRule, Object[] negRule, double value){
-		Rule rule = new Rule(convertRuleIntoMaskInt(posRule), convertRuleIntoMaskInt(negRule), value);
+		cfRule rule = new cfRule(convertRuleIntoMaskInt(posRule), convertRuleIntoMaskInt(negRule), value);
 		iCharacteristicFunction.putAdditionalInformation(rule);
 	}	
 	
@@ -221,20 +242,38 @@ public class CFArtefact extends Artifact {
 		public String[] getObservableProperties();
 		public void keepAnyTimeStatistics(boolean keep);
 		public void initialization();
-		public List<Integer> solveCoalitionStructureGeneration(int numberOfAgents, ICharacteristicFunction characteristicFunction, int[] positiveConstraintsAsMasks, int[] negativeConstraintsAsMasks, int[] sizeConstraints);
+		public List<Integer> solveCoalitionStructureGeneration(cfAgent[] Agents, ICharacteristicFunction characteristicFunction, int[] positiveConstraintsAsMasks, int[] negativeConstraintsAsMasks, cfSizeConstraint[] sizeConstraints);
 		public void clear();
 	}
 	
-	public class Rule {
+	public class cfRule {
 		int positiveRule = 0;
 		int negativeRule = 0;
 		double value = 0;
 		boolean hasNegation = false;
 		
-		public Rule(int positiverule, int negativerule, double value){
+		public cfRule(int positiverule, int negativerule, double value){
 			this.positiveRule = positiverule;
 			this.value = value;
 			this.negativeRule = negativerule;
+		}
+	}	
+	public class cfAgent {
+		String name = "";
+		String type = "";
+		
+		public cfAgent(String name, String type){
+			this.name = name;
+			this.type = type;
+		}
+	}
+	public class cfSizeConstraint {
+		int size 	= 0;
+		String type = "";
+		
+		public cfSizeConstraint(int size, String type){
+			this.size = size;
+			this.type = type;
 		}
 	}
 }

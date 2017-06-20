@@ -6,6 +6,7 @@ import java.util.List;
 import coalition.CFArtefact.ICharacteristicFunction;
 import coalition.CFArtefact.ICoalitionFormationArtifact;
 import coalition.CFArtefact.cfAgent;
+import coalition.CFArtefact.cfConstraint;
 import coalition.CFArtefact.cfSizeConstraint;
 import jason.stdlib.foreach;
 
@@ -20,6 +21,11 @@ public class QuadCoalition implements ICoalitionFormationArtifact{
 	public void keepAnyTimeStatistics(boolean keep) {
 		
 	}
+	
+	@Override
+	public boolean isMaskEncoded() {
+		return false;
+	}
 
 	@Override
 	public void initialization() {
@@ -28,34 +34,47 @@ public class QuadCoalition implements ICoalitionFormationArtifact{
 	}
 
 	@Override
-	public List<Integer> solveCoalitionStructureGeneration(cfAgent[] Agents,
-			ICharacteristicFunction characteristicFunction, int[] positiveConstraintsAsMasks,
-			int[] negativeConstraintsAsMasks, cfSizeConstraint[] sizeConstraints) {		
-		List<Integer> cs = new ArrayList<Integer>();
+	public void clear() {
+		// TODO Auto-generated method stub
 		
-		for (int i=0; i<=sizeConstraints.length; i++){		
-			String seat[] = new String[sizeConstraints[i].size];
-			for (int j=0; j<=Agents.length; j++){
-				if (sizeConstraints[i].type.equals(Agents[j].type)){
-					
+	}
+
+	@Override
+	public List<String[]> solveCoalitionStructureGeneration(cfAgent[] Agents,
+			ICharacteristicFunction characteristicFunction, cfConstraint[] positiveConstraintsAsMasks,
+			cfConstraint[] negativeConstraintsAsMasks, cfSizeConstraint[] sizeConstraints) {
+	
+		cfAgent[] drones = getAgentsByType(Agents, "drones");
+		
+		for(cfAgent drone : drones){
+			for(cfSizeConstraint size : sizeConstraints){
+				cfAgent[] tempAgents = getAgentsByType(Agents, size.type);
+				for(int i=0; i){
+					//sort
+					//take i agents
 				}
 			}
 		}
 		
-		for (int i=1; i<=positiveConstraintsAsMasks.length; i++){
-			characteristicFunction.ge
-			for (int j=1; j<=numberOfAgents; j++){
-				int ag = 1<<j;
-			}
-		}
-		
-		return cs;
+		return null;
 	}
 
 	@Override
-	public void clear() {
+	public List<Integer> solveCoalitionStructureGeneration(int nmbAgents,
+			ICharacteristicFunction characteristicFunction, int[] positiveConstraintsAsMasks,
+			int[] negativeConstraintsAsMasks, int[] sizeConstraints, int[] agentTypes) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private cfAgent[] getAgentsByType(cfAgent[] agents, String type){
+		ArrayList<cfAgent> agentByType = new ArrayList<>();
 		
+		for(cfAgent agent : agents)
+			if (agent.type.equals(type))
+				agentByType.add(agent);
+		
+		return agentByType.toArray(new cfAgent[agentByType.size()]);
 	}
 
 }

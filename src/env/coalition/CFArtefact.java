@@ -18,10 +18,12 @@ public class CFArtefact extends Artifact {
 	private String[] obsCS = null;
 	
 	private final String obsRunning 				= "runningAlgorithm";
-	private final String obspSetAgents 				= "setOfAgents";
-	private final String obspSetSizeConstraints 	= "setOfSizeConstraints";
+	private final String obsWaitingInput 			= "waitingForInputs";
+//	private final String obspSetAgents 				= "setOfAgents";
+//	private final String obspSetSizeConstraints 	= "setOfSizeConstraints";
 	
 	private int mNmbAgents, mNmbPconstraints, mNmbNconstraints;
+	private boolean mHardEncoded;
 	
 	private List<String[]> 	mCoalitionStructure			= new ArrayList<String[]>();
 	private List<String> 	mAgentsTypes				= new ArrayList<String>();
@@ -43,7 +45,8 @@ public class CFArtefact extends Artifact {
 		initialiseAlgorithm(algorithm);
 		initialiseCharacteristicFunction(algorithm);
 		
-		obsCS = iSolver.getObservableProperties();
+		obsCS 			= iSolver.getObservableProperties();
+		mHardEncoded 	= iSolver.isMaskEncoded();
 		
 		for(int i=0; i<obsCS.length; i++)
 			defineObsProperty(obsCS[i], new ArrayList<String[]>());	
@@ -71,34 +74,25 @@ public class CFArtefact extends Artifact {
 			mSetAgents.add(agent);
 	}
 	
-	@OPERATION (guard="everythingOk")
+	@OPERATION (guard="hasAllInputs")
 	void runAlgorithm() {			
+		removeObsProperty(obsWaitingInput);
 		mLogger.info("Running...");
-		defineObsProperty(obsRunning);
+		defineObsProperty(obsRunning);		
 		
-		int[] positiveConstraints = new int[mSetPositiveConstraints.size()];
-		for (int i=0; i<mSetPositiveConstraints.size(); i++){
-			positiveConstraints[i] = convertRuleIntoMaskInt(mSetPositiveConstraints.get(i));
-		}
-		
-		int[] negativeConstraints = new int[mSetNegativeConstraints.size()];
-		for (int i=0; i<mSetNegativeConstraints.size(); i++){
-			negativeConstraints[i] = convertRuleIntoMaskInt(mSetNegativeConstraints.get(i));
-		}
-		
-		cfAgent[] agents 				= mSetAgents.toArray(new cfAgent[mSetAgents.size()]);
-		cfSizeConstraint[] sizeConts 	= mSetSizeConstraints.toArray(new cfSizeConstraint[mSetSizeConstraints.size()]);
-		
-		List<Integer> coalitionStructure = iSolver.solveCoalitionStructureGeneration(agents, iCharacteristicFunction, positiveConstraints, negativeConstraints, sizeConts);
-		
-		updateCoalitionStructure(coalitionStructure);
+		if (mHardEncoded)
+			runAlgorithmHardEncoded();
+		else
+			runAlgorithmSoftEncoded();
 		
 		removeObsProperty(obsRunning);
 		mLogger.info("The Constrained Coalition Formation Algorithm is finished");
 	}
 	@GUARD
-	boolean everythingOk(){
+	boolean hasAllInputs(){
 		boolean ready = true;
+		
+		defineObsProperty(obsWaitingInput);
 		
 		ready = 	(mSetAgents.size() >= mNmbAgents) 
 				& 	(mSetPositiveConstraints.size() >= mNmbPconstraints) 
@@ -111,7 +105,32 @@ public class CFArtefact extends Artifact {
 //		getObsProperty(obspSetAgents).updateValue(mSetAgents.toArray());
 	}
 	
-	private void updateCoalitionStructure(List<Integer> cs){
+	private void updateCoalitionStructure(List<String[]> cs){
+		mCoalitionStructure.clear();
+		
+		if (cs != null){		
+			mLogger.info("Coalition Structure was found");
+//			for
+//			for(int i=0; i<cs.size(); i++){
+//				int[] curCoalition = convertCombinationFromBitToByteFormat(cs.get(i), mSetAgents.size());
+//				
+//				String[] coalition = new String[curCoalition.length];
+//				for(int j=0; j<curCoalition.length; j++){
+//					coalition[j] = mSetAgents.get(curCoalition[j]-1).name;
+//				}
+//				
+//				mLogger.info("Coalition: "+coalition);
+//				mCoalitionStructure.add(coalition);		
+//			}
+		}
+		else{
+			mLogger.info("There is no coalition structure");
+		}
+		
+		
+//		getObsProperty(obsCS).updateValue(mCoalitionStructure.toArray());
+	}
+	/*private void updateCoalitionStructure(List<Integer> cs){
 		mCoalitionStructure.clear();
 		
 		if (cs != null){		
@@ -134,7 +153,7 @@ public class CFArtefact extends Artifact {
 		
 		
 //		getObsProperty(obsCS).updateValue(mCoalitionStructure.toArray());
-	}
+	}*/
 
 	@OPERATION
 	void setTypes(String type){
@@ -172,6 +191,33 @@ public class CFArtefact extends Artifact {
 		mSetNegativeConstraints.clear();
 		
 		iCharacteristicFunction.clear();
+	}
+	
+	private void runAlgorithmSoftEncoded(){
+		
+		cfAgent[] agents 				= mSetAgents.toArray(new cfAgent[mSetAgents.size()]);
+		cfSizeConstraint[] sizeConstr 	= mSetSizeConstraints.toArray(new cfSizeConstraint[mSetSizeConstraints.size()]);
+		cfConstraint[] negConstr 		= mSetNegativeConstraints.toArray(new cfConstraint[mSetNegativeConstraints.size()]);
+		cfConstraint[] posConstr 		= mSetPositiveConstraints.toArray(new cfConstraint[mSetPositiveConstraints.size()]);
+		
+		List<String[]> coalitionStructure = iSolver.solveCoalitionStructureGeneration(agents, iCharacteristicFunction, posConstr, negConstr, sizeConstr);
+		
+		updateCoalitionStructure(coalitionStructure);
+	}
+	private void runAlgorithmHardEncoded(){
+		int[] positiveConstraints = new int[mSetPositiveConstraints.size()];
+		for (int i=0; i<mSetPositiveConstraints.size(); i++){
+			positiveConstraints[i] = convertRuleIntoMaskInt(mSetPositiveConstraints.get(i));
+		}
+		
+		int[] negativeConstraints = new int[mSetNegativeConstraints.size()];
+		for (int i=0; i<mSetNegativeConstraints.size(); i++){
+			negativeConstraints[i] = convertRuleIntoMaskInt(mSetNegativeConstraints.get(i));
+		}
+			
+		List<Integer> coalitionStructure = iSolver.solveCoalitionStructureGeneration(mSetAgents.size(), iCharacteristicFunction, positiveConstraints, negativeConstraints, null, null);
+		
+//		updateCoalitionStructure(coalitionStructure);
 	}
 	
 	private int convertRuleIntoMaskInt(Object[] rule){
@@ -242,7 +288,9 @@ public class CFArtefact extends Artifact {
 		public String[] getObservableProperties();
 		public void keepAnyTimeStatistics(boolean keep);
 		public void initialization();
-		public List<Integer> solveCoalitionStructureGeneration(cfAgent[] Agents, ICharacteristicFunction characteristicFunction, int[] positiveConstraintsAsMasks, int[] negativeConstraintsAsMasks, cfSizeConstraint[] sizeConstraints);
+		public List<String[]> solveCoalitionStructureGeneration(cfAgent[] Agents, ICharacteristicFunction characteristicFunction, cfConstraint[] positiveConstraintsAsMasks, cfConstraint[] negativeConstraintsAsMasks, cfSizeConstraint[] sizeConstraints);
+		public List<Integer> solveCoalitionStructureGeneration(int nmbAgents, ICharacteristicFunction characteristicFunction, int[] positiveConstraintsAsMasks, int[] negativeConstraintsAsMasks, int[] sizeConstraints, int[] agentTypes);
+		public boolean isMaskEncoded();
 		public void clear();
 	}
 	
@@ -274,6 +322,13 @@ public class CFArtefact extends Artifact {
 		public cfSizeConstraint(int size, String type){
 			this.size = size;
 			this.type = type;
+		}
+	}
+	public class cfConstraint {
+		String[] agents = null;
+		
+		public cfConstraint(String[] agents){
+			this.agents = agents;
 		}
 	}
 }

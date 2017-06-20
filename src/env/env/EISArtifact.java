@@ -237,7 +237,9 @@ public class EISArtifact extends Artifact implements AgentListener {
 				} if (match_obs_prop.contains(percept.getName())) {
 					Literal literal = Translator.perceptToLiteral(percept);
 //					logger.info("adding "+literal);
-					start.add(literal);
+					if (percept.getName().equals("role")) {
+						start.add(0,literal);
+					} else { start.add(literal); }
 //					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());				
 				}
 			}

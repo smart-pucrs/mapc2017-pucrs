@@ -36,7 +36,8 @@ public class routeLatLon extends DefaultInternalAction {
 		Location to = new Location(locationLon, locationLat);
 		route = MapHelper.getNewRoute(from, to, type);
 
-		un.unifies(args[4], new NumberTermImpl(route.getRouteDuration(speed)));
-		return true;
+		boolean ret = true;
+		ret = ret & un.unifies(args[4], new NumberTermImpl(route.getRouteDuration(speed)));
+		return ret;
 	}
 }

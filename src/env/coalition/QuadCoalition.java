@@ -49,10 +49,10 @@ public class QuadCoalition implements ICoalitionFormationArtifact{
 		for(cfAgent drone : drones){
 			for(cfSizeConstraint size : sizeConstraints){
 				cfAgent[] tempAgents = getAgentsByType(Agents, size.type);
-				for(int i=0; i){
-					//sort
-					//take i agents
-				}
+//				for(int i=0; i){
+//					//sort
+//					//take i agents
+//				}
 			}
 		}
 		

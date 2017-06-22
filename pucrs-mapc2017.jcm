@@ -2,7 +2,7 @@ mas scenario {
 		
 	agent vehicle1: vehicle.asl {
 		join: vehicleart, cnp
-		focus: vehicleart.eis_art_vehicle1, cnp.task_board, vehicleart.team_artifact
+		focus: vehicleart.eis_art_vehicle1, cnp.task_board, vehicleart.team_artifact, coalition.cf
 		goals: register("connectionA1")
 	}
 	agent vehicle2: vehicle.asl {
@@ -175,6 +175,10 @@ mas scenario {
 
 	workspace cnp {
 		artifact task_board: cnp.TaskBoard()
+	}
+	
+	workspace coalition {
+		artifact cf: coalition.CFArtefact("","quadrante","quadrante",1,0,0)
 	}
 
     asl-path: src/agt

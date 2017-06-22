@@ -1,30 +1,21 @@
 package coalition;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import coalition.CFArtefact.ICharacteristicFunction;
 import coalition.CFArtefact.ICoalitionFormationArtifact;
 import coalition.CFArtefact.cfAgent;
-import coalition.CFArtefact.cfConstraint;
-import coalition.CFArtefact.cfSizeConstraint;
-import jason.stdlib.foreach;
+import coalition.CFArtefact.cfBasicConstraint;
+import coalition.CFArtefact.cfQuantityConstraint;
+import coalition.CFArtefact.cfRule;
 
 public class QuadCoalition implements ICoalitionFormationArtifact{
-
-	@Override
-	public String[] getObservableProperties() {		
-		return new String[]{"coalition1","coalition2","coalition3","coalition4"};
-	}
+//	private final Logger mLogger = Logger.getLogger(QuadCoalition.class.getName()); 
 
 	@Override
 	public void keepAnyTimeStatistics(boolean keep) {
 		
-	}
-	
-	@Override
-	public boolean isMaskEncoded() {
-		return false;
 	}
 
 	@Override
@@ -40,41 +31,71 @@ public class QuadCoalition implements ICoalitionFormationArtifact{
 	}
 
 	@Override
-	public List<String[]> solveCoalitionStructureGeneration(cfAgent[] Agents,
-			ICharacteristicFunction characteristicFunction, cfConstraint[] positiveConstraintsAsMasks,
-			cfConstraint[] negativeConstraintsAsMasks, cfSizeConstraint[] sizeConstraints) {
-	
-		cfAgent[] drones = getAgentsByType(Agents, "drones");
+	public cfCoalitionStructure solveCoalitionStructureGeneration(cfAgent[] agents,
+			cfBasicConstraint[] positiveConstraints, cfBasicConstraint[] negativeConstraints,
+			cfQuantityConstraint[] sizeConstraints, cfRule[] rules) {
 		
+		cfCoalitionStructure cs 	= new cfCoalitionStructure("");
+		List<cfAgent> agentsFree 	= new ArrayList<cfAgent>(Arrays.asList(agents));
+		
+		List<cfRule> orderedRules = Arrays.asList(rules);
+		orderedRules.sort((o1, o2) -> Double.compare(o1.value, o2.value));		
+			
+		List<cfAgent> drones = getAgentsByType(agentsFree, "drone");
+			
 		for(cfAgent drone : drones){
-			for(cfSizeConstraint size : sizeConstraints){
-				cfAgent[] tempAgents = getAgentsByType(Agents, size.type);
-//				for(int i=0; i){
-//					//sort
-//					//take i agents
-//				}
+			cfCoalition c = new cfCoalition("coalition");
+//			c.addAgent(drone);
+//			agentsFree.remove(drone);			
+			
+			for(cfQuantityConstraint size : sizeConstraints){
+				List<cfAgent> agentsType 		= getAgentsByType(agentsFree, size.type);
+				cfAgent[] agentsSameCoalition 	= getBestAgents(drone, agentsType, size.size, orderedRules);
+				
+				for(cfAgent temp : agentsSameCoalition){
+					c.addAgent(temp);
+					agentsFree.remove(temp);
+				}
 			}
+			
+			cs.addCoalition(c);
 		}
 		
-		return null;
-	}
-
-	@Override
-	public List<Integer> solveCoalitionStructureGeneration(int nmbAgents,
-			ICharacteristicFunction characteristicFunction, int[] positiveConstraintsAsMasks,
-			int[] negativeConstraintsAsMasks, int[] sizeConstraints, int[] agentTypes) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private cfAgent[] getAgentsByType(cfAgent[] agents, String type){
+		return cs;
+	}	
+	
+	private List<cfAgent> getAgentsByType(List<cfAgent> agents, String type){
 		ArrayList<cfAgent> agentByType = new ArrayList<>();
 		
 		for(cfAgent agent : agents)
 			if (agent.type.equals(type))
 				agentByType.add(agent);
 		
-		return agentByType.toArray(new cfAgent[agentByType.size()]);
+		return agentByType;
+	}	
+	private cfAgent[] getBestAgents(cfAgent baseAgent, List<cfAgent> agents, int howMany, List<cfRule> rules){
+		ArrayList<cfAgent> bestAgents = new ArrayList<>();
+		
+		for(cfRule rule : rules){
+			if (containsAgents(rule.positiveRule,baseAgent)){
+				for(cfAgent agent : agents)
+					if (containsAgents(rule.positiveRule,agent))
+						bestAgents.add(agent);			
+			}
+			
+			if (bestAgents.size() == howMany)
+				break;
+		}		
+		
+		return bestAgents.toArray(new cfAgent[bestAgents.size()]);
 	}
+	private boolean containsAgents(String[] constraint, cfAgent agent){
+		for(String tempConst : constraint)
+			if(tempConst.equals(agent.name))
+				return true;
+		return false;
+	}
+
+	
 
 }

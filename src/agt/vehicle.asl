@@ -18,7 +18,7 @@ convertListString2Term([String | ListString],Temp,Result) :- .term2string(Term,S
 +default::role(_,_,_,_,_)
 	: .my_name(Me)
 <- 
-	!coalition::introduce_artefact;    
+	!coalition::introduce_to_the_coalition_artefact;    
     if (Me == vehicle1){
     	!coalition::setup_coalition_artefact;
     }

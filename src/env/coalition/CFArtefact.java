@@ -112,11 +112,7 @@ public class CFArtefact extends Artifact {
 				mLogger.info("Coalition Structure was found");
 				
 				if (cs.getCSName().equals("")){
-					for(cfCoalition coalition: coalitions){		
-						mLogger.info("Coalition: "+coalition.getCoalitionName());
-						for(String a : coalition.getAgents())
-							mLogger.info(a);
-						
+					for(cfCoalition coalition: coalitions){							
 //						defineObsProperty(coalition.getCoalitionName(), new Object[] {coalition.getAgents()});	
 						signal(coalition.getCoalitionName(), new Object[] {coalition.getAgents()});
 					}

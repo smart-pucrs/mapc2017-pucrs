@@ -102,7 +102,7 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
     +default::dronesDistance([quad(Route1,quad1),quad(Route2,quad2),quad(Route3,quad3),quad(Route4,quad4)])[source(Me)];
 	.
 
-+!introduce_artefact
++!introduce_to_the_coalition_artefact
 	:.my_name(OldMe) & .term2string(OldMe,Me) & default::role(OldRole, _, _, _, _) & .term2string(OldRole,Role)
 <-
 	putAgent(Me,Role);

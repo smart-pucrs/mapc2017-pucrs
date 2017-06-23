@@ -1,27 +1,53 @@
 {begin namespace(localActions, local)}
-
 +!commitAction(Action)
-	: true
+	: default::step(S) & not action(S)
 <-
+	+action(S);
 	action(Action);
+//	.print("Doing action ",Action, " at step ",S);
+	.wait({ +default::lastActionResult(Result) });
+	-action(S);
+	if (Result == failed) {
+		.print("Failed to execute action ",Action," due to the 1% random error. Executing it again.");
+		!commitAction(Action);
+	}
 	.
-
+-!commitAction(Action) : Action == skip.
+-!commitAction(Action) <- !commitAction(Action).
 {end}
 
 // Goto (option 1)
 // FacilityId must be a string
++!goto(FacilityId) : default::facility(FacilityId).
++!goto(FacilityId)
+	: default::routeLength(R) & R \== 0
+<-	
+	!continue;
+	!goto(FacilityId);
+	.
 +!goto(FacilityId)
 	: true
 <-	
 	!localActions::commitAction(goto(FacilityId));
+	!goto(FacilityId);
 	.
 
 // Goto (option 2)
 // Lat and Lon must be floats
++!goto(Lat, Lon) : going(Lat,Lon) & default::routeLength(R) & R == 0 <- -going(Lat,Lon).
++!goto(Lat, Lon)
+	: going(Lat,Lon) & default::routeLength(R) & R \== 0
+<-	
+	!continue;
+	!goto(Lat, Lon);
+	.
+	
 +!goto(Lat, Lon)
 	: true
 <-
+	+going(Lat,Lon);
 	!localActions::commitAction(goto(Lat,Lon));
+	!goto(Lat, Lon);
 	.
 	
 // Charge
@@ -58,7 +84,7 @@
 +!buy(ItemId, Amount)
 	: true
 <-	
-	!localActions::commitAction(buy(item(ItemId),amount(Amount)));
+	!localActions::commitAction(buy(ItemId,Amount));
 	.
 
 // Give
@@ -254,6 +280,16 @@
 <-
 	!localActions::commitAction(skip);
 	.
+	
+// Gather
+// No parameters
++!gather(Vol)
+	: default::role(_,_,LoadCap,_,_) & default::load(Load) & Load + Vol <= LoadCap
+<-
+	!localActions::commitAction(gather);
+	!gather(Vol);
+	.
+-!gather(Vol).
 
 // Abort
 // No parameters

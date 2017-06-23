@@ -1,6 +1,6 @@
 find_shops(ItemId,[],[]).
-find_shops(ItemId,[shop(ShopId,ListItems)|List],[ShopId|Result]) :- .member(item(ItemId,_,_,_),ListItems) & find_shops(ItemId,List,Result).
-find_shops(ItemId,[shop(ShopId,ListItems)|List],Result) :- not .member(item(ItemId,_,_,_),ListItems) & find_shops(ItemId,List,Result).
+find_shops(ItemId,[ShopId|List],[ShopId|Result]) :- shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,_,_,_,_),ListItems) & find_shops(ItemId,List,Result).
+find_shops(ItemId,[ShopId|List],Result) :- shop(ShopId, _, _, _, ListItems) & not .member(item(ItemId,_,_,_,_,_),ListItems) & find_shops(ItemId,List,Result).
 
 closest_facility(List, Facility) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility).
 closest_facility(List, Facility1, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility1, Facility2).
@@ -26,3 +26,11 @@ find_shops_id([shop(ShopId,_)|List],Temp,Result) :- find_shops_id(List,[ShopId|T
 getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- shop(FacilityId, LatAux, LonAux,_) & Flat=LatAux & Flon=LonAux.
 getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- storage(FacilityId, LatAux, LonAux,_,_,_,_) & Flat=LatAux & Flon=LonAux.
 getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- dump(FacilityId,LatAux,LonAux,_) & Flat=LatAux & Flon=LonAux.
+
+checkQuadrant(1,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < MaxLat & Lat > CenterLat & Lon < CenterLon & Lon > MinLon).
+checkQuadrant(2,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < MaxLat & Lat > CenterLat & Lon < MaxLon & Lon > CenterLon).
+checkQuadrant(3,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < CenterLat & Lat > MinLat & Lon < CenterLon & Lon > MinLon).
+checkQuadrant(4,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < CenterLat & Lat > MinLat & Lon < MaxLon & Lon > CenterLon).
+
+convertListString2Term([],Temp,Result) :- Result = Temp.
+convertListString2Term([String | ListString],Temp,Result) :- .term2string(Term,String) & convertListString2Term(ListString,[Term|Temp],Result).

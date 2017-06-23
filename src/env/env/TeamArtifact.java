@@ -58,6 +58,14 @@ public class TeamArtifact extends Artifact {
 	@OPERATION void addLoad(String agent, int load){
 		this.defineObsProperty("load",agent,load);
 	}
+	
+	@OPERATION void addResourceNode(String resourceId, double lat, double lon, String resource){
+		ObsProperty prop = this.getObsPropertyByTemplate("resNode", resourceId,lat,lon,resource);
+		if (prop == null) {
+			this.defineObsProperty("resNode",resourceId,lat,lon,resource);
+		}
+	}
+	
 
 	@OPERATION void updateLoad(String agent, int load){
 		this.removeObsPropertyByTemplate("load",agent,null);

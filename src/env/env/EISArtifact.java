@@ -39,6 +39,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private Map<String, AgentId> agentIds;
 	private Map<String, String> agentToEntity;
 	private List<Literal> start = new ArrayList<Literal>();
+	private List<Literal> percs = new ArrayList<Literal>();
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
 
@@ -181,7 +182,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //		else {
 			for (Percept old: previousPercepts) {
 				if (step_obs_prop.contains(old.getName())) {
-					if (!percepts.contains(old) || old.getName().equals("lastAction")) { // not perceived anymore
+					if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore
 						Literal literal = Translator.perceptToLiteral(old);
 						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
 //						logger.info("removing old perception "+literal);
@@ -192,6 +193,8 @@ public class EISArtifact extends Artifact implements AgentListener {
 		
 		// compute new perception
 		Literal step = null;
+		Literal lastActionResult = null;
+		Literal actionID = null;
 //		if (agent.equals("vehicle15")) {
 //			for (Percept percept: percepts) {
 //				if (step_obs_propv1.contains(percept.getName())) {
@@ -220,7 +223,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //		else {
 			for (Percept percept: percepts) {
 				if (step_obs_prop.contains(percept.getName())) {
-					if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction")) { // really new perception 
+					if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction") || percept.getName().equals("lastActionResult")) { // really new perception 
 						Literal literal = Translator.perceptToLiteral(percept);
 						if (percept.getName().equals("step")) {
 							step = literal;
@@ -231,7 +234,12 @@ public class EISArtifact extends Artifact implements AgentListener {
 							break;
 						} else {
 //							logger.info("adding "+literal);
-							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
+//							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
+							if (percept.getName().equals("lastActionResult")) {
+								lastActionResult = literal;
+							} else if (percept.getName().equals("actionID")) { actionID = literal; }
+							else if (percept.getName().equals("shop") || percept.getName().equals("workshop") || percept.getName().equals("routeLength") || percept.getName().equals("facility")) { percs.add(0,literal); }
+							else { percs.add(literal); }
 						}
 					}
 				} if (match_obs_prop.contains(percept.getName())) {
@@ -244,14 +252,23 @@ public class EISArtifact extends Artifact implements AgentListener {
 				}
 			}
 //		}
-		
-		if (step != null) {
-//			logger.info("adding "+step);
-			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
+
+		if (!start.isEmpty()) {
 			for (Literal lit: start) {
 				defineObsProperty(lit.getFunctor(), (Object[]) lit.getTermsArray());
 			}
 			start.clear();
+		}
+			
+		if (step != null) {
+//			logger.info("adding "+step);
+			for (Literal lit: percs) {
+				defineObsProperty(lit.getFunctor(), (Object[]) lit.getTermsArray());
+			}
+			percs.clear();
+			defineObsProperty(actionID.getFunctor(), (Object[]) actionID.getTermsArray());
+			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
+			defineObsProperty(lastActionResult.getFunctor(), (Object[]) lastActionResult.getTermsArray());
 		}
 
 	}

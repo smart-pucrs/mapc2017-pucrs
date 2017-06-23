@@ -53,8 +53,8 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 //<- actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad4 is: ",Route).
 //+quad4(Lat,Lon) <- .print("quad4").
 
-+default::dronesDistance(_)
-	:.findall(routes(Agent,Routes),dronesDistance(Routes)[source(Agent)],ListDistances) & .length(ListDistances,4)
++!default::dronesDistance
+	: default::step(0) & .findall(routes(Agent,Routes),dronesDistance(Routes)[source(Agent)],ListDistances) & .length(ListDistances,4)
 <-	
 	.findall(Agent,dronesDistance(_)[source(Agent)],Agents);
 	.sort(Agents,SortedAgents);
@@ -67,6 +67,8 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 	.term2string(OldMe,Me);
 	setMCRule([Me],[],5);
 	.
+-!default::dronesDistance : not default::step(0) <- !default::dronesDistance.
+-!default::dronesDistance.
 
 +default::quadrant(quad1)[source(OldDrone)]
 	: quad1(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
@@ -90,7 +92,7 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 	.
 
 +!broadcast_my_route_to_drones
-	: quad1(Lat1,Lon1) & quad2(Lat2,Lon2) & quad3(Lat3,Lon3) & quad4(Lat4,Lon4) & default::role(Role, Speed, _, _, _) & dronesList(Drones) & .my_name(Me) & .delete(Me,Drones,L)
+	: default::step(0) & quad1(Lat1,Lon1) & quad2(Lat2,Lon2) & quad3(Lat3,Lon3) & quad4(Lat4,Lon4) & default::role(Role, Speed, _, _, _) & dronesList(Drones) & .my_name(Me) & .delete(Me,Drones,L)
 <-	
 	actions.routeLatLon(Role,Speed,Lat1,Lon1,Route1);
 	actions.routeLatLon(Role,Speed,Lat2,Lon2,Route2);
@@ -98,9 +100,12 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 	actions.routeLatLon(Role,Speed,Lat4,Lon4,Route4);
 	for ( .member(Drone,L) ) {
         .send(Drone,tell,dronesDistance([quad(Route1,quad1),quad(Route2,quad2),quad(Route3,quad3),quad(Route4,quad4)]));
+        .send(Drone,achieve,dronesDistance);
     }	
     +default::dronesDistance([quad(Route1,quad1),quad(Route2,quad2),quad(Route3,quad3),quad(Route4,quad4)])[source(Me)];
+    !default::dronesDistance;
 	.
+-!broadcast_my_route_to_drones <- !broadcast_my_route_to_drones.
 
 +!introduce_to_the_coalition_artefact
 	:.my_name(OldMe) & .term2string(OldMe,Me) & default::role(OldRole, _, _, _, _) & .term2string(OldRole,Role)

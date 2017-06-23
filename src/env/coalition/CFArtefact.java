@@ -3,9 +3,12 @@ package coalition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import cartago.AgentId;
+import cartago.AgentIdCredential;
 import cartago.Artifact;
 import cartago.GUARD;
 import cartago.OPERATION;
@@ -27,6 +30,8 @@ public class CFArtefact extends Artifact {
 	private List<cfQuantityConstraint> 	mSetSizeConstraints 	= new ArrayList<cfQuantityConstraint>();
 	private List<cfRule> 				mSetRules 				= new ArrayList<cfRule>();
 	
+	private Map<String, AgentId> agentIds;
+	
 	private ICoalitionFormationArtifact iSolver;
 	
 	void init(String owner, String algorithm, int nmbAgents, int nmbPconstraints, int nmbNconstraints, int nmbMCRules) {	
@@ -39,6 +44,8 @@ public class CFArtefact extends Artifact {
 		addOwner(owner);
 		
 		initialiseAlgorithm(algorithm);
+		
+		agentIds = new ConcurrentHashMap<String, AgentId>();
 		
 		mLogger.info("The Coalition Formation Artefact was created");
 	}
@@ -56,6 +63,7 @@ public class CFArtefact extends Artifact {
 		cfAgent agent = new cfAgent(name, type);
 		if(!mSetAgents.contains(agent))
 			mSetAgents.add(agent);
+		agentIds.put(name, getCurrentOpAgentId());
 	}
 	
 	@OPERATION (guard="hasAllInputs")
@@ -106,6 +114,33 @@ public class CFArtefact extends Artifact {
 						removeObsProperty(c.getCoalitionName());
 		}
 		else{
+			mLogger.info("Coalition Structure was found");
+			cfCoalition[] coalitions = cs.getCoalitions();
+
+			String[] tasks = new String[]{"shop","shop","explore","first","second","workshop","resource"};
+			for (cfCoalition c : coalitions)
+			{				
+				c.getAgents().sort((o1, o2) -> o1.type.compareTo(o2.type));	
+						
+				for (int i=0; i<c.getAgents().size(); i++){
+					signal(agentIds.get(c.getAgents().get(i).name), c.getCoalitionName(),c.getAgentsArray(),tasks[i]);
+				}
+			}
+			
+		}
+		
+		mCoalitionStructure = cs;
+	}
+	/*private void updateCoalitionStructure(cfCoalitionStructure cs){
+		if (cs == null){			
+			if (mCoalitionStructure != null)
+				if (mCoalitionStructure.getCSName().equals(""))
+					removeObsProperty(mCoalitionStructure.getCSName());
+				else
+					for(cfCoalition c : mCoalitionStructure.getCoalitions())
+						removeObsProperty(c.getCoalitionName());
+		}
+		else{
 			cfCoalition[] coalitions = cs.getCoalitions();
 			
 			if (coalitions.length > 0){		
@@ -131,7 +166,7 @@ public class CFArtefact extends Artifact {
 		}
 		
 		mCoalitionStructure = cs;
-	}
+	}*/
 
 	@OPERATION
 	void putType(String type){

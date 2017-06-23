@@ -58,7 +58,7 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 //+quad4(Lat,Lon) <- .print("quad4").
 
 +!default::dronesDistance
-	: default::step(0) & .findall(routes(Agent,Routes),dronesDistance(Routes)[source(Agent)],ListDistances) & .length(ListDistances,4)
+	: default::step(_) & .findall(routes(Agent,Routes),dronesDistance(Routes)[source(Agent)],ListDistances) & .length(ListDistances,4)
 <-	
 	.findall(Agent,dronesDistance(_)[source(Agent)],Agents);
 	.sort(Agents,SortedAgents);
@@ -73,39 +73,39 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 	.term2string(OldMe,Me);
 	setMCRule([Me],[],5);
 	.
--!default::dronesDistance : not default::step(0) <- !default::dronesDistance.
--!default::dronesDistance.
+-!default::dronesDistance : .findall(routes(Agent,Routes),dronesDistance(Routes)[source(Agent)],ListDistances) & .length(ListDistances,L) & L \== 4.
+-!default::dronesDistance <- !default::dronesDistance.
 
 +!default::quadrant(quad1)[source(OldDrone)]
-	: default::step(0) & quad1(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
+	: default::step(_) & quad1(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
 <- 
 	setMCRule([Me,Drone],[],Route);
 	.
--!default::quadrant(quad1)[source(OldDrone)] : not default::step(0) <- !default::quadrant(quad1)[source(OldDrone)].
--!default::quadrant(quad1)[source(OldDrone)].
+-!default::quadrant(quad1)[source(OldDrone)] : default::role(Role, Speed, _, _, _) & (Role==drone).
+-!default::quadrant(quad1)[source(OldDrone)] <- !default::quadrant(quad1)[source(OldDrone)].	
 +!default::quadrant(quad2)[source(OldDrone)]
-	: default::step(0) & quad1(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
+	: default::step(_) & quad2(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
 <- 
 	setMCRule([Me,Drone],[],Route);
 	.
--!default::quadrant(quad2)[source(OldDrone)] : not default::step(0) <- !default::quadrant(quad2)[source(OldDrone)].
--!default::quadrant(quad2)[source(OldDrone)].
+-!default::quadrant(quad2)[source(OldDrone)] : default::role(Role, Speed, _, _, _) & (Role==drone).
+-!default::quadrant(quad2)[source(OldDrone)] <- !default::quadrant(quad2)[source(OldDrone)].
 +!default::quadrant(quad3)[source(OldDrone)]
-	: default::step(0) & quad1(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
+	: default::step(_) & quad3(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
 <- 
 	setMCRule([Me,Drone],[],Route);
 	.
--!default::quadrant(quad3)[source(OldDrone)] : not default::step(0) <- !default::quadrant(quad3)[source(OldDrone)].
--!default::quadrant(quad3)[source(OldDrone)].
+-!default::quadrant(quad3)[source(OldDrone)] : default::role(Role, Speed, _, _, _) & (Role==drone).
+-!default::quadrant(quad3)[source(OldDrone)] <- !default::quadrant(quad3)[source(OldDrone)].
 +!default::quadrant(quad4)[source(OldDrone)]
-	: default::step(0) & quad1(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
+	: default::step(_) & quad4(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)
 <- 
 	setMCRule([Me,Drone],[],Route);
 	.
--!default::quadrant(quad4)[source(OldDrone)] : not default::step(0) <- !default::quadrant(quad4)[source(OldDrone)].
--!default::quadrant(quad4)[source(OldDrone)].
+-!default::quadrant(quad4)[source(OldDrone)] : default::role(Role, Speed, _, _, _) & (Role==drone).
+-!default::quadrant(quad4)[source(OldDrone)] <- !default::quadrant(quad4)[source(OldDrone)].
 +!broadcast_my_route_to_drones
-	: default::step(0) & quad1(Lat1,Lon1) & quad2(Lat2,Lon2) & quad3(Lat3,Lon3) & quad4(Lat4,Lon4) & default::role(Role, Speed, _, _, _) & dronesList(Drones) & .my_name(Me) & .delete(Me,Drones,L)
+	: default::step(_) & quad1(Lat1,Lon1) & quad2(Lat2,Lon2) & quad3(Lat3,Lon3) & quad4(Lat4,Lon4) & default::role(Role, Speed, _, _, _) & dronesList(Drones) & .my_name(Me) & .delete(Me,Drones,L)
 <-	
 	actions.routeLatLon(Role,Speed,Lat1,Lon1,Route1);
 	actions.routeLatLon(Role,Speed,Lat2,Lon2,Route2);

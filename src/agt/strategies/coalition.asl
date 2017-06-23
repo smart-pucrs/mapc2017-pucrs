@@ -16,9 +16,14 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 +default::maxLat(Lat) : X = Lat - 0.00001 & countCenter(I)  <- -maxLat(Lat); +maxLatReal(X); -+countCenter(I+1).
 
 +countCenter(4) 
-	: minLonReal(MinLon) & maxLonReal(MaxLon) & minLatReal(MinLat) & maxLatReal(MaxLat) & default::role(drone, _, _, _, _)
 <- 
 	-countCenter(4);
+	!!calc;
+	.
+
++!calc
+	: minLonReal(MinLon) & maxLonReal(MaxLon) & minLatReal(MinLat) & maxLatReal(MaxLat) & default::role(drone, _, _, _, _)
+<- 
 	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
 	?mapCenter(CLat,CLon);
 	+quad1(math.ceil(((MaxLat+CLat)/2) * 100000) / 100000,math.ceil(((MinLon+CLon)/2) * 100000) / 100000);
@@ -28,10 +33,9 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 	
 	!broadcast_my_route_to_drones
 	.
-+countCenter(4) 
++!calc
 	: minLonReal(MinLon) & maxLonReal(MaxLon) & minLatReal(MinLat) & maxLatReal(MaxLat)  
 <- 
-	-countCenter(4);
 	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
 	?mapCenter(CLat,CLon);
 	+quad1(math.ceil(((MaxLat+CLat)/2) * 100000) / 100000,math.ceil(((MinLon+CLon)/2) * 100000) / 100000);

@@ -1,4 +1,5 @@
 countCenter(0).
+countDrones(0).
 dronesList([vehicle1,vehicle2,vehicle3,vehicle4]).
  
 removeTakenQuad([], Temp, Result) :- Result=Temp.
@@ -56,9 +57,17 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 //+quad4(Lat,Lon) : default::role(Role, Speed, _, _, _)
 //<- actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad4 is: ",Route).
 //+quad4(Lat,Lon) <- .print("quad4").
-
+@drones[atomic]
 +!default::dronesDistance
-	: default::step(_) & .findall(routes(Agent,Routes),dronesDistance(Routes)[source(Agent)],ListDistances) & .length(ListDistances,4)
+<-
+	?countDrones(D);
+	-+countDrones(D+1);
+	.
+	
++countDrones(4) <- !!dronesD.
+	
++!dronesD
+	: default::step(_)
 <-	
 	.findall(Agent,dronesDistance(_)[source(Agent)],Agents);
 	.sort(Agents,SortedAgents);
@@ -73,8 +82,7 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 	.term2string(OldMe,Me);
 	setMCRule([Me],[],5);
 	.
--!default::dronesDistance : .findall(routes(Agent,Routes),dronesDistance(Routes)[source(Agent)],ListDistances) & .length(ListDistances,L) & L \== 4.
--!default::dronesDistance <- !default::dronesDistance.
+-!default::dronesD <- !default::dronesD.
 
 +!default::quadrant(quad1)[source(OldDrone)]
 	: default::step(_) & quad1(Lat,Lon) & .my_name(OldMe) & .term2string(OldMe,Me) & .term2string(OldDrone,Drone) & default::role(Role, Speed, _, _, _) & (Role\==drone) & actions.routeLatLon(Role,Speed,Lat,Lon,Route)

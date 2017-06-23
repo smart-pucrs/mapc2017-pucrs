@@ -45,18 +45,6 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 	+quad4(math.ceil(((MinLat+CLat)/2) * 100000) / 100000,math.ceil(((MaxLon+CLon)/2) * 100000) / 100000);	
 	.
 
-//+quad1(Lat,Lon) : default::role(Role, Speed, _, _, _)
-//<- actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad1 is: ",Route).
-//+quad1(Lat,Lon) <- .print("quad1").
-//+quad2(Lat,Lon) : default::role(Role, Speed, _, _, _)
-//<- actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad2 is: ",Route).
-//+quad2(Lat,Lon) <- .print("quad2").
-//+quad3(Lat,Lon) : default::role(Role, Speed, _, _, _)
-//<- actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad3 is: ",Route).
-//+quad3(Lat,Lon) <- .print("quad2").
-//+quad4(Lat,Lon) : default::role(Role, Speed, _, _, _)
-//<- actions.routeLatLon(Role,Speed,Lat,Lon,Route); .print("My route length to quad4 is: ",Route).
-//+quad4(Lat,Lon) <- .print("quad4").
 @drones[atomic]
 +!default::dronesDistance
 <-

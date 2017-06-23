@@ -149,7 +149,7 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 	?default::convertListString2Term(Coalition,[],TermCoalition);
 	.delete(OldMe,TermCoalition,NewCoalition);
 	
-	+default::coalition(Quad,NewCoalition,Task);
+	+coalition(Quad,NewCoalition,Task);
 	!clean_coalition_beliefs;	
 	.
 	

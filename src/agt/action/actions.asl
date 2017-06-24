@@ -20,6 +20,12 @@
 // FacilityId must be a string
 +!goto(FacilityId) : default::facility(FacilityId).
 +!goto(FacilityId)
+	: default::charge(0)
+<-
+	!recharge;
+	!goto(FacilityId);
+	.
++!goto(FacilityId)
 	: default::routeLength(R) & R \== 0
 <-	
 	!continue;
@@ -35,6 +41,12 @@
 // Goto (option 2)
 // Lat and Lon must be floats
 +!goto(Lat, Lon) : going(Lat,Lon) & default::routeLength(R) & R == 0 <- -going(Lat,Lon).
++!goto(Lat, Lon)
+	: default::charge(0)
+<-
+	!recharge;
+	!goto(Lat, Lon);
+	.
 +!goto(Lat, Lon)
 	: going(Lat,Lon) & default::routeLength(R) & R \== 0
 <-	
@@ -280,6 +292,16 @@
 <-
 	!localActions::commitAction(skip);
 	.
+	
+// Recharge
+// No parameters
++!recharge
+	: default::charge(C) & not default::role(_,_,_,C,_)
+<-
+	!localActions::commitAction(recharge);
+	!recharge;
+	.
+-!recharge.
 	
 // Gather
 // No parameters

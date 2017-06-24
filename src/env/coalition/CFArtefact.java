@@ -118,15 +118,26 @@ public class CFArtefact extends Artifact {
 			cfCoalition[] coalitions = cs.getCoalitions();
 
 			String[] tasks = new String[]{"shop","shop","explore","first","second","workshop","resource"};
-			for (cfCoalition c : coalitions)
+			/*for (cfCoalition c : coalitions)
 			{				
 				c.getAgents().sort((o1, o2) -> o1.type.compareTo(o2.type));	
 						
 				for (int i=0; i<c.getAgents().size(); i++){
 					signal(agentIds.get(c.getAgents().get(i).name), c.getCoalitionName(),c.getAgentsArray(),tasks[i]);
 				}
+			}*/			
+			for (cfCoalition c : coalitions)
+			{	
+				String[] agentTask = new String[c.getAgents().size()];
+				c.getAgents().sort((o1, o2) -> o1.type.compareTo(o2.type));	
+						
+				for (int i=0; i<c.getAgents().size(); i++){
+					agentTask[i] = "agent("+c.getAgents().get(i).name+","+tasks[i]+")";
+				}
+				for (int i=0; i<c.getAgents().size(); i++){
+					signal(agentIds.get(c.getAgents().get(i).name), c.getCoalitionName(),agentTask,tasks[i]);
+				}
 			}
-			
 		}
 		
 		mCoalitionStructure = cs;

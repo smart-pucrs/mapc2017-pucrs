@@ -4,8 +4,6 @@
 { include("strategies/common-plans.asl", strategies) }
 { include("strategies/coalition.asl", coalition) }
 
-
-
 +!register(E)
 	: .my_name(Me)
 <- 

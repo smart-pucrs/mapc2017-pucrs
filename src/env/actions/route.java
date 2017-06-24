@@ -41,6 +41,17 @@ public class route extends DefaultInternalAction {
 			String to = args[3].toString();
 			route = MapHelper.getNewRoute(from, to, type);
 		} else if (args.length == 6) {
+			String from = args[2].toString();
+			// Create a location with Lat (1) and Lon (2) parameter
+			NumberTermImpl a1 = (NumberTermImpl) args[3];
+			NumberTermImpl a2 = (NumberTermImpl) args[4];
+			double locationLat = a1.solve();
+			double locationLon = a2.solve();
+			// Location is first LONGITUDE and then LATITUDE
+			Location to = new Location(locationLon, locationLat);
+			route = MapHelper.getNewRoute(from, to, type);
+		}
+		else if (args.length == 7) {
 			// Create a location with Lat (1) and Lon (2) parameter
 			NumberTermImpl a1 = (NumberTermImpl) args[2];
 			NumberTermImpl a2 = (NumberTermImpl) args[3];
@@ -50,7 +61,18 @@ public class route extends DefaultInternalAction {
 			Location from = new Location(locationLon, locationLat);
 			String to = args[4].toString();
 			route = MapHelper.getNewRoute(from, to, type);
-		} else {
+		}
+		else if (args.length == 8) {
+			// Create a location with Lat (1) and Lon (2) parameter
+			NumberTermImpl a1 = (NumberTermImpl) args[2];
+			NumberTermImpl a2 = (NumberTermImpl) args[3];
+			double locationLat = a1.solve();
+			double locationLon = a2.solve();
+			// Location is first LONGITUDE and then LATITUDE
+			Location to = new Location(locationLon, locationLat);
+			String from = ts.getUserAgArch().getAgName();
+			route = MapHelper.getNewRoute(from, to, type);
+		}  else {
 			return false;
 		}
 

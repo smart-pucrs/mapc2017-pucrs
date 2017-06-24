@@ -4,15 +4,18 @@ find_shops(ItemId,[ShopId|List],Result) :- shop(ShopId, _, _, _, ListItems) & no
 
 closest_facility(List, Facility) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility).
 closest_facility(List, Facility1, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility1, Facility2).
-closest_facility_from_center(CenterLat, CenterLon, List, ShopId) :- Role = "Drone" & actions.closest(Role, CenterLat, CenterLon, List, ShopId).
+closest_facility(List, Lat, Lon, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Lat, Lon, Facility2).
+//closest_facility_from_center(CenterLat, CenterLon, List, ShopId) :- Role = "Drone" & actions.closest(Role, CenterLat, CenterLon, List, ShopId).
 
-route(FacilityId, RouteLen) :- role(Role, _, _, _, _) & actions.route(Role, FacilityId, RouteLen).
-route(FacilityId1, FacilityId2, RouteLen) :- role(Role, _, _, _, _) & actions.route(Role, FacilityId1, FacilityId2, RouteLen).
-route_drone_from_center(CenterLat, CenterLon, FacilityId, RouteLen) :- Role = "Drone" & actions.route(Role, CenterLat, CenterLon, FacilityId, RouteLen).
-route_car_from_center(CenterLat, CenterLon, FacilityId, RouteLen) :- Role = "Car" & actions.route(Role, CenterLat, CenterLon, FacilityId, RouteLen).
+//route(FacilityId, RouteLen) :- role(Role, _, _, _, _) & actions.route(Role, FacilityId, RouteLen).
+//route(FacilityId1, FacilityId2, RouteLen) :- role(Role, _, _, _, _) & actions.route(Role, FacilityId1, FacilityId2, RouteLen).
+//route_drone_from_center(CenterLat, CenterLon, FacilityId, RouteLen) :- Role = "Drone" & actions.route(Role, CenterLat, CenterLon, FacilityId, RouteLen).
+//route_car_from_center(CenterLat, CenterLon, FacilityId, RouteLen) :- Role = "Car" & actions.route(Role, CenterLat, CenterLon, FacilityId, RouteLen).
 
 enough_battery(FacilityId1, FacilityId2, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId1, RouteLen1) & actions.route(Role, Speed, FacilityId1, FacilityId2, RouteLen2) & charge(Battery) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
+enough_battery(Lat, Lon, FacilityId2, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, Lat, Lon, _, _, _, RouteLen1) & actions.route(Role, Speed, Lat, Lon, FacilityId2, _, RouteLen2) & charge(Battery) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
 enough_battery2(FacilityAux, FacilityId1, FacilityId2, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId1, RouteLen1) & actions.route(Role, Speed, FacilityId1, FacilityId2, RouteLen2) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
+enough_battery2(FacilityAux, Lat, Lon, FacilityId2, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, Lat, Lon, RouteLen1) & actions.route(Role, Speed, Lat, Lon, FacilityId2, _, RouteLen2) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
 enough_battery_charging(FacilityId, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId, RouteLen) & charge(Battery) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
 enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId, RouteLen) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
 

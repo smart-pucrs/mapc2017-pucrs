@@ -24,7 +24,7 @@ public class closest extends DefaultInternalAction {
 		if(role.equals("\"Drone\"")){
 			type = "air";
 		}
-		if (args.length == 5) {
+		if (args.length == 6) {
 			ListTerm ids = (ListTerm) args[3];
 			NumberTermImpl a1 = (NumberTermImpl) args[1];
 			NumberTermImpl a2 = (NumberTermImpl) args[2];
@@ -40,8 +40,23 @@ public class closest extends DefaultInternalAction {
 					len = route.getRouteLength();
 				}
 			}
-		}
-		else {
+		} else if (args.length == 5) {
+			ListTerm ids = (ListTerm) args[1];
+			NumberTermImpl a1 = (NumberTermImpl) args[2];
+			NumberTermImpl a2 = (NumberTermImpl) args[3];
+			double locationLat = a1.solve();
+			double locationLon = a2.solve();
+			// Location is first LONGITUDE and then LATITUDE
+			Location from = new Location(locationLon, locationLat);			
+			for (Term term : ids) {
+				String to = term.toString();
+				Route route = MapHelper.getNewRoute(from, to, type);
+				if(route.getRouteLength() < len){
+					closest = to;
+					len = route.getRouteLength();
+				}
+			}
+		} else {
 			ListTerm ids = (ListTerm) args[1];
 			String from = null;
 			if (args.length == 4){

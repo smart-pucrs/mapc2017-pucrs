@@ -24,7 +24,7 @@ free.
 	if (Quad == quad2) {?coalition::quad2(Lat,Lon)};
 	if (Quad == quad3) {?coalition::quad3(Lat,Lon)};
 	if (Quad == quad4) {?coalition::quad4(Lat,Lon)};
-	actions.closest(Role,Lat,Lon,List,ClosestShop);
+	actions.closest(Role,Lat,Lon,List,_,ClosestShop);
 	!action::goto(ClosestShop);
 	?default::step(S);
 	.print("Finished my exploration at step ",S);
@@ -38,7 +38,7 @@ free.
 	if (Quad == quad2) {?coalition::quad2(Lat,Lon)};
 	if (Quad == quad3) {?coalition::quad3(Lat,Lon)};
 	if (Quad == quad4) {?coalition::quad4(Lat,Lon)};
-	actions.closest(Role,Lat,Lon,List,ClosestWorkshop);
+	actions.closest(Role,Lat,Lon,List,_,ClosestWorkshop);
 	!action::goto(ClosestWorkshop);
 	?default::step(S);
 	.print("Finished my exploration at step ",S);
@@ -105,11 +105,11 @@ free.
 +!goBuy
 	: buyList(_,_,Shop)
 <-
-	.print("Going to shop ",Shop);
+//	.print("Going to shop ",Shop);
 	!action::goto(Shop);
 	for ( buyList(Tool,Qty,Shop) ) {
 		!action::buy(Tool,Qty);
-		.print("Buying #",Qty," of ",Tool);
+//		.print("Buying #",Qty," of ",Tool);
 		-buyList(Tool,Qty,Shop);
 	}
 	!goBuy

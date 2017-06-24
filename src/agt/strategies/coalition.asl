@@ -139,7 +139,7 @@ getMyQuad([Agent | ListAgents], Going, Result) :- default::dronesDistance(Route)
 +default::coalition(Coalition,Task)
 	: default::convertListString2Term(Coalition,[],TermCoalition) & .my_name(Me) & .member(agent(Me,_),TermCoalition) & default::quadrant(Quad)[source(Agent)] & .member(agent(Agent,_),TermCoalition)
 <-
-	.print("This is my Quadrant: ",Quad);
+//	.print("This is my Quadrant: ",Quad);
 	
 	.delete(agent(Me,_),TermCoalition,NewCoalition);
 	

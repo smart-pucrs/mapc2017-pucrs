@@ -3,11 +3,11 @@ free.
 
 +default::actionID(0) 
 <-
-	.wait({ +coalition::coalition(Quad,NewCoalition,Task) });
+	.wait({ +coalition::coalition(Quad,Members,Task) });
 	if (Task == explore) {-free; !explore(Quad)};
 	if (Task == shop) {-free; !exploreShop(Quad)};
-	if (Task == first) {-free; !exploreTools(Task,Quad)};
-	if (Task == second) {-free; !exploreTools(Task,Quad)};
+	if (Task == first) {-free; !exploreTools(Task,Quad,Members)};
+	if (Task == second) {-free; !exploreTools(Task,Quad,Members)};
 	if (Task == workshop) {-free; !exploreWorkshop(Quad)};
 	if (Task == resource) {!action::skip};
 	.
@@ -78,13 +78,9 @@ free.
 	+free; 
 	!action::skip;
 	.
-+!exploreTools(Task,Quad)
++!exploreTools(Task,Quad,Members)
 	: default::role(Role, _, _, _, _) & new::shopList(List) & .term2string(Task,TaskS) & default::tools(TaskS,[H|T])
 <- 
-//	if (Q == quad1) {?coalition::quad1(Lat,Lon)};
-//	if (Q == quad2) {?coalition::quad2(Lat,Lon)};
-//	if (Q == quad3) {?coalition::quad3(Lat,Lon)};
-//	if (Q == quad4) {?coalition::quad4(Lat,Lon)};
 	for ( .member(ToolS,H) ) {
 		.term2string(Tool,ToolS);
 		?default::find_shops(Tool,List,Shops);
@@ -96,6 +92,19 @@ free.
 		else { +buyList(Tool,1,ClosestShop); }
 	}
 	!goBuy;
+	if (Quad == quad1) {?coalition::quad1(Lat,Lon)};
+	if (Quad == quad2) {?coalition::quad2(Lat,Lon)};
+	if (Quad == quad3) {?coalition::quad3(Lat,Lon)};
+	if (Quad == quad4) {?coalition::quad4(Lat,Lon)};	
+	?new::workshopList(WList);
+	actions.closest(Role,Lat,Lon,WList,_,ClosestWorkshop);
+	!action::goto(ClosestWorkshop);
+	.sublist([agent(Truck,workshop)],Members);
+	for ( default::hasItem(Tool,Qty) ) {
+		.term2string(Tool,ToolS);
+		.send(Truck,achieve,action::receive);
+		!action::give(Truck,Tool,Qty);
+	}
 	?default::step(S);
 	.print("Finished my exploration at step ",S);
 	+free; 

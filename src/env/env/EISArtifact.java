@@ -303,6 +303,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"maxLon",
 		"minLat",
 		"maxLat",
+		"team",
 	}));
 	
 	static Set<String> step_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
@@ -311,6 +312,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"chargingStation",
 		"actionID",
 		"routeLength",
+//		"entity",
 //		"visibleChargingStation",
 		"shop",			
 		"storage",

@@ -102,29 +102,33 @@
 // AgentId must be a string
 // ItemId must be a string
 // Amount must be an integer
-+!give(AgentId, ItemId, Amount)
++!give(AgentName, ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
-		give(
-			agent(AgentId),
-			item(ItemId),
-			amount(Amount)
-		)
-	);
+	?default::team(Team);
+	.delete("vehicle",AgentName,AgentNumber);
+	.concat("agent",Team,AgentNumber,AgentServer);
+	!localActions::commitAction(give(AgentServer,ItemId,Amount));
+	!giveLoop(AgentServer, ItemId, Amount);
 	.
++!giveLoop(AgentId, ItemId, Amount)
+	: default::lastAction(give) & default::lastActionResult(Result) & Result \== successful
+<-
+	!localActions::commitAction(give(AgentId,ItemId,Amount));
+	!giveLoop(AgentId, ItemId, Amount);
+	.
+-!giveLoop(AgentId, ItemId, Amount).
 
 // Receive
-// AgentId must be a string
-// ItemId must be a string
-// Amount must be an integer
+// No parameters
 +!receive
-	: true
+	: default::lastActionResult(Result) & Result \== failed_counterpart
 <-
-	!localActions::commitAction(
-		receive
-	);
+	-free;
+	!localActions::commitAction(receive);
+	!receive;
 	.
+-!receive <- +free; !skip.
 
 // Store
 // ItemId must be a string

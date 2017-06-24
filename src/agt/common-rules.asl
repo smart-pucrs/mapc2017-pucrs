@@ -11,10 +11,10 @@ route(FacilityId1, FacilityId2, RouteLen) :- role(Role, _, _, _, _) & actions.ro
 route_drone_from_center(CenterLat, CenterLon, FacilityId, RouteLen) :- Role = "Drone" & actions.route(Role, CenterLat, CenterLon, FacilityId, RouteLen).
 route_car_from_center(CenterLat, CenterLon, FacilityId, RouteLen) :- Role = "Car" & actions.route(Role, CenterLat, CenterLon, FacilityId, RouteLen).
 
-enough_battery(FacilityId1, FacilityId2, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, FacilityId1, RouteLen1) & actions.route(Role, FacilityId1, FacilityId2, RouteLen2) & charge(Battery) & ((Battery > ((RouteLen1 / Speed * 10) + (RouteLen2 / Speed * 10) + 10) & Result = true) | (Result = false)).
-enough_battery2(FacilityAux, FacilityId1, FacilityId2, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, FacilityAux, FacilityId1, RouteLen1) & actions.route(Role, FacilityId1, FacilityId2, RouteLen2) & ((Battery > ((RouteLen1 / Speed * 10) + (RouteLen2 / Speed * 10) + 10) & Result = true) | (Result = false)).
-enough_battery_charging(FacilityId, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, FacilityId, RouteLen)& charge(Battery) & ((Battery > ((RouteLen / Speed * 10) + 10) & Result = true) | (Result = false)).
-enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, FacilityAux, FacilityId, RouteLen) & ((Battery > ((RouteLen / Speed * 10) + 10) & Result = true) | (Result = false)).
+enough_battery(FacilityId1, FacilityId2, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId1, RouteLen1) & actions.route(Role, Speed, FacilityId1, FacilityId2, RouteLen2) & charge(Battery) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
+enough_battery2(FacilityAux, FacilityId1, FacilityId2, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId1, RouteLen1) & actions.route(Role, Speed, FacilityId1, FacilityId2, RouteLen2) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
+enough_battery_charging(FacilityId, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId, RouteLen) & charge(Battery) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
+enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId, RouteLen) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
 
 select_bid([],bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),bid(BidWinner,BidAgentWinner,ShopIdWinner,ItemWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId  & ItemWinner = AuxItem.
 select_bid([bid(Bid,BidAgent,ShopId,item(ItemId,Qty))|Bids],bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( ((not awarded(BidAgent,_,_)) )  | (awarded(BidAgent,ShopId,_) & product(ItemId,Volume,BaseList) & .term2string(BidAgent,BidAgentS) & load(BidAgentS,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(Bid,BidAgent,ShopId,item(ItemId,Qty)),BidWinner).
@@ -23,9 +23,10 @@ select_bid([bid(Bid,BidAgent,ShopId,Item)|Bids],bid(AuxBid,AuxBidAgent,AuxShopId
 find_shops_id([],Temp,Result) :- Result = Temp.
 find_shops_id([shop(ShopId,_)|List],Temp,Result) :- find_shops_id(List,[ShopId|Temp],Result).
 
-getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- shop(FacilityId, LatAux, LonAux,_) & Flat=LatAux & Flon=LonAux.
-getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- storage(FacilityId, LatAux, LonAux,_,_,_,_) & Flat=LatAux & Flon=LonAux.
-getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- dump(FacilityId,LatAux,LonAux,_) & Flat=LatAux & Flon=LonAux.
+getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- shop(FacilityId, LatAux, LonAux,_,_) & Flat=LatAux & Flon=LonAux.
+getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- storage(FacilityId, LatAux, LonAux,_,_,_) & Flat=LatAux & Flon=LonAux.
+getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- dump(FacilityId,LatAux,LonAux) & Flat=LatAux & Flon=LonAux.
+getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- workshop(FacilityId,LatAux,LonAux) & Flat=LatAux & Flon=LonAux.
 
 checkQuadrant(quad1,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < MaxLat & Lat > CenterLat & Lon < CenterLon & Lon > MinLon).
 checkQuadrant(quad2,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < MaxLat & Lat > CenterLat & Lon < MaxLon & Lon > CenterLon).

@@ -1,7 +1,7 @@
 +!new_round
 	: true
 <-
-//	+chargingList([]);
+	+chargingList([]);
 //	+dumpList([]);
 //	+storageList([]);
 	+shopList([]);
@@ -24,13 +24,13 @@
 //<-
 //	-+storageList([StorageId|List]);
 //	.	
-//
-//@chargingList[atomic]
-//+default::chargingStation(ChargingId,Lat,Lon,Rate) 
-//	:  chargingList(List) & not .member(ChargingId,List)
-//<-
-//	-+chargingList([ChargingId|List]);
-//	.
+
+@chargingList[atomic]
++default::chargingStation(ChargingId,Lat,Lon,Rate) 
+	:  chargingList(List) & not .member(ChargingId,List)
+<-
+	-+chargingList([ChargingId|List]);
+	.
 	
 @workshopList[atomic]
 +default::workshop(WorkshopId,Lat,Lon) 

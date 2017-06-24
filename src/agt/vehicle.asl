@@ -14,11 +14,33 @@
     register(E);
 	.
 	
-+default::role(_,_,_,_,_)
-	: .my_name(Me)
++default::role(_,_,_,_,Tools)
+	: .my_name(Me) & Me == vehicle1
 <- 
 	!coalition::introduce_to_the_coalition_artefact;    
-    if (Me == vehicle1){
-    	!coalition::setup_coalition_artefact;
-    }
+	addTools(Tools);
+	!coalition::setup_coalition_artefact;
+    .
++default::role(_,_,_,_,Tools)
+	: .my_name(Me) & Me == vehicle5
+<- 
+	!coalition::introduce_to_the_coalition_artefact;    
+	addTools(Tools);
+    .
++default::role(_,_,_,_,Tools)
+	: .my_name(Me) & Me == vehicle13
+<- 
+	!coalition::introduce_to_the_coalition_artefact;    
+	addTools(Tools);
+    .
++default::role(_,_,_,_,Tools)
+	: .my_name(Me) & Me == vehicle21
+<- 
+	!coalition::introduce_to_the_coalition_artefact;    
+	addTools(Tools);
+    .
++default::role(_,_,_,_,_)
+	: true
+<- 
+	!coalition::introduce_to_the_coalition_artefact;    
     .

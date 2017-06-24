@@ -6,8 +6,8 @@ free.
 	.wait({ +coalition::coalition(Quad,NewCoalition,Task) });
 	if (Task == explore) {-free; !explore(Quad)};
 	if (Task == shop) {-free; !exploreShop(Quad)};
-	if (Task == first) {!action::skip};
-	if (Task == second) {!action::skip};
+	if (Task == first) {-free; !exploreTools(Task,Quad)};
+	if (Task == second) {-free; !exploreTools(Task,Quad)};
 	if (Task == workshop) {-free; !exploreWorkshop(Quad)};
 	if (Task == resource) {!action::skip};
 	.
@@ -78,39 +78,43 @@ free.
 	+free; 
 	!action::skip;
 	.
-//+!exploreTools
-//	: default::role(Role, Speed, _, _, Tools) & (Role == motorcycle) & new::shopList(List)
-//<- 
-//	?myquad(Q);
-//	if (Q == 1) {?coalition::quad1(Lat,Lon)};
-//	if (Q == 2) {?coalition::quad2(Lat,Lon)};
-//	if (Q == 3) {?coalition::quad3(Lat,Lon)};
-//	if (Q == 4) {?coalition::quad4(Lat,Lon)};
-//	for ( .member(Tool,Tools) ) {
-//		?default::find_shops(Tool,List,Shops);
-//		actions.closest(Role,Lat,Lon,Shops,ClosestShop);
-//		+buyList(Tool,1,ClosestShop);
-//	}
-//	!goBuy;
-//	?default::step(S);
-//	.print("Finished my exploration at step ",S);
-//	+free; 
-//	!action::skip;
-//	.
-//
-//+!goBuy
-//	: buyList(_,_,Shop)
-//<-
-//	.print("Going to shop ",Shop);
-//	!action::goto(Shop);
-//	for ( buyList(Tool,Qty,Shop) ) {
-//		!action::buy(Tool,Qty);
-//		.print("Buying #",Qty," of ",Tool);
-//		-buyList(Tool,Qty,Shop);
-//	}
-//	!gotoShops
-//	.
-//+!gotoShops.
++!exploreTools(Task,Quad)
+	: default::role(Role, _, _, _, _) & new::shopList(List) & .term2string(Task,TaskS) & default::tools(TaskS,[H|T])
+<- 
+//	if (Q == quad1) {?coalition::quad1(Lat,Lon)};
+//	if (Q == quad2) {?coalition::quad2(Lat,Lon)};
+//	if (Q == quad3) {?coalition::quad3(Lat,Lon)};
+//	if (Q == quad4) {?coalition::quad4(Lat,Lon)};
+	for ( .member(ToolS,H) ) {
+		.term2string(Tool,ToolS);
+		?default::find_shops(Tool,List,Shops);
+		actions.closest(Role,Shops,ClosestShop);
+		if (buyList(Tool,Qty,ClosestShop)) {
+			-buyList(Tool,Qty,ClosestShop);
+			+buyList(Tool,Qty+1,ClosestShop);
+		}
+		else { +buyList(Tool,1,ClosestShop); }
+	}
+	!goBuy;
+	?default::step(S);
+	.print("Finished my exploration at step ",S);
+	+free; 
+	!action::skip;
+	.
+
++!goBuy
+	: buyList(_,_,Shop)
+<-
+	.print("Going to shop ",Shop);
+	!action::goto(Shop);
+	for ( buyList(Tool,Qty,Shop) ) {
+		!action::buy(Tool,Qty);
+		.print("Buying #",Qty," of ",Tool);
+		-buyList(Tool,Qty,Shop);
+	}
+	!goBuy
+	.
++!goBuy.
 
 +default::resNode(ResourceId,Lat,Lon,Resource)
 <- !checkCoalition(ResourceId,Lat,Lon,Resource).

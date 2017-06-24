@@ -1,6 +1,7 @@
 package env;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ public class TeamArtifact extends Artifact {
 	private static Logger logger = Logger.getLogger(TeamArtifact.class.getName());
 	private static Map<String, Integer> shopItemsPrice = new HashMap<String, Integer>();
 	private static List<String> shops = new ArrayList<String>();
+	private int count = 0;
+	private List<String> tools = new ArrayList<String>();
 	
 	void init(){
 		logger.info("Team Artifact has been created!");
@@ -63,6 +66,33 @@ public class TeamArtifact extends Artifact {
 		ObsProperty prop = this.getObsPropertyByTemplate("resNode", resourceId,lat,lon,resource);
 		if (prop == null) {
 			this.defineObsProperty("resNode",resourceId,lat,lon,resource);
+		}
+	}
+	
+	@OPERATION void addTools(Object[] tool){
+		String[] toolsAux = Arrays.copyOf(tool, tool.length, String[].class);
+		count+=1;
+		for (String s:  toolsAux) {
+			tools.add(s);
+		}		
+		if (count == 4) {
+			toolsAux = tools.toArray(new String[tools.size()]);
+//			List<String> firstHalf = new ArrayList<String>();
+//			List<String> secondHalf = new ArrayList<String>();
+//			for (int i = 0; i<toolsAux.length; i++){
+//				if (i < (toolsAux.length/2)) {
+//					firstHalf.add(toolsAux[i]);
+//				} else {
+//					secondHalf.add(toolsAux[i]);
+//				}
+//			}
+//			String[] firstHalfS = firstHalf.toArray(new String[firstHalf.size()]);
+//			String[] secondHalfS = secondHalf.toArray(new String[secondHalf.size()]);
+			
+			String[] firstHalf = Arrays.copyOfRange(toolsAux, 0, toolsAux.length/2);
+			String[] secondHalf = Arrays.copyOfRange(toolsAux, toolsAux.length/2, toolsAux.length);
+			this.defineObsProperty("tools", "first", new Object[] {firstHalf});
+			this.defineObsProperty("tools", "second", new Object[] {secondHalf});
 		}
 	}
 	

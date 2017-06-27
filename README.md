@@ -6,8 +6,8 @@ File > Import > Git > Projects from Git > Clone URI
 
 Copy https://github.com/smart-pucrs/mapc2017-pucrs.git and paste it on the URI field.
 
-The rest should autocomplete. Add your github credentials in the Authentication fields.
-Proceed until the import finishes.
+The rest should autocomplete. Add your github credentials in the Authentication fields.   
+Next > Tick master > Next > Select destination folder, do not tick clonesubmodules, remote name: origin > Next > Receiving objects (after that select import existing Eclipse projects) > Next > Tick macontest2017 and search for nested projects, do not tick add project to working sets > Finish
 
 Right click on the project and select Team to access git commands (commit, push, and pull).
 

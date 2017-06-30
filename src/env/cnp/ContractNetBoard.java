@@ -1,7 +1,6 @@
 package cnp;
 
 import jason.asSyntax.Literal;
-import env.EISArtifact;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,17 +14,17 @@ public class ContractNetBoard extends Artifact {
 	
 	private List<Bid> bids;
 	
-	void init(String taskDescr, long duration){
-		logger = Logger.getLogger(ContractNetBoard.class.getName()+"_"+taskDescr);
+	void init(String taskDescr, long duration, int agents){
+		logger = Logger.getLogger(""+this.getId());
 		this.defineObsProperty("state","open");
 		bids = new ArrayList<Bid>();
 		this.execInternalOp("checkDeadline", duration);
-		this.execInternalOp("checkAllBids");
+		this.execInternalOp("checkAllBids", agents);
 	}
 	
-	@OPERATION void bid(int bid, String agent, String shop, String item){
+	@OPERATION void bid(int shopQuad, int storageQuad, int distance, String agent){
 		if (getObsProperty("state").stringValue().equals("open")){
-			bids.add(new Bid(agent,bid,shop,item));
+			bids.add(new Bid(agent,shopQuad,storageQuad,distance));
 		} else {
 			this.failed("cnp_closed");
 		}
@@ -39,8 +38,8 @@ public class ContractNetBoard extends Artifact {
 		}
 	}
 	
-	@INTERNAL_OPERATION void checkAllBids(){
-		while(!isClosed() && !allAgentsMadeTheirBid()){
+	@INTERNAL_OPERATION void checkAllBids(int agents){
+		while(!isClosed() && !allAgentsMadeTheirBid(agents)){
 			await_time(50);
 		}
 		if(!isClosed()){
@@ -54,7 +53,7 @@ public class ContractNetBoard extends Artifact {
 		int i = 0;
 		Literal[] aux= new Literal[bids.size()];
 		for (Bid p: bids){
-			aux[i] = Literal.parseLiteral("bid("+p.getValue()+","+p.getAgent()+","+p.getShop()+","+p.getItem()+")");
+			aux[i] = Literal.parseLiteral("bid("+p.getAgent()+","+p.getShopQuad()+","+p.getStorageQuad()+","+p.getDistance()+")");
 			i++;
 		}
 		bidList.set(aux);
@@ -68,28 +67,28 @@ public class ContractNetBoard extends Artifact {
 		return this.getObsProperty("state").stringValue().equals("closed");		
 	}
 	
-	private boolean allAgentsMadeTheirBid(){
-		 return bids.size() == EISArtifact.getRegisteredAgents().size()-1;
+	private boolean allAgentsMadeTheirBid(int agents){
+		 return bids.size() == agents;
 	}
 	
 	static public class Bid {
 		
 		private String agent;
-		private int value;
-		private String shop;
-		private String item;
+		private int shopQuad;
+		private int storageQuad;
+		private int distance;
 		
-		public Bid(String agent, int value, String shop, String item){
-			this.value = value;
+		public Bid(String agent, int shopQuad, int storageQuad, int distance){
 			this.agent = agent;
-			this.shop = shop;
-			this.item = item;
+			this.shopQuad = shopQuad;
+			this.storageQuad = storageQuad;
+			this.distance = distance;
 		}
 		
 		public String getAgent(){ return agent; }
-		public int getValue(){ return value; }
-		public String getShop(){ return shop; }
-		public String getItem(){ return item; }
+		public int getShopQuad(){ return shopQuad; }
+		public int getStorageQuad(){ return storageQuad; }
+		public int getDistance(){ return distance; }
 	}
 	
 }

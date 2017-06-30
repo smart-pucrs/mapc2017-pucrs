@@ -16,12 +16,12 @@ public class TaskBoard extends Artifact {
 		taskId = 0;
 	}
 	
-	@OPERATION void announce(String taskDescr, int duration, String storageId, OpFeedbackParam<String> id){
+	@OPERATION void announce(String taskDescr, int duration, int agents, OpFeedbackParam<String> id){
 		taskId++;
 		try {
 			String artifactName = "cnp_board_"+taskId;
-			makeArtifact(artifactName, "cnp.ContractNetBoard", new ArtifactConfig(taskDescr,duration));
-			defineObsProperty("task", Literal.parseLiteral(taskDescr), artifactName, storageId, taskId);
+			makeArtifact(artifactName, "cnp.ContractNetBoard", new ArtifactConfig(taskDescr,duration,agents));
+			defineObsProperty("task", Literal.parseLiteral(taskDescr), artifactName, taskId);
 			id.set(artifactName);
 		} catch (Exception ex){
 			logger.info("announce_failed");
@@ -29,7 +29,7 @@ public class TaskBoard extends Artifact {
 	}
 	
 	@OPERATION void clear(String artifactName){
-		this.removeObsPropertyByTemplate("task", null, artifactName, null, null);
+		this.removeObsPropertyByTemplate("task", null, artifactName, null);
 	}
 	
 }

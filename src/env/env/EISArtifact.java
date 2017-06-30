@@ -166,7 +166,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 
 	private void updatePerception(String agent, Collection<Percept> previousPercepts, Collection<Percept> percepts) throws JasonException {
 		for (Percept old: previousPercepts) {
-			if (((agent.equals("vehicle1") || agent.equals("vehicle2") || agent.equals("vehicle3") || agent.equals("vehicle4")) && step_obs_prop_leaders.contains(old.getName())) || step_obs_prop.contains(old.getName())) {
+			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(old.getName())) || step_obs_prop.contains(old.getName())) {
 				if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore
 					Literal literal = Translator.perceptToLiteral(old);
 					removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
@@ -180,7 +180,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		Literal lastActionResult = null;
 		Literal actionID = null;
 		for (Percept percept: percepts) {
-			if ( ((agent.equals("vehicle1") || agent.equals("vehicle2") || agent.equals("vehicle3") || agent.equals("vehicle4")) && step_obs_prop_leaders.contains(percept.getName())) || step_obs_prop.contains(percept.getName()) ) {
+			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(percept.getName())) || step_obs_prop.contains(percept.getName()) ) {
 				if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction") || percept.getName().equals("lastActionResult")) { // really new perception 
 					Literal literal = Translator.perceptToLiteral(percept);
 					if (percept.getName().equals("step")) {
@@ -287,7 +287,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"lastActionResult",
 	}));
 	
-	static Set<String> step_obs_prop_leaders = new HashSet<String>( Arrays.asList(new String[] {
+	static Set<String> step_obs_prop_v1 = new HashSet<String>( Arrays.asList(new String[] {
 			"chargingStation",
 			"actionID",
 			"routeLength",

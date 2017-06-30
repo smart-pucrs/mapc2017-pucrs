@@ -3,10 +3,15 @@
 { include("strategies/new-round.asl", new) }
 { include("strategies/common-plans.asl", strategies) }
 { include("strategies/coalition.asl", coalition) }
+{ include("strategies/initiator.asl", initiator) }
+{ include("strategies/bidder.asl", bidder) }
+
++!create_taskboard <- makeArtifact("task_board","cnp.TaskBoard",[]).
 
 +!register(E)
 	: .my_name(Me)
 <- 
+	focusWhenAvailable("task_board");
 	!new::new_round;
     .print("Registering...");
     register(E);

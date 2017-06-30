@@ -165,10 +165,3 @@ free.
 	addResourceNode(ResourceId,Lat,Lon,Resource);
 	.
 	
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
-	: true
-<-
-	.print("Mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
-	.print("Items required: ",Items);
-	.
-	

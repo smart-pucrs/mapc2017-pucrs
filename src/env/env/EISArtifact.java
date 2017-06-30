@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +23,6 @@ import cartago.Artifact;
 import cartago.INTERNAL_OPERATION;
 import cartago.OPERATION;
 import cartago.ObsProperty;
-import eis.EILoader;
 import eis.EnvironmentInterfaceStandard;
 import eis.AgentListener;
 import eis.EnvironmentListener;
@@ -167,91 +165,48 @@ public class EISArtifact extends Artifact implements AgentListener {
 //	}
 
 	private void updatePerception(String agent, Collection<Percept> previousPercepts, Collection<Percept> percepts) throws JasonException {
-//		if (agent.equals("vehicle15")) {
-//			// compute removed perception
-//			for (Percept old: previousPercepts) {
-//				if (step_obs_propv1.contains(old.getName())) {
-//					if (!percepts.contains(old)) { // not perceived anymore
-//						Literal literal = Translator.perceptToLiteral(old);
-//						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
-////						logger.info("removing old perception "+literal);
-//					}
-//				}
-//			}
-//		}
-//		else {
-			for (Percept old: previousPercepts) {
-				if (step_obs_prop.contains(old.getName())) {
-					if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore
-						Literal literal = Translator.perceptToLiteral(old);
-						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
+		for (Percept old: previousPercepts) {
+			if (((agent.equals("vehicle1") || agent.equals("vehicle2") || agent.equals("vehicle3") || agent.equals("vehicle4")) && step_obs_prop_leaders.contains(old.getName())) || step_obs_prop.contains(old.getName())) {
+				if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore
+					Literal literal = Translator.perceptToLiteral(old);
+					removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
 //						logger.info("removing old perception "+literal);
-					}
 				}
 			}
-//		}
+		}
 		
 		// compute new perception
 		Literal step = null;
 		Literal lastActionResult = null;
 		Literal actionID = null;
-//		if (agent.equals("vehicle15")) {
-//			for (Percept percept: percepts) {
-//				if (step_obs_propv1.contains(percept.getName())) {
-//					if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction")) { // really new perception 
-//						Literal literal = Translator.perceptToLiteral(percept);
-//						if (percept.getName().equals("step")) {
-//							step = literal;
-//						} else if (percept.getName().equals("simEnd")) {
-////							cleanObsProps(step_obs_propv1);
-//							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
-//							cleanObsProps(match_obs_prop);
-//							lastStep = -1;
-//							break;
-//						} else {
-////							logger.info("adding "+literal);
-//							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
-//						}
-//					}
-//				} if (match_obs_prop.contains(percept.getName())) {
-//					Literal literal = Translator.perceptToLiteral(percept);
-////					logger.info("adding "+literal);
-//					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());				
-//				}
-//			}
-//		}
-//		else {
-			for (Percept percept: percepts) {
-				if (step_obs_prop.contains(percept.getName())) {
-					if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction") || percept.getName().equals("lastActionResult")) { // really new perception 
-						Literal literal = Translator.perceptToLiteral(percept);
-						if (percept.getName().equals("step")) {
-							step = literal;
-						} else if (percept.getName().equals("simEnd")) {
-							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
-							cleanObsProps(match_obs_prop);
-							lastStep = -1;						
-							break;
-						} else {
-//							logger.info("adding "+literal);
-//							defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
-							if (percept.getName().equals("lastActionResult")) {
-								lastActionResult = literal;
-							} else if (percept.getName().equals("actionID")) { actionID = literal; }
-							else if (percept.getName().equals("shop") || percept.getName().equals("workshop") || percept.getName().equals("routeLength") || percept.getName().equals("facility")) { percs.add(0,literal); }
-							else { percs.add(literal); }
-						}
-					}
-				} if (match_obs_prop.contains(percept.getName())) {
+		for (Percept percept: percepts) {
+			if ( ((agent.equals("vehicle1") || agent.equals("vehicle2") || agent.equals("vehicle3") || agent.equals("vehicle4")) && step_obs_prop_leaders.contains(percept.getName())) || step_obs_prop.contains(percept.getName()) ) {
+				if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction") || percept.getName().equals("lastActionResult")) { // really new perception 
 					Literal literal = Translator.perceptToLiteral(percept);
-//					logger.info("adding "+literal);
-					if (percept.getName().equals("role")) {
-						start.add(0,literal);
-					} else { start.add(literal); }
-//					defineObsProperty(literal.getFunctor(), (Object[]) literal.getTermsArray());				
+					if (percept.getName().equals("step")) {
+						step = literal;
+					} else if (percept.getName().equals("simEnd")) {
+						defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
+						cleanObsProps(match_obs_prop);
+						lastStep = -1;						
+						break;
+					} else {
+//							logger.info("adding "+literal);
+						if (percept.getName().equals("lastActionResult")) {
+							lastActionResult = literal;
+						} else if (percept.getName().equals("actionID")) { actionID = literal; }
+						else if (percept.getName().equals("shop") || percept.getName().equals("workshop") || percept.getName().equals("routeLength") || percept.getName().equals("facility")) { percs.add(0,literal); }
+						else { percs.add(literal); }
+					}
 				}
+			} if (match_obs_prop.contains(percept.getName())) {
+				Literal literal = Translator.perceptToLiteral(percept);
+//					logger.info("adding "+literal);
+				if (percept.getName().equals("role")) {
+					start.add(0,literal);
+				} else { start.add(literal); }
 			}
-//		}
+		}
 
 		if (!start.isEmpty()) {
 			for (Literal lit: start) {
@@ -294,7 +249,6 @@ public class EISArtifact extends Artifact implements AgentListener {
 	}
 
 	static Set<String> match_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
-//		"simStart",
 		"map",
 		"steps",
 		"item",
@@ -307,13 +261,10 @@ public class EISArtifact extends Artifact implements AgentListener {
 	}));
 	
 	static Set<String> step_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
-//		"simStart",
-//		"map",
 		"chargingStation",
 		"actionID",
 		"routeLength",
 //		"entity",
-//		"visibleChargingStation",
 		"shop",			
 		"storage",
 		"workshop",
@@ -336,29 +287,33 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"lastActionResult",
 	}));
 	
-//	static Set<String> step_obs_propv1 = new HashSet<String>( Arrays.asList(new String[] {
-//			"simStart",
-//			"map",
-//			"chargingStation",
-////			"visibleChargingStation",
-//			"shop",			
-//			"storage",
-////			"workshop",
-//			"dump",
-//			"lat",
-//			"lon",
-//			"charge",
-//			"load",
-//			"inFacility",
-//			"item",
-////			"jobTaken",
-//			"step",
-//			"simEnd",		
+	static Set<String> step_obs_prop_leaders = new HashSet<String>( Arrays.asList(new String[] {
+			"chargingStation",
+			"actionID",
+			"routeLength",
+//			"entity",
+			"shop",			
+			"storage",
+			"workshop",
+			"resourceNode",	
+			"mission",
+			"dump",
+			"lat",
+			"lon",
+//			"lastActionParams",
+			"charge",
+			"load",
+			"facility",
+			"hasItem",
+//			"jobTaken",
+			"step",
+//			"simEnd",
+//			"ranking",		
 //			"pricedJob",
-////			"auctionJob",
-//			"lastAction",
-//			"lastActionResult",
-//		}));	
+//			"auctionJob",
+			"lastAction",
+			"lastActionResult",
+		}));
 	
 	static List<String> location_perceptions = Arrays.asList(new String[] { "shop", "storage", "workshop", "chargingStation", "dump", "entity" });
 

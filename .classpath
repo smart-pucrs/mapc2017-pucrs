@@ -4,13 +4,13 @@
 	<classpathentry excluding="**/*.asl" kind="src" path="src/agt"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="src/env"/>
-	<classpathentry kind="lib" path="lib/eismassim-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/eismassim-3.1-jar-with-dependencies.jar"/>
-	<classpathentry kind="lib" path="lib/protocol-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/eismassim-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/eismassim-3.2-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="lib/protocol-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/javaagents-2017-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/javaagents-2017-1.0-jar-with-dependencies.jar"/>
-	<classpathentry kind="lib" path="lib/server-2017-0.3.jar"/>
-	<classpathentry kind="lib" path="lib/server-2017-0.3-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="lib/server-2017-0.4.jar"/>
+	<classpathentry kind="lib" path="lib/server-2017-0.4-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="lib/cartago-2.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/intmas-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/jaca-2.3-SNAPSHOT.jar"/>

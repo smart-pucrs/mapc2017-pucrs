@@ -23,6 +23,10 @@ select_bid([],bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),bid(BidWinner,BidAgentWi
 select_bid([bid(Bid,BidAgent,ShopId,item(ItemId,Qty))|Bids],bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( ((not awarded(BidAgent,_,_)) )  | (awarded(BidAgent,ShopId,_) & product(ItemId,Volume,BaseList) & .term2string(BidAgent,BidAgentS) & load(BidAgentS,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(Bid,BidAgent,ShopId,item(ItemId,Qty)),BidWinner).
 select_bid([bid(Bid,BidAgent,ShopId,Item)|Bids],bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),BidWinner) :- select_bid(Bids,bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),BidWinner).
 
+select_bid_mission([],bid(AuxAgent,AuxDistance),bid(AgentWinner,DistanceWinner)) :- AgentWinner = AuxAgent & DistanceWinner = AuxDistance.
+select_bid_mission([bid(Agent,Distance)|Bids],bid(AuxAgent,AuxDistance),BidWinner) :- Distance < AuxDistance & select_bid_mission(Bids,bid(Agent,Distance),BidWinner).
+select_bid_mission([bid(Agent,Distance)|Bids],bid(AuxAgent,AuxDistance),BidWinner) :- select_bid_mission(Bids,bid(AuxAgent,AuxDistance),BidWinner).
+
 find_shops_id([],Temp,Result) :- Result = Temp.
 find_shops_id([shop(ShopId,_)|List],Temp,Result) :- find_shops_id(List,[ShopId|Temp],Result).
 

@@ -22,9 +22,9 @@ public class ContractNetBoard extends Artifact {
 		this.execInternalOp("checkAllBids", agents);
 	}
 	
-	@OPERATION void bid(int shopQuad, int storageQuad, int distance, String agent){
+	@OPERATION void bid(String agent, int distance){
 		if (getObsProperty("state").stringValue().equals("open")){
-			bids.add(new Bid(agent,shopQuad,storageQuad,distance));
+			bids.add(new Bid(agent,distance));
 		} else {
 			this.failed("cnp_closed");
 		}
@@ -54,7 +54,7 @@ public class ContractNetBoard extends Artifact {
 		int i = 0;
 		Literal[] aux= new Literal[bids.size()];
 		for (Bid p: bids){
-			aux[i] = Literal.parseLiteral("bid("+p.getAgent()+","+p.getShopQuad()+","+p.getStorageQuad()+","+p.getDistance()+")");
+			aux[i] = Literal.parseLiteral("bid("+p.getAgent()+","+p.getDistance()+")");
 			i++;
 		}
 		bidList.set(aux);
@@ -75,20 +75,14 @@ public class ContractNetBoard extends Artifact {
 	static public class Bid {
 		
 		private String agent;
-		private int shopQuad;
-		private int storageQuad;
 		private int distance;
 		
-		public Bid(String agent, int shopQuad, int storageQuad, int distance){
+		public Bid(String agent, int distance){
 			this.agent = agent;
-			this.shopQuad = shopQuad;
-			this.storageQuad = storageQuad;
 			this.distance = distance;
 		}
 		
 		public String getAgent(){ return agent; }
-		public int getShopQuad(){ return shopQuad; }
-		public int getStorageQuad(){ return storageQuad; }
 		public int getDistance(){ return distance; }
 	}
 	

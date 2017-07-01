@@ -18,8 +18,11 @@
 	getBids(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
 		.print("Got bids (",.length(Bids),") for task ",CNPBoardName," List ",Bids);
+		?default::select_bid_mission(Bids,bid(99999,99999),bid(Agent,Distance));
+		.send(Agent,tell,winner(mission(Id, Storage, Reward, Start, End, Fine, Items)));
 	}
 	else {
 		.print("No bids.");
 	}
+	clear(CNPBoardName);
 	.

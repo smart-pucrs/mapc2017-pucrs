@@ -36,6 +36,7 @@ public class ContractNetBoard extends Artifact {
 			getObsProperty("state").updateValue("closed");
 			logger.info("bidding stage closed by deadline.");
 		}
+		removeObsProperty("state");
 	}
 	
 	@INTERNAL_OPERATION void checkAllBids(int agents){

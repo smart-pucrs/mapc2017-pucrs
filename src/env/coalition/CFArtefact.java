@@ -71,8 +71,7 @@ public class CFArtefact extends Artifact {
 //	void runAlgorithm(boolean sendSignal) {			
 //		if (sendSignal)
 //			mLogger.info("Must send signal");
-			
-		removeObsProperty(obsWaitingInput);
+		
 		mLogger.info("Running...");
 		defineObsProperty(obsRunning);		
 
@@ -87,6 +86,7 @@ public class CFArtefact extends Artifact {
 		updateCoalitionStructure(cs);
 		
 		removeObsProperty(obsRunning);
+		removeObsProperty(obsWaitingInput);
 		mLogger.info("The Constrained Coalition Formation Algorithm is finished");
 	}
 	@GUARD

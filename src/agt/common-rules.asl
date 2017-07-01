@@ -1,8 +1,6 @@
 find_shops(ItemId,[],[]).
 find_shops(ItemId,[ShopId|List],[ShopId|Result]) :- shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,_,_,_,_),ListItems) & find_shops(ItemId,List,Result).
 find_shops(ItemId,[ShopId|List],Result) :- shop(ShopId, _, _, _, ListItems) & not .member(item(ItemId,_,_,_,_,_),ListItems) & find_shops(ItemId,List,Result).
-find_all_shops([],Shops,Temp,Result):- Result = Temp.
-find_all_shops([ItemId|Bases],Shops,Temp,Result) :- find_shops(ItemId,Shops,MidResult) & .print(MidResult) & .intersection(MidResult,Temp,New) & find_all_shops(Bases,Shops,New,Result).
 
 closest_facility(List, Facility) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility).
 closest_facility(List, Facility1, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility1, Facility2).

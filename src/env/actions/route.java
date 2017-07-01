@@ -7,6 +7,9 @@ import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
 import massim.scenario.city.data.Location;
 import massim.scenario.city.data.Route;
+
+import javax.sound.midi.MidiDevice.Info;
+
 import env.MapHelper;
 
 public class route extends DefaultInternalAction {
@@ -27,7 +30,7 @@ public class route extends DefaultInternalAction {
 		String role = args[0].toString();
 		int speed 	= Integer.valueOf(args[1].toString());
 		String type = "road";
-		if (role.equals("\"Drone\"")) {
+		if (role.equals("drone")) {
 			type = "air";
 		}
 

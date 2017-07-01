@@ -21,7 +21,7 @@ public class routeLatLon extends DefaultInternalAction {
 		String role = args[0].toString();
 		int speed 	= (int) ((NumberTerm) args[1]).solve();
 		String type = "road";
-		if (role.equals("\"Drone\"")) {
+		if(role.equals("drone")){
 			type = "air";
 		}
 

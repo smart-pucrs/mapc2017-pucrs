@@ -21,7 +21,7 @@ public class closest extends DefaultInternalAction {
 		String type = "road";
 		String closest = null;
 		double len = Integer.MAX_VALUE;
-		if(role.equals("\"Drone\"")){
+		if(role.equals("drone")){
 			type = "air";
 		}
 		if (args.length == 6) {

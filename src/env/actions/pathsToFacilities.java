@@ -24,7 +24,7 @@ public class pathsToFacilities extends DefaultInternalAction {
 		String role = args[1].toString();
 		int speed 	= Integer.valueOf(args[2].toString());
 		String type = "road";
-		if(role.equals("\"Drone\"")){
+		if(role.equals("drone")){
 			type = "air";
 		}
 		ListTerm ids   = (ListTerm) args[3];

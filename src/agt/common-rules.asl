@@ -56,3 +56,8 @@ decomposeRequirements([],Temp,Result):- Result = Temp.
 decomposeRequirements([required(Item,Qtd) | Requirements],Temp,Result):- item(Item,_,tools(Tools),parts(Parts)) & decomposeItem(Item,Qtd,Tools,Parts,[],ListItensJob) & decomposeRequirements(Requirements,[ListItensJob|Temp],Result).
 decomposeRequirementsNoTools([],Temp,Result):- Result = Temp.
 decomposeRequirementsNoTools([required(Item,_) | Requirements],Temp,Result):- item(Item,_,_,parts(Parts)) & decomposeItemNoTools(Item,Parts,[],ListItensJob) & .union(ListItensJob,Temp,New) & decomposeRequirementsNoTools(Requirements,New,Result).
+
+getQuadLatLon(quad1,QLat,QLon) :- coalition::quad1(QLat,QLon).
+getQuadLatLon(quad2,QLat,QLon) :- coalition::quad2(QLat,QLon).
+getQuadLatLon(quad3,QLat,QLon) :- coalition::quad3(QLat,QLon).
+getQuadLatLon(quad4,QLat,QLon) :- coalition::quad4(QLat,QLon).

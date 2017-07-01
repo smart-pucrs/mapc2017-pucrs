@@ -9,6 +9,7 @@
 	+max_bid_time(2000);
 	+job_bidders(4);
 	+coalition_leaders([vehicle1,vehicle2,vehicle3,vehicle4]);
+	+vehicle_mission(car,3);
 	+noActionCount(0);
 	.
 	

@@ -18,12 +18,8 @@ free.
 	.
 
 +!exploreShop(Quad)
-	: default::role(Role, _, _, _, _) & new::shopList(List)
+	: default::role(Role, _, _, _, _) & new::shopList(List) & default::getQuadLatLon(Quad,Lat,Lon)
 <- 
-	if (Quad == quad1) {?coalition::quad1(Lat,Lon)};
-	if (Quad == quad2) {?coalition::quad2(Lat,Lon)};
-	if (Quad == quad3) {?coalition::quad3(Lat,Lon)};
-	if (Quad == quad4) {?coalition::quad4(Lat,Lon)};
 	actions.closest(Role,Lat,Lon,List,_,ClosestShop);
 	!action::goto(ClosestShop);
 	?default::step(S);
@@ -32,12 +28,8 @@ free.
 	!action::skip;
 	.
 +!exploreWorkshop(Quad)
-	: default::role(Role, _, _, _, _) & new::workshopList(List)
+	: default::role(Role, _, _, _, _) & new::workshopList(List) & default::getQuadLatLon(Quad,Lat,Lon)
 <- 
-	if (Quad == quad1) {?coalition::quad1(Lat,Lon)};
-	if (Quad == quad2) {?coalition::quad2(Lat,Lon)};
-	if (Quad == quad3) {?coalition::quad3(Lat,Lon)};
-	if (Quad == quad4) {?coalition::quad4(Lat,Lon)};
 	actions.closest(Role,Lat,Lon,List,_,ClosestWorkshop);
 	!action::goto(ClosestWorkshop);
 	?default::step(S);
@@ -46,7 +38,7 @@ free.
 	!action::skip;
 	.
 +!explore(Quad)
-	: coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) //& coalition::quad1(LatQ1,LonQ1) & coalition::quad2(LatQ2,LonQ2) & coalition::quad3(LatQ3,LonQ3) & coalition::quad4(LatQ4,LonQ4)
+	: coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon)
 <- 
 	if (Quad == quad1) {
 		!action::goto(CenterLat,MinLon);
@@ -79,7 +71,7 @@ free.
 	!action::skip;
 	.
 +!exploreTools(Task,Quad,Members)
-	: default::role(Role, _, _, _, _) & new::shopList(List) & .term2string(Task,TaskS) & default::tools(TaskS,[H|T])
+	: default::role(Role, _, _, _, _) & new::shopList(List) & .term2string(Task,TaskS) & default::tools(TaskS,[H|T]) & default::getQuadLatLon(Quad,Lat,Lon)
 <- 
 	for ( .member(ToolS,H) ) {
 		.term2string(Tool,ToolS);
@@ -92,10 +84,6 @@ free.
 		else { +buyList(Tool,1,ClosestShop); }
 	}
 	!goBuy;
-	if (Quad == quad1) {?coalition::quad1(Lat,Lon)};
-	if (Quad == quad2) {?coalition::quad2(Lat,Lon)};
-	if (Quad == quad3) {?coalition::quad3(Lat,Lon)};
-	if (Quad == quad4) {?coalition::quad4(Lat,Lon)};	
 	?new::workshopList(WList);
 	actions.closest(Role,Lat,Lon,WList,_,ClosestWorkshop);
 	!action::goto(ClosestWorkshop);

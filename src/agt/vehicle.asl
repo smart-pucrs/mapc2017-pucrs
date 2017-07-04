@@ -17,6 +17,12 @@
     register(E);
 	.
 	
++default::name(ServerMe)
+	: .my_name(Me)
+<-
+	addName(Me,ServerMe);
+	.
+	
 +default::role(_,_,_,_,Tools)
 	: .my_name(Me) & Me == vehicle1
 <- 

@@ -250,6 +250,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 
 	static Set<String> match_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
 		"map",
+		"name",
 		"steps",
 		"item",
 		"role",

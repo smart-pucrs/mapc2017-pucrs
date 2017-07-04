@@ -56,7 +56,11 @@ public class TeamArtifact extends Artifact {
 			this.defineObsProperty("itemPrice",key,shopItemsPrice.get(key));
 		}
 		
-	}	
+	}
+	
+	@OPERATION void addName(String agent, String AgentServer){
+		this.defineObsProperty("names",agent,AgentServer);
+	}
 	
 	@OPERATION void addLoad(String agent, int load){
 		this.defineObsProperty("load",agent,load);
@@ -77,18 +81,6 @@ public class TeamArtifact extends Artifact {
 		}		
 		if (count == 4) {
 			toolsAux = tools.toArray(new String[tools.size()]);
-//			List<String> firstHalf = new ArrayList<String>();
-//			List<String> secondHalf = new ArrayList<String>();
-//			for (int i = 0; i<toolsAux.length; i++){
-//				if (i < (toolsAux.length/2)) {
-//					firstHalf.add(toolsAux[i]);
-//				} else {
-//					secondHalf.add(toolsAux[i]);
-//				}
-//			}
-//			String[] firstHalfS = firstHalf.toArray(new String[firstHalf.size()]);
-//			String[] secondHalfS = secondHalf.toArray(new String[secondHalf.size()]);
-			
 			String[] firstHalf = Arrays.copyOfRange(toolsAux, 0, toolsAux.length/2);
 			String[] secondHalf = Arrays.copyOfRange(toolsAux, toolsAux.length/2, toolsAux.length);
 			this.defineObsProperty("tools", "first", new Object[] {firstHalf});
@@ -96,7 +88,6 @@ public class TeamArtifact extends Artifact {
 		}
 	}
 	
-
 	@OPERATION void updateLoad(String agent, int load){
 		this.removeObsPropertyByTemplate("load",agent,null);
 		this.defineObsProperty("load",agent,load);

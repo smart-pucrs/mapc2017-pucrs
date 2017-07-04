@@ -103,13 +103,10 @@
 // ItemId must be a string
 // Amount must be an integer
 +!give(AgentName, ItemId, Amount)
-	: true
+	: .term2string(AgentName,AgentNameS) & default::names(AgentNameS,ServerName)
 <-
-	?default::team(Team);
-	.delete("vehicle",AgentName,AgentNumber);
-	.concat("agent",Team,AgentNumber,AgentServer);
-	!localActions::commitAction(give(AgentServer,ItemId,Amount));
-	!giveLoop(AgentServer, ItemId, Amount);
+	!localActions::commitAction(give(ServerName,ItemId,Amount));
+	!giveLoop(ServerName, ItemId, Amount);
 	.
 +!giveLoop(AgentId, ItemId, Amount)
 	: default::lastAction(give) & default::lastActionResult(Result) & Result \== successful

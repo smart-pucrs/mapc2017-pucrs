@@ -90,9 +90,11 @@ free.
 	.sublist([agent(Truck,workshop)],Members);
 	for ( default::hasItem(Tool,Qty) ) {
 		.term2string(Tool,ToolS);
-		.send(Truck,achieve,action::receive);
+		.send(Truck,achieve,action::receive(Tool,Qty));
 		!action::give(Truck,Tool,Qty);
 	}
+	.send(Truck,tell,strategies::free);
+	.send(Truck,achieve,action::skip);
 	?default::step(S);
 	.print("Finished my exploration at step ",S);
 	+free; 

@@ -105,27 +105,41 @@
 +!give(AgentName, ItemId, Amount)
 	: .term2string(AgentName,AgentNameS) & default::names(AgentNameS,ServerName)
 <-
+	?default::hasItem(ItemId, OldAmount);
 	!localActions::commitAction(give(ServerName,ItemId,Amount));
-	!giveLoop(ServerName, ItemId, Amount);
+	!giveLoop(ServerName, ItemId, Amount, OldAmount);
 	.
-+!giveLoop(AgentId, ItemId, Amount)
-	: default::lastAction(give) & default::lastActionResult(Result) & Result \== successful
++!giveLoop(AgentId, ItemId, Amount, OldAmount)
+	: default::hasItem(ItemId,OldAmount)
 <-
 	!localActions::commitAction(give(AgentId,ItemId,Amount));
-	!giveLoop(AgentId, ItemId, Amount);
+	!giveLoop(AgentId, ItemId, Amount, OldAmount);
 	.
--!giveLoop(AgentId, ItemId, Amount).
+-!giveLoop(AgentId, ItemId, Amount, OldAmount).
 
 // Receive
 // No parameters
-+!receive
-	: default::lastActionResult(Result) & Result \== failed_counterpart
++!receive(ItemId,Amount)
+	: default::hasItem(ItemId,OldAmount)
 <-
-	-free;
+	-strategies::free[source(_)];
 	!localActions::commitAction(receive);
-	!receive;
+	!receiveLoop(ItemId,Amount,OldAmount);
 	.
--!receive <- +free; !skip.
++!receive(ItemId,Amount)
+	: true
+<-
+	-strategies::free[source(_)];
+	!localActions::commitAction(receive);
+	!receiveLoop(ItemId,Amount,0);
+	.
++!receiveLoop(ItemId, Amount, OldAmount)
+	: not default::hasItem(ItemId,Amount+OldAmount)
+<-
+	!localActions::commitAction(receive);
+	!receiveLoop(ItemId, Amount, OldAmount);
+	.
+-!receiveLoop(ItemId,Amount,OldAmount).
 
 // Store
 // ItemId must be a string

@@ -141,7 +141,7 @@ free.
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)
 <-
 	-+new::noActionCount(Count+1);
-	.print(">>>>>>>>>>> I have done ",Count+1," noActions.");
+	.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> I have done ",Count+1," noActions.");
 	.
 	
 //+default::hasItem(Item,Qty)

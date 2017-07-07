@@ -9,11 +9,14 @@
 +!make_bid(mission(Id, Storage, Reward, Start, End, Fine, Items),BoardId,TaskId)
 	: .my_name(Me)
 <-
-	!create_bid_mission(Storage,Items,Distance);
-	if (Distance >= End-Start) {
-		bid(Me,-1)[artifact_id(BoardId)];
+	if (not default::winner(mission(_,_,_,_,_,_,_))) {
+		!create_bid_mission(Storage,Items,Distance);
+		if (Distance >= End-Start) {
+			bid(Me,-1)[artifact_id(BoardId)];
+		}
+		else { bid(Me,Distance)[artifact_id(BoardId)]; }
 	}
-	else { bid(Me,Distance)[artifact_id(BoardId)]; }
+	else { bid(Me,-1)[artifact_id(BoardId)]; }
 	.
 	
 @create_bid_mission[atomic]
@@ -38,4 +41,12 @@
 	.
 	
 +default::winner(mission(Id, Storage, Reward, Start, End, Fine, Items))
-<- .print("I won mission ",Id).
+<- 
+	.print("I won mission ",Id);
+	.
+
++default::step(End)
+	: default::winner(mission(Id, Storage, Reward, Start, End, Fine, Items))
+<-
+	-default::winner(mission(Id, Storage, Reward, Start, End, Fine, Items));
+	.

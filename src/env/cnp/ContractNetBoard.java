@@ -11,19 +11,20 @@ import cartago.*;
 public class ContractNetBoard extends Artifact {
 	
 	private Logger logger = null;
+	Boolean state;
 	
 	private List<Bid> bids;
 	
 	void init(String taskDescr, long duration, int agents){
 		logger = Logger.getLogger(""+this.getId());
-		this.defineObsProperty("state","open");
+		state = true;
 		bids = new ArrayList<Bid>();
 		this.execInternalOp("checkDeadline", duration);
 		this.execInternalOp("checkAllBids", agents);
 	}
 	
 	@OPERATION void bid(String agent, int distance){
-		if (getObsProperty("state").stringValue().equals("open")){
+		if (state){
 			bids.add(new Bid(agent,distance));
 		} else {
 			this.failed("cnp_closed");
@@ -33,10 +34,9 @@ public class ContractNetBoard extends Artifact {
 	@INTERNAL_OPERATION void checkDeadline(long dt){
 		await_time(dt);
 		if(!isClosed()){
-			getObsProperty("state").updateValue("closed");
+			state = false;
 			logger.info("bidding stage closed by deadline.");
 		}
-		removeObsProperty("state");
 	}
 	
 	@INTERNAL_OPERATION void checkAllBids(int agents){
@@ -44,7 +44,7 @@ public class ContractNetBoard extends Artifact {
 			await_time(50);
 		}
 		if(!isClosed()){
-			getObsProperty("state").updateValue("closed");
+			state = false;
 			logger.info("bidding stage closed by all agents bids.");
 		}
 	}
@@ -65,7 +65,7 @@ public class ContractNetBoard extends Artifact {
 	}
 	
 	private boolean isClosed(){
-		return this.getObsProperty("state").stringValue().equals("closed");		
+		return state.equals(false);
 	}
 	
 	private boolean allAgentsMadeTheirBid(int agents){

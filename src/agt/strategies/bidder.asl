@@ -6,6 +6,14 @@
     !make_bid(Task,BoardId,TaskId);
   	.
   	
++default::task(Task,CNPBoard,TaskId,QuadS)
+	: .term2string(Quad,QuadS) & coalition::coalition(Quad, _, _)
+<- 
+	lookupArtifact(CNPBoard,BoardId);
+	focus(BoardId);
+    !make_bid(Task,BoardId,TaskId);
+  	.
+  	
 +!make_bid(mission(Id, Storage, Reward, Start, End, Fine, Items),BoardId,TaskId)
 	: .my_name(Me)
 <-
@@ -17,6 +25,11 @@
 		else { bid(Me,Distance)[artifact_id(BoardId)]; }
 	}
 	else { bid(Me,-1)[artifact_id(BoardId)]; }
+	.
++!make_bid(item(ItemId, Qty),BoardId,TaskId)
+	: .my_name(Me)
+<-
+	bid(Me,-1)[artifact_id(BoardId)];
 	.
 	
 @create_bid_mission[atomic]
@@ -43,6 +56,7 @@
 +default::winner(mission(Id, Storage, Reward, Start, End, Fine, Items))
 <- 
 	.print("I won mission ",Id);
+	!initiator::separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items));
 	.
 
 +default::step(End)

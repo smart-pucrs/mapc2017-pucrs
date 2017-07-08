@@ -29,8 +29,8 @@
 	
 +!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Quad)
 <- 
-	.print("Creating cnp for task #",Qty," of ",ItemId);
 	announce(item(ItemId,Qty),Deadline,NumberOfAgents,CNPBoardName,Quad);
+	.print("Created cnp ",CNPBoardName," for task #",Qty," of ",ItemId);
 	getBids(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
 		.print("Got bids (",.length(Bids),") for task ",CNPBoardName," List ",Bids);

@@ -29,9 +29,31 @@
 +!make_bid(item(ItemId, Qty),BoardId,TaskId)
 	: .my_name(Me)
 <-
-	bid(Me,-1)[artifact_id(BoardId)];
+	!create_bid_task(item(ItemId, Qty), Bid);
+	bid(Me,Bid)[artifact_id(BoardId)];
 	.
-	
+
+@create_bid_task[atomic]
++!create_bid_task(item(ItemId, Qty), Bid)
+	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
+<-
+    if (.substring("item",ItemId)) {
+		if (LoadCap - MyLoad >= Vol * Qty + 15) {
+			?default::find_shops(ItemId,SList,Shops);
+			actions.closest(Role,Shops,ClosestShop);
+			actions.route(Role,Speed,ClosestShop,RouteShop);
+			Bid = RouteShop;
+		}
+		else { Bid = -1 }
+	}
+	else { 
+		if (.sublist([ItemId],Tools)) { 
+			Bid = 1;
+		}
+		else { Bid = -1 }
+	}
+	.
+
 @create_bid_mission[atomic]
 +!create_bid_mission(Storage,Items,Distance)
 	: coalition::coalition(Quad, _, _) & new::shopList(SList) & new::workshopList(WList) & default::getQuadLatLon(Quad,QLat,QLon) & new::vehicle_mission(Role,Speed)

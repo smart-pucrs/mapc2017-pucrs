@@ -34,6 +34,7 @@
 	getBids(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
 		.print("Got bids (",.length(Bids),") for task ",CNPBoardName," List ",Bids);
+		+bids(item(ItemId,Qty),Bids);
 ////		?default::select_bid_mission(Bids,bid(99999,99999),bid(Agent,Distance));
 ////		.send(Agent,tell,winner(mission(Id, Storage, Reward, Start, End, Fine, Items)));
 	}
@@ -47,10 +48,22 @@
 	: new::max_bid_time(Deadline) & coalition::coalition(Quad,Members,_) & NumberOfAgents = .length(Members)+1
 <-
 	?default::decomposeRequirements(Items,[],Bases);
-//	.print(Bases);
+	+number_of_tasks(0);
+	for ( .member(Lists,Bases) ) { 
+		?number_of_tasks(NumberOfTasks); 
+		-+number_of_tasks(NumberOfTasks+.length(Lists));
+	}
 	for ( .member(Item,Bases) ) {
 		for ( .member(item(ItemId,Qty),Item) ) {
 			!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Quad);
 		}
 	}
 	.
+	
++bids(item(ItemId,Qty),Bids)
+	: .count(initiator::bids(_,_),NumberOfBids) & number_of_tasks(NumberOfTasks) & NumberOfBids == NumberOfTasks
+<-
+	.print("@@@@@@@@@@@ Finished getting all bids, time to select and award.");
+	.abolish(initiator::bids(_,_));
+	-number_of_tasks(NumberOfTasks);
+	.	

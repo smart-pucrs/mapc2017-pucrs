@@ -117,7 +117,7 @@ public class CFArtefact extends Artifact {
 			mLogger.info("Coalition Structure was found");
 			cfCoalition[] coalitions = cs.getCoalitions();
 
-			String[] tasks = new String[]{"shop","shop","explore","first","second","workshop","resource"};
+			String[] tasks = new String[]{"first","second","explore","shop","shop","workshop","resource"};
 			/*for (cfCoalition c : coalitions)
 			{				
 				c.getAgents().sort((o1, o2) -> o1.type.compareTo(o2.type));	

@@ -92,10 +92,10 @@ public class TeamArtifact extends Artifact {
 		}		
 		if (count == 4) {
 			toolsAux = tools.toArray(new String[tools.size()]);
-			String[] firstHalfS = Arrays.copyOfRange(toolsAux, 0, toolsAux.length/2);
-			toolHalf.put("first", firstHalfS);
-			String[] secondHalfS = Arrays.copyOfRange(toolsAux, toolsAux.length/2, toolsAux.length);
-			toolHalf.put("second", secondHalfS);
+			String[] firstHalf = Arrays.copyOfRange(toolsAux, 0, toolsAux.length/2);
+			toolHalf.put("first", firstHalf);
+			String[] secondHalf = Arrays.copyOfRange(toolsAux, toolsAux.length/2, toolsAux.length);
+			toolHalf.put("second", secondHalf);
 		}
 	}
 	

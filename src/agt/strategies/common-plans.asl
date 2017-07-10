@@ -71,9 +71,11 @@ free.
 	!action::skip;
 	.
 +!exploreTools(Task,Quad,Members)
-	: default::role(Role, _, _, _, _) & new::shopList(List) & .term2string(Task,TaskS) & default::tools(TaskS,[H|T]) & default::getQuadLatLon(Quad,Lat,Lon)
+	: default::role(Role, _, _, _, _) & new::shopList(List) & default::getQuadLatLon(Quad,Lat,Lon)
 <- 
-	for ( .member(ToolS,H) ) {
+	getTools(Task,ListTools);
+//	.print("Quad #",Quad," Have to buy ",ListTools);
+	for ( .member(ToolS,ListTools) ) {
 		.term2string(Tool,ToolS);
 		?default::find_shops(Tool,List,Shops);
 		actions.closest(Role,Shops,ClosestShop);

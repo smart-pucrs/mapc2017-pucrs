@@ -23,6 +23,9 @@
 	addServerName(Me,ServerMe);
 	.
 	
+//+default::hasItem(Item,Qty)
+//<- .print("Just got #",Qty," of ",Item).
+	
 +default::role(_,_,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)
 <- 

@@ -29,12 +29,12 @@
 +!make_bid(item(ItemId, Qty),BoardId,TaskId)
 	: .my_name(Me)
 <-
-	!create_bid_task(item(ItemId, Qty), Bid);
-	bid(Me,Bid)[artifact_id(BoardId)];
+	!create_bid_task(item(ItemId, Qty), Bid, Shop);
+	bid(Me,Bid,Shop,TaskId)[artifact_id(BoardId)];
 	.
 
 @create_bid_task[atomic]
-+!create_bid_task(item(ItemId, Qty), Bid)
++!create_bid_task(item(ItemId, Qty), Bid, Shop)
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
 <-
     if (.substring("item",ItemId)) {
@@ -43,14 +43,13 @@
 			actions.closest(Role,Shops,ClosestShop);
 			actions.route(Role,Speed,ClosestShop,RouteShop);
 			Bid = RouteShop;
+			Shop = ClosestShop;
 		}
-		else { Bid = -1 }
+		else { Bid = -1; Shop = null; }
 	}
 	else { 
-		if (.sublist([ItemId],Tools)) { 
-			Bid = 1;
-		}
-		else { Bid = -1 }
+		if (.sublist([ItemId],Tools)) { Bid = 1; Shop = null; }
+		else { Bid = -1; Shop = null; }
 	}
 	.
 
@@ -79,6 +78,12 @@
 <- 
 	.print("I won mission ",Id);
 	!initiator::separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items));
+	.
+	
++default::winner(TaskList, TaskType)
+<-
+	if (.number(TaskType)) { .print("I won the task to use ",List); }
+	else { .print("I won the task to get ",List," in ",TaskType); }
 	.
 
 +default::step(End)

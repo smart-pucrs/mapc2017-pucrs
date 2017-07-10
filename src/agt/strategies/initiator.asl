@@ -15,11 +15,12 @@
 +!announce(mission(Id, Storage, Reward, Start, End, Fine, Items),Deadline,NumberOfAgents)
 <- 
 	announce(mission(Id, Storage, Reward, Start, End, Fine, Items),Deadline,NumberOfAgents,CNPBoardName);
-	getBids(Bids) [artifact_name(CNPBoardName)];
+	getBidsJob(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
 		.print("Got bids (",.length(Bids),") for task ",CNPBoardName," List ",Bids);
 		?default::select_bid_mission(Bids,bid(99999,99999),bid(Agent,Distance));
-		.send(Agent,tell,winner(mission(Id, Storage, Reward, Start, End, Fine, Items)));
+		if ( Distance \== 99999 ) { .send(Agent,tell,winner(mission(Id, Storage, Reward, Start, End, Fine, Items))); }
+		else { .print("Ignoring mission ",Id," because it is impossible at the moment.") }
 	}
 	else {
 		.print("No bids.");
@@ -31,12 +32,10 @@
 <- 
 	announce(item(ItemId,Qty),Deadline,NumberOfAgents,CNPBoardName,Quad);
 	.print("Created cnp ",CNPBoardName," for task #",Qty," of ",ItemId);
-	getBids(Bids) [artifact_name(CNPBoardName)];
+	getBidsTask(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
 		.print("Got bids (",.length(Bids),") for task ",CNPBoardName," List ",Bids);
 		+bids(item(ItemId,Qty),Bids);
-////		?default::select_bid_mission(Bids,bid(99999,99999),bid(Agent,Distance));
-////		.send(Agent,tell,winner(mission(Id, Storage, Reward, Start, End, Fine, Items)));
 	}
 	else {
 		.print("No bids.");
@@ -60,10 +59,36 @@
 	}
 	.
 	
-+bids(item(ItemId,Qty),Bids)
+@selectBids[atomic]
++bids(item(_,_),_)
 	: .count(initiator::bids(_,_),NumberOfBids) & number_of_tasks(NumberOfTasks) & NumberOfBids == NumberOfTasks
 <-
 	.print("@@@@@@@@@@@ Finished getting all bids, time to select and award.");
-	.abolish(initiator::bids(_,_));
 	-number_of_tasks(NumberOfTasks);
+	for ( bids(item(ItemId,Qty),Bids) ) {
+		if (.substring("item",ItemId)) {
+			-bids(item(ItemId,Qty),Bids);
+//			?default::select_bid(Bids,bid(99999,99999,99999,99999),bid(Agent,Distance,Shop,TaskId));
+//			if (not initiator::awarded(Agent,_,_)) {
+//				+awarded(Agent,Shop,[item(ItemId,Qty)]);
+//			}
+//			else {
+//				?awarded(Agent,Shop,List);
+//	    		-awarded(Agent,Shop,List);
+//	    		.concat(List,[item(ItemId,Qty)],NewList);
+//	    		+awarded(Agent,Shop,NewList);
+//			}
+		}
+	}
+	for ( bids(item(ItemId,Qty),Bids) ) {
+		-bids(item(ItemId,Qty),Bids);
+//		?default::select_bid_tool(Bids,bid(99999,99999,99999,99999),bid(Agent,Distance,Shop,TaskId));
+//		if (not initiator::awarded(Agent,TaskId,_)) {
+//			+awarded(Agent,TaskId,[item(ItemId,Qty)]);
+//		}
+	}
+    for (awarded(Agent,Shop,List)) {
+    	.send(Agent,tell,winner(List,Shop));
+		-awarded(Agent,Shop,List);	
+	}	
 	.	

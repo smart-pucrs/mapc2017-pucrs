@@ -103,8 +103,9 @@
 // ItemId must be a string
 // Amount must be an integer
 +!give(AgentName, ItemId, Amount)
-	: .term2string(AgentName,AgentNameS) & default::names(AgentNameS,ServerName)
+	: true
 <-
+	getServerName(AgentName,ServerName);
 	?default::hasItem(ItemId, OldAmount);
 	!localActions::commitAction(give(ServerName,ItemId,Amount));
 	!giveLoop(ServerName, ItemId, Amount, OldAmount);

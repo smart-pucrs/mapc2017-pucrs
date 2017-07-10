@@ -20,36 +20,14 @@
 +default::name(ServerMe)
 	: .my_name(Me)
 <-
-	addName(Me,ServerMe);
+	addServerName(Me,ServerMe);
 	.
 	
-+default::role(_,_,_,_,Tools)
-	: .my_name(Me) & Me == vehicle1
++default::role(_,_,LoadCap,_,Tools)
+	: .my_name(Me) & new::tool_types(Agents)
 <- 
-	!coalition::introduce_to_the_coalition_artefact;    
-	addTools(Tools);
-	!coalition::setup_coalition_artefact;
-    .
-+default::role(_,_,_,_,Tools)
-	: .my_name(Me) & Me == vehicle5
-<- 
-	!coalition::introduce_to_the_coalition_artefact;    
-	addTools(Tools);
-    .
-+default::role(_,_,_,_,Tools)
-	: .my_name(Me) & Me == vehicle13
-<- 
-	!coalition::introduce_to_the_coalition_artefact;    
-	addTools(Tools);
-    .
-+default::role(_,_,_,_,Tools)
-	: .my_name(Me) & Me == vehicle21
-<- 
-	!coalition::introduce_to_the_coalition_artefact;    
-	addTools(Tools);
-    .
-+default::role(_,_,_,_,_)
-	: true
-<- 
-	!coalition::introduce_to_the_coalition_artefact;    
+	!coalition::introduce_to_the_coalition_artefact;
+	if ( .sublist([Me],Agents) ) { addTools(Tools); }
+	addLoad(Me,LoadCap);
+	if ( Me == vehicle1 ) { !coalition::setup_coalition_artefact; }
     .

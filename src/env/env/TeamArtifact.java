@@ -14,6 +14,7 @@ public class TeamArtifact extends Artifact {
 
 	private static Logger logger = Logger.getLogger(TeamArtifact.class.getName());
 	private static Map<String, Integer> shopItemsPrice = new HashMap<String, Integer>();
+	private static Map<String, String> agentNames = new HashMap<String, String>();
 	private static List<String> shops = new ArrayList<String>();
 	private int count = 0;
 	private List<String> tools = new ArrayList<String>();
@@ -58,8 +59,12 @@ public class TeamArtifact extends Artifact {
 		
 	}
 	
-	@OPERATION void addName(String agent, String AgentServer){
-		this.defineObsProperty("names",agent,AgentServer);
+	@OPERATION void addServerName(String agent, String agentServer){
+		agentNames.put(agent,agentServer);
+	}
+	
+	@OPERATION void getServerName(String agent, OpFeedbackParam<String> agentServer){
+		agentServer.set(agentNames.get(agent));
 	}
 	
 	@OPERATION void addLoad(String agent, int load){

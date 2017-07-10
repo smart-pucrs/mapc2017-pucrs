@@ -9,6 +9,7 @@
 	+max_bid_time(2000);
 	+job_bidders(4);
 	+coalition_leaders([vehicle1,vehicle2,vehicle3,vehicle4]);
+	+tool_types([vehicle1,vehicle5,vehicle13,vehicle21]);
 	+vehicle_mission(motorcycle,4);
 	+noActionCount(0);
 	.

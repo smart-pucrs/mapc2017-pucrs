@@ -7,7 +7,7 @@
   	.
   	
 +default::task(Task,CNPBoard,TaskId,QuadS)
-	: .term2string(Quad,QuadS) & coalition::coalition(Quad, _, _)
+	: .term2string(Quad,QuadS) & coalition::coalition(Quad, _, ExplorationTask) & ExplorationTask \== workshop
 <- 
 	lookupArtifact(CNPBoard,BoardId);
 	focus(BoardId);
@@ -30,7 +30,7 @@
 	: .my_name(Me)
 <-
 	!create_bid_task(item(ItemId, Qty), Bid, Shop);
-	bid(Me,Bid,Shop,TaskId)[artifact_id(BoardId)];
+	bid(Me,Bid,Shop,TaskId,item(ItemId, Qty))[artifact_id(BoardId)];
 	.
 
 @create_bid_task[atomic]
@@ -83,7 +83,7 @@
 +default::winner(TaskList, TaskType)
 <-
 	if (.number(TaskType)) { .print("I won the task to use ",List); }
-	else { .print("I won the task to get ",List," in ",TaskType); }
+	else { .print("I won the task to get ",TaskList," in ",TaskType); }
 	.
 
 +default::step(End)

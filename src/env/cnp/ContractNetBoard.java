@@ -31,9 +31,9 @@ public class ContractNetBoard extends Artifact {
 		}
 	}
 	
-	@OPERATION void bid(String agent, int distance, String shop, int taskid){
+	@OPERATION void bid(String agent, int distance, String shop, int taskid, String item){
 		if (state){
-			bids.add(new Bid(agent,distance,shop,taskid));
+			bids.add(new Bid(agent,distance,shop,taskid,item));
 		} else {
 			this.failed("cnp_closed");
 		}
@@ -73,7 +73,7 @@ public class ContractNetBoard extends Artifact {
 		int i = 0;
 		Literal[] aux= new Literal[bids.size()];
 		for (Bid p: bids){
-			aux[i] = Literal.parseLiteral("bid("+p.getAgent()+","+p.getDistance()+","+p.getShop()+","+p.getTaskId()+")");
+			aux[i] = Literal.parseLiteral("bid("+p.getAgent()+","+p.getDistance()+","+p.getShop()+","+p.getItem()+","+p.getTaskId()+")");
 			i++;
 		}
 		bidList.set(aux);
@@ -97,23 +97,26 @@ public class ContractNetBoard extends Artifact {
 		private int distance;
 		private String shop;
 		private int taskid;
+		private String item;
 		
 		public Bid(String agent, int distance){
 			this.agent = agent;
 			this.distance = distance;
 		}
 		
-		public Bid(String agent, int distance, String shop, int taskid){
+		public Bid(String agent, int distance, String shop, int taskid, String item){
 			this.agent = agent;
 			this.distance = distance;
 			this.shop = shop;
 			this.taskid = taskid;
+			this.item = item;
 		}
 		
 		public String getAgent(){ return agent; }
 		public int getDistance(){ return distance; }
 		public String getShop(){ return shop; }
 		public int getTaskId(){ return taskid; }
+		public String getItem(){ return item; }
 	}
 	
 }

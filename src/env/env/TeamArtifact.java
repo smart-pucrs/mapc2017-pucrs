@@ -73,8 +73,12 @@ public class TeamArtifact extends Artifact {
 		loads.put(agent,load);
 	}
 	
-	@OPERATION void getLoads(String agent, OpFeedbackParam<Integer> load){
+	@OPERATION void getLoad(String agent, OpFeedbackParam<Integer> load){
 		load.set(loads.get(agent));
+	}
+	
+	public static int getLoad(String agent) {
+		return loads.get(agent);
 	}
 	
 	@OPERATION void addResourceNode(String resourceId, double lat, double lon, String resource){
@@ -102,10 +106,5 @@ public class TeamArtifact extends Artifact {
 	@OPERATION void getTools(String half, OpFeedbackParam<String[]> toolList){
 		toolList.set(toolHalf.get(half));
 	}
-	
-	@OPERATION void updateLoad(String agent, int load){
-		this.removeObsPropertyByTemplate("load",agent,null);
-		this.defineObsProperty("load",agent,load);
-	}	
 	
 }

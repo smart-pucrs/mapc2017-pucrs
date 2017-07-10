@@ -31,10 +31,10 @@
 +!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Quad)
 <- 
 	announce(item(ItemId,Qty),Deadline,NumberOfAgents,CNPBoardName,Quad);
-	.print("Created cnp ",CNPBoardName," for task #",Qty," of ",ItemId);
+//	.print("Created cnp ",CNPBoardName," for task #",Qty," of ",ItemId);
 	getBidsTask(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
-		.print("Got bids (",.length(Bids),") for task ",CNPBoardName," List ",Bids);
+		.print("Got bids (",.length(Bids),") for task #",Qty," ",ItemId," Bids: ",Bids);
 		+bids(item(ItemId,Qty),Bids);
 	}
 	else {
@@ -44,7 +44,7 @@
 	.
 	
 +!separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items))
-	: new::max_bid_time(Deadline) & coalition::coalition(Quad,Members,_) & NumberOfAgents = .length(Members)+1
+	: new::max_bid_time(Deadline) & coalition::coalition(Quad,Members,_) & NumberOfAgents = .length(Members)
 <-
 	?default::decomposeRequirements(Items,[],Bases);
 	+number_of_tasks(0);
@@ -68,16 +68,22 @@
 	for ( bids(item(ItemId,Qty),Bids) ) {
 		if (.substring("item",ItemId)) {
 			-bids(item(ItemId,Qty),Bids);
-//			?default::select_bid(Bids,bid(99999,99999,99999,99999),bid(Agent,Distance,Shop,TaskId));
-//			if (not initiator::awarded(Agent,_,_)) {
-//				+awarded(Agent,Shop,[item(ItemId,Qty)]);
-//			}
-//			else {
-//				?awarded(Agent,Shop,List);
-//	    		-awarded(Agent,Shop,List);
-//	    		.concat(List,[item(ItemId,Qty)],NewList);
-//	    		+awarded(Agent,Shop,NewList);
-//			}
+			?default::select_bid(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
+			if (Distance \== 99999) {
+				getLoad(Agent,Load);
+				?default::item(ItemId,Volume,_,_);
+		    	addLoad(Agent,Load-Volume*Qty);
+				if (not initiator::awarded(Agent,_,_)) {
+					+awarded(Agent,Shop,[item(ItemId,Qty)]);
+				}
+				else {
+					?awarded(Agent,Shop,List);
+		    		-awarded(Agent,Shop,List);
+		    		.concat(List,[item(ItemId,Qty)],NewList);
+		    		+awarded(Agent,Shop,NewList);
+				}
+			}
+			else { .print("Impossible task detected!") }
 		}
 	}
 	for ( bids(item(ItemId,Qty),Bids) ) {

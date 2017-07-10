@@ -13,9 +13,9 @@ enough_battery2(FacilityAux, Lat, Lon, FacilityId2, Result, Battery) :- role(Rol
 enough_battery_charging(FacilityId, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId, RouteLen) & charge(Battery) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
 enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId, RouteLen) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
 
-select_bid([],bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),bid(BidWinner,BidAgentWinner,ShopIdWinner,ItemWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId  & ItemWinner = AuxItem.
-select_bid([bid(Bid,BidAgent,ShopId,item(ItemId,Qty))|Bids],bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( ((not awarded(BidAgent,_,_)) )  | (awarded(BidAgent,ShopId,_) & item(ItemId,Volume,_,_) & .term2string(BidAgent,BidAgentS) & load(BidAgentS,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(Bid,BidAgent,ShopId,item(ItemId,Qty)),BidWinner).
-select_bid([bid(Bid,BidAgent,ShopId,Item)|Bids],bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),BidWinner) :- select_bid(Bids,bid(AuxBid,AuxBidAgent,AuxShopId,AuxItem),BidWinner).
+select_bid([],bid(AuxBidAgent,AuxBid,AuxShopId),bid(BidAgentWinner,BidWinner,ShopIdWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId.
+select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( ((not initiator::awarded(BidAgent,_,_)) )  | (initiator::awarded(BidAgent,ShopId,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid([bid(BidAgent,Bid,ShopId,Item,TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- select_bid(Bids,bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner).
 
 select_bid_mission([],bid(AuxAgent,AuxDistance),bid(AgentWinner,DistanceWinner)) :- AgentWinner = AuxAgent & DistanceWinner = AuxDistance.
 select_bid_mission([bid(Agent,Distance)|Bids],bid(AuxAgent,AuxDistance),BidWinner) :- Distance \== -1 & Distance < AuxDistance & select_bid_mission(Bids,bid(Agent,Distance),BidWinner).

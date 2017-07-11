@@ -2,7 +2,7 @@
 free.
 
 +default::actionID(0)
-	: .my_name(Me)
+	: true
 <-
 	.wait({ +coalition::coalition(Quad,Members,Task) });
 	if (Task == shoporganiser) {
@@ -14,12 +14,14 @@ free.
 		for ( .member(agent(Agent,shop),Members) ) {
 			?counter(I);
 			.nth(I,Shops,Shop);
+			.print(I);
 			if (NumberOfShops-1 >= I+1) { -+counter(I+1); }
+			else { if (NumberOfShops-1 \== 0) { -+counter(I-1); }}
 			.send(Agent, achieve, strategies::exploreShop(Shop));
 		}
 		-counter(_);
-		.nth(0,Shops,Shop);
-		!exploreShop(Shop);
+		.nth(NumberOfShops-1,Shops,ShopN);
+		!exploreShop(ShopN);
 	}
 //	if (Task == explore) {-free; !explore(Quad)};
 //	if (Task == shop) {-free; !exploreShop(Quad)};

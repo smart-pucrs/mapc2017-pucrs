@@ -14,7 +14,6 @@ free.
 		for ( .member(agent(Agent,shop),Members) ) {
 			?counter(I);
 			.nth(I,Shops,Shop);
-			.print(I);
 			if (NumberOfShops-1 >= I+1) { -+counter(I+1); }
 			else { if (NumberOfShops-1 \== 0) { -+counter(I-1); }}
 			.send(Agent, achieve, strategies::exploreShop(Shop));

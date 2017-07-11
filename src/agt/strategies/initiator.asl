@@ -47,15 +47,22 @@
 	: new::max_bid_time(Deadline) & coalition::coalition(Quad,Members,_) & NumberOfAgents = .length(Members)
 <-
 	?default::decomposeRequirements(Items,[],Bases);
-	+number_of_tasks(0);
-	for ( .member(Lists,Bases) ) { 
-		?number_of_tasks(NumberOfTasks); 
-		-+number_of_tasks(NumberOfTasks+.length(Lists));
-	}
+	+bases([]);
 	for ( .member(Item,Bases) ) {
-		for ( .member(item(ItemId,Qty),Item) ) {
-			!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Quad);
-		}
+		?bases(L);
+		.concat(L,Item,New);
+		-+bases(New);
+	}
+	?bases(B);
+	-bases(B);
+	?default::separateItemTool(B,ListTools,ListItems);
+	?default::removeDuplicateTool(ListTools,ListToolsNew);
+	+number_of_tasks(.length(ListItems)+.length(ListToolsNew));
+	for ( .member(item(ItemId,Qty),ListItems) ) {
+		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Quad);
+	}
+	for ( .member(item(ItemId,Qty),ListToolsNew) ) {
+		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Quad);
 	}
 	.
 	
@@ -63,7 +70,6 @@
 +bids(item(_,_),_)
 	: .count(initiator::bids(_,_),NumberOfBids) & number_of_tasks(NumberOfTasks) & NumberOfBids == NumberOfTasks
 <-
-	.print("@@@@@@@@@@@ Finished getting all bids, time to select and award.");
 	-number_of_tasks(NumberOfTasks);
 	for ( bids(item(ItemId,Qty),Bids) ) {
 		if (.substring("tool",ItemId)) {
@@ -83,35 +89,33 @@
 		    		+awarded(Agent,tool,NewList);
 				}
 			}
-			else { .print("Impossible task detected!"); +impossible_task; }
+			else { +impossible_task }
 		}
 	}
-//	for ( bids(item(ItemId,Qty),Bids) ) {
-//		if (.substring("item",ItemId)) {
-//			-bids(item(ItemId,Qty),Bids);
-//			?default::select_bid(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
-//			if (Distance \== 99999) {
-//				getLoad(Agent,Load);
-//				?default::item(ItemId,Volume,_,_);
-//		    	addLoad(Agent,Load-Volume*Qty);
-//				if (not initiator::awarded(Agent,_,_)) {
-//					+awarded(Agent,Shop,[item(ItemId,Qty)]);
-//				}
-//				else {
-//					?awarded(Agent,Shop,List);
-//		    		-awarded(Agent,Shop,List);
-//		    		.concat(List,[item(ItemId,Qty)],NewList);
-//		    		+awarded(Agent,Shop,NewList);
-//				}
-//			}
-//			else { .print("Impossible task detected!"); +impossible_task; }
-//		}
-//	}
+	for ( bids(item(ItemId,Qty),Bids) ) {
+		-bids(item(ItemId,Qty),Bids);
+		?default::select_bid(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
+		if (Distance \== 99999) {
+			getLoad(Agent,Load);
+			?default::item(ItemId,Volume,_,_);
+	    	addLoad(Agent,Load-Volume*Qty);
+			if (not initiator::awarded(Agent,_,_)) {
+				+awarded(Agent,Shop,[item(ItemId,Qty)]);
+			}
+			else {
+				?awarded(Agent,_,List);
+	    		-awarded(Agent,_,List);
+	    		.concat(List,[item(ItemId,Qty)],NewList);
+	    		+awarded(Agent,Shop,NewList);
+			}
+		}
+		else { +impossible_task }
+	}
 	if (not impossible_task) {
 		for (awarded(Agent,Shop,List)) {
-	    	.send(Agent,tell,winner(List,Shop));
+	    	.send(Agent,tell,winner(List));
 			-awarded(Agent,Shop,List);	
 		}	
 	}
-	else { -impossible_task }
+	else { -impossible_task; .print("Impossible job, aborting it."); }
 	.	

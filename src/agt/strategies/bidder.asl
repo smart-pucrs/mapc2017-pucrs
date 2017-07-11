@@ -38,7 +38,7 @@
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
 <-
     if (.substring("item",ItemId)) {
-		if (LoadCap - MyLoad >= Vol * Qty + 15) {
+		if (LoadCap - MyLoad >= Vol * Qty) {
 			?default::find_shops(ItemId,SList,Shops);
 			actions.closest(Role,Shops,ClosestShop);
 			actions.route(Role,Speed,ClosestShop,RouteShop);
@@ -80,10 +80,9 @@
 	!initiator::separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items));
 	.
 	
-+default::winner(TaskList, TaskType)
++default::winner(TaskList)
 <-
-	if (TaskType == tool) { .print("I won the task to use ",TaskList); }
-	else { .print("I won the task to get ",TaskList," in ",TaskType); }
+	.print("I won the tasks ",TaskList);
 	.
 
 +default::step(End)

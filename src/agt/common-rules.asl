@@ -14,7 +14,8 @@ enough_battery_charging(FacilityId, Result) :- role(Role, Speed, _, _, _) & acti
 enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId, RouteLen) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
 
 select_bid([],bid(AuxBidAgent,AuxBid,AuxShopId),bid(BidAgentWinner,BidWinner,ShopIdWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId.
-select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( ((not initiator::awarded(BidAgent,_,_)) )  | (initiator::awarded(BidAgent,ShopId,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( ((not initiator::awarded(BidAgent,_,_)) )  | (initiator::awarded(BidAgent,ShopId2,_) & (ShopId2 == ShopId | ShopId2 == tool) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( (initiator::awarded(BidAgent,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
 select_bid([bid(BidAgent,Bid,ShopId,Item,TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- select_bid(Bids,bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner).
 
 select_bid_tool([],bid(AuxBidAgent,AuxBid),bid(BidAgentWinner,BidWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent.
@@ -63,6 +64,14 @@ decomposeRequirements([],Temp,Result):- Result = Temp.
 decomposeRequirements([required(Item,Qtd) | Requirements],Temp,Result):- item(Item,_,tools(Tools),parts(Parts)) & decomposeItem(Item,Qtd,Tools,Parts,[],ListItensJob) & decomposeRequirements(Requirements,[ListItensJob|Temp],Result).
 decomposeRequirementsNoTools([],Temp,Result):- Result = Temp.
 decomposeRequirementsNoTools([required(Item,_) | Requirements],Temp,Result):- item(Item,_,_,parts(Parts)) & decomposeItemNoTools(Item,Parts,[],ListItensJob) & .union(ListItensJob,Temp,New) & decomposeRequirementsNoTools(Requirements,New,Result).
+
+separateItemTool([],[],[]).
+separateItemTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools],ListItems) :- .substring("tool",ItemId) & separateItemTool(B,ListTools,ListItems).
+separateItemTool([item(ItemId,Qty)|B],ListTools,[item(ItemId,Qty)|ListItems]) :- .substring("item",ItemId) & separateItemTool(B,ListTools,ListItems).
+
+removeDuplicateTool([],[]).
+removeDuplicateTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools]) :- not .member(item(ItemId,Qty),B) & separateItemTool(B,ListTools,ListItems).
+removeDuplicateTool([item(ItemId,Qty)|B],ListTools) :- separateItemTool(B,ListTools,ListItems).
 
 getQuadLatLon(quad1,QLat,QLon) :- coalition::quad1(QLat,QLon).
 getQuadLatLon(quad2,QLat,QLon) :- coalition::quad2(QLat,QLon).

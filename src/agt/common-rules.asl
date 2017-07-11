@@ -34,6 +34,10 @@ checkQuadrant(quad2,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLo
 checkQuadrant(quad3,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < CenterLat & Lat > MinLat & Lon < CenterLon & Lon > MinLon).
 checkQuadrant(quad4,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < CenterLat & Lat > MinLat & Lon < MaxLon & Lon > CenterLon).
 
+getQuadShops(Quad, [], []).
+getQuadShops(Quad, [Shop|List], [Shop|Shops]) :- getFacility(Shop,Flat,Flon,LatAux,LonAux) & checkQuadrant(Quad, Flat, Flon) & getQuadShops(Quad, List, Shops).
+getQuadShops(Quad, [Shop|List], Shops) :- getQuadShops(Quad, List, Shops).
+
 convertListString2Term([],Temp,Result) :- Result = Temp.
 convertListString2Term([String | ListString],Temp,Result) :- .term2string(Term,String) & convertListString2Term(ListString,[Term|Temp],Result).
 

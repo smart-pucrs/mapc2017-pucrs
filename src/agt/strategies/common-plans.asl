@@ -1,11 +1,28 @@
 { include("action/actions.asl",action) }
 free.
 
-+default::actionID(0) 
++default::actionID(0)
+	: .my_name(Me)
 <-
 	.wait({ +coalition::coalition(Quad,Members,Task) });
+	if (Task == shoporganiser) {
+		?new::shopList(List);
+		?default::getQuadShops(Quad, List, Shops);
+//		.print("Shops in my quad ",Shops);
+		+counter(0);
+		.length(Shops,NumberOfShops);
+		for ( .member(agent(Agent,shop),Members) ) {
+			?counter(I);
+			.nth(I,Shops,Shop);
+			if (NumberOfShops-1 >= I+1) { -+counter(I+1); }
+			.send(Agent, achieve, strategies::exploreShop(Shop));
+		}
+		-counter(_);
+		.nth(0,Shops,Shop);
+		!exploreShop(Shop);
+	}
 //	if (Task == explore) {-free; !explore(Quad)};
-	if (Task == shop) {-free; !exploreShop(Quad)};
+//	if (Task == shop) {-free; !exploreShop(Quad)};
 //	if (Task == first) {-free; !exploreTools(Task,Quad,Members)};
 //	if (Task == second) {-free; !exploreTools(Task,Quad,Members)};
 	if (Task == workshop) {-free; !exploreWorkshop(Quad)};
@@ -17,16 +34,17 @@ free.
 	!action::skip;
 	.
 
-+!exploreShop(Quad)
-	: default::role(Role, _, _, _, _) & new::shopList(List) & default::getQuadLatLon(Quad,Lat,Lon)
++!exploreShop(Shop)
+	: true
 <- 
-	actions.closest(Role,Lat,Lon,List,_,ClosestShop);
-	!action::goto(ClosestShop);
+	-free;
+	!action::goto(Shop);
 	?default::step(S);
 	.print("Finished my exploration at step ",S);
 	+free; 
 	!action::skip;
 	.
+	
 +!exploreWorkshop(Quad)
 	: default::role(Role, _, _, _, _) & new::workshopList(List) & default::getQuadLatLon(Quad,Lat,Lon)
 <- 

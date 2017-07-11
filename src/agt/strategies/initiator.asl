@@ -83,7 +83,7 @@
 		    		+awarded(Agent,Shop,NewList);
 				}
 			}
-			else { .print("Impossible task detected!") }
+			else { .print("Impossible task detected!"); +impossible_task; }
 		}
 	}
 	for ( bids(item(ItemId,Qty),Bids) ) {
@@ -93,8 +93,11 @@
 //			+awarded(Agent,TaskId,[item(ItemId,Qty)]);
 //		}
 	}
-    for (awarded(Agent,Shop,List)) {
-    	.send(Agent,tell,winner(List,Shop));
-		-awarded(Agent,Shop,List);	
-	}	
+	if (not impossible_task) {
+		for (awarded(Agent,Shop,List)) {
+	    	.send(Agent,tell,winner(List,Shop));
+			-awarded(Agent,Shop,List);	
+		}	
+	}
+	else { -impossible_task }
 	.	

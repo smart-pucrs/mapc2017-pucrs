@@ -17,6 +17,11 @@ select_bid([],bid(AuxBidAgent,AuxBid,AuxShopId),bid(BidAgentWinner,BidWinner,Sho
 select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( ((not initiator::awarded(BidAgent,_,_)) )  | (initiator::awarded(BidAgent,ShopId,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
 select_bid([bid(BidAgent,Bid,ShopId,Item,TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- select_bid(Bids,bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner).
 
+select_bid_tool([],bid(AuxBidAgent,AuxBid),bid(BidAgentWinner,BidWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent.
+select_bid_tool([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- Bid == 1 & initiator::awarded(BidAgent,tool,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume & select_bid_tool([],bid(BidAgent,Bid),BidWinner).
+select_bid_tool([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- Bid \== -1 & Bid < AuxBid & not initiator::awarded(BidAgent,tool,_) & select_bid_tool(Bids,bid(BidAgent,Bid),BidWinner).
+select_bid_tool([bid(BidAgent,Bid,ShopId,Item,TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- select_bid_tool(Bids,bid(AuxBidAgent,AuxBid),BidWinner).
+
 select_bid_mission([],bid(AuxAgent,AuxDistance),bid(AgentWinner,DistanceWinner)) :- AgentWinner = AuxAgent & DistanceWinner = AuxDistance.
 select_bid_mission([bid(Agent,Distance)|Bids],bid(AuxAgent,AuxDistance),BidWinner) :- Distance \== -1 & Distance < AuxDistance & select_bid_mission(Bids,bid(Agent,Distance),BidWinner).
 select_bid_mission([bid(Agent,Distance)|Bids],bid(AuxAgent,AuxDistance),BidWinner) :- select_bid_mission(Bids,bid(AuxAgent,AuxDistance),BidWinner).

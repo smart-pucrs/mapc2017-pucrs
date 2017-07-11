@@ -66,33 +66,47 @@
 	.print("@@@@@@@@@@@ Finished getting all bids, time to select and award.");
 	-number_of_tasks(NumberOfTasks);
 	for ( bids(item(ItemId,Qty),Bids) ) {
-		if (.substring("item",ItemId)) {
+		if (.substring("tool",ItemId)) {
 			-bids(item(ItemId,Qty),Bids);
-			?default::select_bid(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
-			if (Distance \== 99999) {
+			?default::select_bid_tool(Bids,bid(99999,99999),bid(Agent,Bid));
+			if (Bid \== 99999) {
 				getLoad(Agent,Load);
 				?default::item(ItemId,Volume,_,_);
 		    	addLoad(Agent,Load-Volume*Qty);
-				if (not initiator::awarded(Agent,_,_)) {
-					+awarded(Agent,Shop,[item(ItemId,Qty)]);
+				if (not initiator::awarded(Agent,tool,_)) {
+					+awarded(Agent,tool,[item(ItemId,Qty)]);
 				}
 				else {
-					?awarded(Agent,Shop,List);
-		    		-awarded(Agent,Shop,List);
+					?awarded(Agent,tool,List);
+		    		-awarded(Agent,tool,List);
 		    		.concat(List,[item(ItemId,Qty)],NewList);
-		    		+awarded(Agent,Shop,NewList);
+		    		+awarded(Agent,tool,NewList);
 				}
 			}
 			else { .print("Impossible task detected!"); +impossible_task; }
 		}
 	}
-	for ( bids(item(ItemId,Qty),Bids) ) {
-		-bids(item(ItemId,Qty),Bids);
-//		?default::select_bid_tool(Bids,bid(99999,99999,99999,99999),bid(Agent,Distance,Shop,TaskId));
-//		if (not initiator::awarded(Agent,TaskId,_)) {
-//			+awarded(Agent,TaskId,[item(ItemId,Qty)]);
+//	for ( bids(item(ItemId,Qty),Bids) ) {
+//		if (.substring("item",ItemId)) {
+//			-bids(item(ItemId,Qty),Bids);
+//			?default::select_bid(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
+//			if (Distance \== 99999) {
+//				getLoad(Agent,Load);
+//				?default::item(ItemId,Volume,_,_);
+//		    	addLoad(Agent,Load-Volume*Qty);
+//				if (not initiator::awarded(Agent,_,_)) {
+//					+awarded(Agent,Shop,[item(ItemId,Qty)]);
+//				}
+//				else {
+//					?awarded(Agent,Shop,List);
+//		    		-awarded(Agent,Shop,List);
+//		    		.concat(List,[item(ItemId,Qty)],NewList);
+//		    		+awarded(Agent,Shop,NewList);
+//				}
+//			}
+//			else { .print("Impossible task detected!"); +impossible_task; }
 //		}
-	}
+//	}
 	if (not impossible_task) {
 		for (awarded(Agent,Shop,List)) {
 	    	.send(Agent,tell,winner(List,Shop));

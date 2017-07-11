@@ -31,9 +31,9 @@ public class ContractNetBoard extends Artifact {
 		}
 	}
 	
-	@OPERATION void bid(String agent, int distance, String shop, int taskid, String item){
+	@OPERATION void bid(String agent, int distance, String shop, String item, int taskid){
 		if (state){
-			bids.add(new Bid(agent,distance,shop,taskid,item));
+			bids.add(new Bid(agent,distance,shop,item,taskid));
 		} else {
 			this.failed("cnp_closed");
 		}
@@ -104,7 +104,7 @@ public class ContractNetBoard extends Artifact {
 			this.distance = distance;
 		}
 		
-		public Bid(String agent, int distance, String shop, int taskid, String item){
+		public Bid(String agent, int distance, String shop, String item, int taskid){
 			this.agent = agent;
 			this.distance = distance;
 			this.shop = shop;

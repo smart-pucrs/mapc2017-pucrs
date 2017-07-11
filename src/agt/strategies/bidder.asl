@@ -30,7 +30,7 @@
 	: .my_name(Me)
 <-
 	!create_bid_task(item(ItemId, Qty), Bid, Shop);
-	bid(Me,Bid,Shop,TaskId,item(ItemId, Qty))[artifact_id(BoardId)];
+	bid(Me,Bid,Shop,item(ItemId, Qty),TaskId)[artifact_id(BoardId)];
 	.
 
 @create_bid_task[atomic]
@@ -82,7 +82,7 @@
 	
 +default::winner(TaskList, TaskType)
 <-
-	if (.number(TaskType)) { .print("I won the task to use ",List); }
+	if (TaskType == tool) { .print("I won the task to use ",TaskList); }
 	else { .print("I won the task to get ",TaskList," in ",TaskType); }
 	.
 

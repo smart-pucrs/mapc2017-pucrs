@@ -201,14 +201,24 @@
 // Assemble
 // ItemId must be a string
 +!assemble(ItemId)
+	: default::hasItem(ItemId,OldAmount)
+<-
+	!localActions::commitAction(assemble(ItemId));
+	!assembleLoop(ItemId,1,OldAmount);
+	.
++!assemble(ItemId)
 	: true
 <-
-	!localActions::commitAction(
-		assemble(
-			item(ItemId)
-		)
-	);
+	!localActions::commitAction(assemble(ItemId));
+	!assembleLoop(ItemId,1,0);
 	.
++!assembleLoop(ItemId, Amount, OldAmount)
+	: not default::hasItem(ItemId,Amount+OldAmount)
+<-
+	!localActions::commitAction(assemble(ItemId));
+	!assembleLoop(ItemId, Amount, OldAmount);
+	.
+-!assembleLoop(ItemId,Amount,OldAmount).
 
 // Assist assemble
 // AgentId must be a string
@@ -227,11 +237,7 @@
 +!deliver_job(JobId)
 	: true
 <-
-	!localActions::commitAction(
-		deliver_job(
-			job(JobId)
-		)
-	);
+	!localActions::commitAction(deliver_job(JobId));
 	.
 
 // Bid for job

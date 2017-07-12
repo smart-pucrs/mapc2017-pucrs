@@ -34,7 +34,7 @@
 //	.print("Created cnp ",CNPBoardName," for task #",Qty," of ",ItemId);
 	getBidsTask(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
-		.print("Got bids (",.length(Bids),") for task #",Qty," ",ItemId," Bids: ",Bids);
+//		.print("Got bids (",.length(Bids),") for task #",Qty," ",ItemId," Bids: ",Bids);
 		+bids(item(ItemId,Qty),Bids);
 	}
 	else {
@@ -65,7 +65,7 @@
 		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Quad);
 	}
 	.member(agent(Agent,workshop),Members);
-	+awarded_assemble(Agent,Items,Storage);
+	+awarded_assemble(Agent,Items,Storage,Id);
 	.
 	
 @selectBids[atomic]
@@ -114,8 +114,8 @@
 		else { +impossible_task }
 	}
 	if (not impossible_task) {
-		?awarded_assemble(AgentA,Items,Storage);
-		.send(AgentA,tell,winner(Items,Storage));
+		?awarded_assemble(AgentA,Items,Storage,JobId);
+		.send(AgentA,tell,winner(Items,Storage,JobId));
 		for (awarded(Agent,Shop,List)) {
 	    	.send(Agent,tell,winner(List));
 			-awarded(Agent,Shop,List);	

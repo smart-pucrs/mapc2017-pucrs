@@ -84,9 +84,11 @@
 <-
 	.print("I won the tasks ",TaskList);
 	.
-+default::winner(TaskList, Storage)
++default::winner(TaskList, Storage, JobId)
 <-
-	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage);
+	?default::get_assemble(TaskList,[],AssembleList);
+	.print("I won the tasks to assemble ",AssembleList," and deliver to ",Storage," for ",JobId);
+	!strategies::go_assemble(AssembleList,Storage,JobId);
 	.
 
 +default::step(End)

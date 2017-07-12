@@ -56,6 +56,26 @@ free.
 	+free; 
 	!action::skip;
 	.
+	
++!go_assemble(AssembleList,Storage,JobId)
+	: default::role(Role, _, _, _, _) & new::workshopList(WList)
+<-
+	-free;
+	actions.closest(Role,WList,Storage,ClosestWorkshop);
+	!action::goto(ClosestWorkshop);
+	for ( .member(item(ItemId,Qty),AssembleList) ) {
+		for ( .range(I,1,Qty) ) {
+			!action::assemble(ItemId);
+		} 
+	}
+	.print("Finished assembly all items, ready to deliver.");
+	!action::goto(Storage);
+	!action::deliver_job(JobId);
+	.print("$$$ I have just delivered job ",JobId);
+	+free;
+	!action::skip;
+	.
+	
 //+!explore(Quad)
 //	: coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon)
 //<- 

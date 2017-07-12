@@ -73,6 +73,13 @@ removeDuplicateTool([],[]).
 removeDuplicateTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools]) :- not .member(item(ItemId,Qty),B) & separateItemTool(B,ListTools,ListItems).
 removeDuplicateTool([item(ItemId,Qty)|B],ListTools) :- separateItemTool(B,ListTools,ListItems).
 
+get_assemble([],Aux,AssembleList) :- AssembleList = Aux.
+get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts(Parts,Assemble) & .concat([item(ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList).
+get_assemble([required(ItemId,Qty)|TaskList],[item(ItemId,Qty)|Aux],AssembleList) :- get_assemble(TaskList,Aux,AssembleList).
+get_parts([],[]).
+get_parts([[Item,Qty]|Parts],[item(Item,Qty)|Assemble]) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts(Parts2,Assemble) & get_parts(Parts,Assemble).
+get_parts([[Item,Qty]|Parts],Assemble) :- get_parts(Parts,Assemble).
+
 getQuadLatLon(quad1,QLat,QLon) :- coalition::quad1(QLat,QLon).
 getQuadLatLon(quad2,QLat,QLon) :- coalition::quad2(QLat,QLon).
 getQuadLatLon(quad3,QLat,QLon) :- coalition::quad3(QLat,QLon).

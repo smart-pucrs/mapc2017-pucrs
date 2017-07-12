@@ -121,8 +121,8 @@
 		  "jobs" : {
 			"rate" : [0.15, 0.3],
 			"auctionProbability" : [0.3, 0.5],
-			"missionProbability" : 0.1,
-			"productTypesMin" : [2,4] ,
+			"missionProbability" : 0.5,
+			"productTypesMin" : [2,4],
 			"productTypesMax" : [3,6],
 			"difficultyMin" : [2, 5],
 			"difficultyMax" : [10,15],

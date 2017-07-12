@@ -96,7 +96,15 @@
 	: true
 <-	
 	!localActions::commitAction(buy(ItemId,Amount));
+	!buy_loop(ItemId, Amount);
 	.
++!buy_loop(ItemId, Amount)
+	: not default::hasItem(ItemId, Amount)
+<-
+	!localActions::commitAction(buy(ItemId,Amount));
+	!buy_loop(ItemId, Amount);
+	.
+-!buy_loop(ItemId, Amount).
 
 // Give
 // AgentId must be a string
@@ -222,15 +230,19 @@
 
 // Assist assemble
 // AgentId must be a string
-+!assist_assemble(AgentId)
++!assist_assemble(AgentName)
 	: true
 <-
-	!localActions::commitAction(
-		assist_assemble(
-			assembler(AgentId)
-		)
-	);
+	getServerName(AgentName,ServerName);
+	!assist_assemble_loop(ServerName);
 	.
++!assist_assemble_loop(ServerName)
+	: strategies::assembling
+<-
+	!localActions::commitAction(assist_assemble(ServerName));
+	!assist_assemble_loop(ServerName);
+	.
+	
 
 // Deliver job
 // JobId must be a string

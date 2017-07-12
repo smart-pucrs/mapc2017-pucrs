@@ -58,20 +58,48 @@ free.
 	.
 	
 +!go_assemble(AssembleList,Storage,JobId)
-	: default::role(Role, _, _, _, _) & new::workshopList(WList)
+	: default::role(Role, _, _, _, _) & new::workshopList(WList) & coalition::coalition(_,Members,_)
 <-
 	-free;
 	actions.closest(Role,WList,Storage,ClosestWorkshop);
 	!action::goto(ClosestWorkshop);
-	for ( .member(item(ItemId,Qty),AssembleList) ) {
+//	.print("Assemble List ",AssembleList);
+	for ( .member(item(_,ItemId,Qty),AssembleList) ) {
 		for ( .range(I,1,Qty) ) {
+//			.print("trying to assemble ",ItemId);
 			!action::assemble(ItemId);
 		} 
+	}
+	for ( .member(agent(Agent,_),Members) ) {
+		.send(Agent,untell,strategies::assembling);
 	}
 	.print("Finished assembly all items, ready to deliver.");
 	!action::goto(Storage);
 	!action::deliver_job(JobId);
 	.print("$$$ I have just delivered job ",JobId);
+	+free;
+	!action::skip;
+	.
+	
++!go_work(TaskList, Storage)
+	: default::role(Role, _, _, _, _) & new::workshopList(WList) & new::shopList(SList) & coalition::coalition(_,Members,_)
+<-
+	-free;
+	for ( .member(item(ItemId,Qty),TaskList) ) {
+		?default::find_shops(ItemId,SList,Shops);
+		actions.closest(Role,Shops,ClosestShop);
+		if (buyList(ItemId,Qty2,ClosestShop)) {
+			-buyList(ItemId,Qty2,ClosestShop);
+			+buyList(ItemId,Qty+Qty2,ClosestShop);
+		}
+		else { +buyList(ItemId,Qty,ClosestShop); }
+	}
+	!go_buy;
+	actions.closest(Role,WList,Storage,ClosestWorkshop);
+	!action::goto(ClosestWorkshop);
+	+assembling;
+	.member(agent(Agent,workshop),Members);
+	!action::assist_assemble(Agent);
 	+free;
 	!action::skip;
 	.
@@ -142,19 +170,19 @@ free.
 //	!action::skip;
 //	.
 //
-//+!goBuy
-//	: buyList(_,_,Shop)
-//<-
-////	.print("Going to shop ",Shop);
-//	!action::goto(Shop);
-//	for ( buyList(Tool,Qty,Shop) ) {
-//		!action::buy(Tool,Qty);
-////		.print("Buying #",Qty," of ",Tool);
-//		-buyList(Tool,Qty,Shop);
-//	}
-//	!goBuy
-//	.
-//+!goBuy.
++!go_buy
+	: buyList(_,_,Shop)
+<-
+//	.print("Going to shop ",Shop);
+	!action::goto(Shop);
+	for ( buyList(ItemId,Qty,Shop) ) {
+		!action::buy(ItemId,Qty);
+//		.print("Buying #",Qty," of ",ItemId);
+		-buyList(ItemId,Qty,Shop);
+	}
+	!go_buy
+	.
++!go_buy.
 
 //+default::resNode(ResourceId,Lat,Lon,Resource)
 //<- !checkCoalition(ResourceId,Lat,Lon,Resource).

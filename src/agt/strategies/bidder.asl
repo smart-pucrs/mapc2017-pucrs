@@ -82,13 +82,13 @@
 	
 +default::winner(TaskList, Storage)
 <-
-	-winner(TaskList, Storage);
+	-default::winner(TaskList, Storage);
 	.print("I won the tasks ",TaskList);
 	!strategies::go_work(TaskList, Storage);
 	.
 +default::winner(TaskList, Storage, JobId)
 <-
-	-winner(TaskList, Storage, JobId);
+	-default::winner(TaskList, Storage, JobId);
 	?default::get_assemble(TaskList,[],AssembleList);
 	.sort(AssembleList,AssembleListSorted);
 	.print("I won the tasks to assemble ",AssembleListSorted," and deliver to ",Storage," for ",JobId);

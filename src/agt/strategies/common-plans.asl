@@ -77,6 +77,8 @@ free.
 	!action::goto(Storage);
 	!action::deliver_job(JobId);
 	.print("$$$ I have just delivered job ",JobId);
+	.member(agent(Agent,shoporganiser),Members);
+	.send(Agent,achieve,strategies::job_finished);
 	+free;
 	!action::skip;
 	.
@@ -105,6 +107,8 @@ free.
 	.
 	
 +!stop_assisting <- -assembling.
+
++!job_finished <- -default::winner(_).
 	
 //+!explore(Quad)
 //	: coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon)

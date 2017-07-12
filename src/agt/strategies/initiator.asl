@@ -46,7 +46,9 @@
 +!separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items))
 	: new::max_bid_time(Deadline) & coalition::coalition(Quad,Members,_) & NumberOfAgents = .length(Members)
 <-
+	.print(Items);
 	?default::decomposeRequirements(Items,[],Bases);
+	.print(Bases);
 	+bases([]);
 	for ( .member(Item,Bases) ) {
 		?bases(L);

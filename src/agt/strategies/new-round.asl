@@ -13,7 +13,18 @@
 	+vehicle_mission(motorcycle,4);
 	+noActionCount(0);
 	.
-	
+
+@shopListQty[atomic]
++default::shop(ShopId, Lat, Lon, Restock, Items)
+	: .my_name(Me) & Me == vehicle1 & shopList(List) & not .member(ShopId,List)
+<-
+//	.print("Adding Shop: ",ShopId," Lat: ",Lat," Lon: ",Lon," Restock: ",Restock," Items: ",Items);
+//	-+shopList([shop(ShopId,Items)|List]);
+	for (.member(item(ItemId,_,Qty,_,_,_),Items)) {
+		addShopItem(item(ShopId,ItemId),Qty);
+	}
+	-+shopList([ShopId|List]);
+	.
 @shopList[atomic]
 +default::shop(ShopId, Lat, Lon, Restock, Items)
 	: shopList(List) & not .member(ShopId,List)

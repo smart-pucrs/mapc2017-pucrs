@@ -92,9 +92,30 @@ free.
 		actions.closest(Role,Shops,ClosestShop);
 		if (buyList(ItemId,Qty2,ClosestShop)) {
 			-buyList(ItemId,Qty2,ClosestShop);
-			+buyList(ItemId,Qty+Qty2,ClosestShop);
+			getShopItem(item(ClosestShop,ItemId),QtyCap);
+			if (Qty+Qty2 > QtyCap) {
+				for ( .range(I,1,math.floor((Qty+Qty2)/QtyCap)) ) {
+					+buyList(ItemId,QtyCap,ClosestShop);
+				}
+				Mod = (Qty+Qty2) mod QtyCap;
+				if ( Mod \== 0 ) {
+					+buyList(ItemId,Mod,ClosestShop);
+				}
+			}
+			else { +buyList(ItemId,Qty+Qty2,ClosestShop); }
 		}
-		else { +buyList(ItemId,Qty,ClosestShop); }
+		else { 
+			if (Qty > QtyCap) {
+				for ( .range(I,1,math.floor(Qty/QtyCap)) ) {
+					+buyList(ItemId,QtyCap,ClosestShop);
+				}
+				Mod = Qty mod QtyCap;
+				if ( Mod \== 0 ) {
+					+buyList(ItemId,Mod,ClosestShop);
+				}
+			}
+			else { +buyList(ItemId,Qty,ClosestShop); }
+		}
 	}
 	!go_buy;
 	actions.closest(Role,WList,Storage,ClosestWorkshop);

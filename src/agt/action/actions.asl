@@ -93,19 +93,24 @@
 // ItemId must be a string
 // Amount must be an integer
 +!buy(ItemId, Amount)
+	: default::hasItem(ItemId,OldAmount)
+<-	
+	!localActions::commitAction(buy(ItemId,Amount));
+	!buy_loop(ItemId, Amount, OldAmount);
+	.
++!buy(ItemId, Amount)
 	: true
 <-	
 	!localActions::commitAction(buy(ItemId,Amount));
-	!buy_loop(ItemId, Amount);
+	!buy_loop(ItemId, Amount, 0);
 	.
-+!buy_loop(ItemId, Amount)
-	: not default::hasItem(ItemId, Amount)
++!buy_loop(ItemId, Amount, OldAmount)
+	: not default::hasItem(ItemId, Amount+OldAmount)
 <-
-//	.print("Warning!!!!!!!!!!!!! Trying to buy #",Amount," of ",ItemId);
 	!localActions::commitAction(buy(ItemId,Amount));
-	!buy_loop(ItemId, Amount);
+	!buy_loop(ItemId, Amount, OldAmount);
 	.
--!buy_loop(ItemId, Amount).
+-!buy_loop(ItemId, Amount, OldAmount).
 
 // Give
 // AgentId must be a string

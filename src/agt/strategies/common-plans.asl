@@ -71,7 +71,7 @@ free.
 		} 
 	}
 	for ( .member(agent(Agent,_),Members) ) {
-		.send(Agent,untell,strategies::assembling);
+		.send(Agent,achieve,strategies::stop_assisting);
 	}
 	.print("Finished assembly all items, ready to deliver.");
 	!action::goto(Storage);
@@ -103,6 +103,8 @@ free.
 	+free;
 	!action::skip;
 	.
+	
++!stop_assisting <- -assembling.
 	
 //+!explore(Quad)
 //	: coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon)

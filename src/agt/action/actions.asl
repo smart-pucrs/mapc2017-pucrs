@@ -242,8 +242,8 @@
 	!localActions::commitAction(assist_assemble(ServerName));
 	!assist_assemble_loop(ServerName);
 	.
++!assist_assemble_loop(ServerName).
 	
-
 // Deliver job
 // JobId must be a string
 +!deliver_job(JobId)

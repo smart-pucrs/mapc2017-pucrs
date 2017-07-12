@@ -101,6 +101,7 @@
 +!buy_loop(ItemId, Amount)
 	: not default::hasItem(ItemId, Amount)
 <-
+//	.print("Warning!!!!!!!!!!!!! Trying to buy #",Amount," of ",ItemId);
 	!localActions::commitAction(buy(ItemId,Amount));
 	!buy_loop(ItemId, Amount);
 	.

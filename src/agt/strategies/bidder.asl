@@ -80,15 +80,15 @@
 	!initiator::separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items));
 	.
 	
-+default::winner(TaskList, Storage)
++default::winner(TaskList, Storage)[source(X)]
 <-
-	-default::winner(TaskList, Storage);
+	-default::winner(TaskList, Storage)[source(X)];
 	.print("I won the tasks ",TaskList);
 	!strategies::go_work(TaskList, Storage);
 	.
-+default::winner(TaskList, Storage, JobId)
++default::winner(TaskList, Storage, JobId)[source(X)]
 <-
-	-default::winner(TaskList, Storage, JobId);
+	-default::winner(TaskList, Storage, JobId)[source(X)];
 	?default::get_assemble(TaskList,[],AssembleList);
 	.sort(AssembleList,AssembleListSorted);
 	.print("I won the tasks to assemble ",AssembleListSorted," and deliver to ",Storage," for ",JobId);

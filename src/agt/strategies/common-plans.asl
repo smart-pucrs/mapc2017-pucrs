@@ -108,7 +108,7 @@ free.
 	
 +!stop_assisting <- -assembling.
 
-+!job_finished <- -default::winner(_).
++!job_finished <- -default::winner(_)[source(_)].
 	
 //+!explore(Quad)
 //	: coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon)

@@ -84,6 +84,10 @@
 <-
 	.print("I won the tasks ",TaskList);
 	.
++default::winner(TaskList, Storage)
+<-
+	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage);
+	.
 
 +default::step(End)
 	: default::winner(mission(Id, Storage, Reward, Start, End, Fine, Items))

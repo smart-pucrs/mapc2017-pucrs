@@ -64,6 +64,8 @@
 	for ( .member(item(ItemId,Qty),ListToolsNew) ) {
 		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Quad);
 	}
+	.member(agent(Agent,workshop),Members);
+	+awarded_assemble(Agent,Items,Storage);
 	.
 	
 @selectBids[atomic]
@@ -112,10 +114,12 @@
 		else { +impossible_task }
 	}
 	if (not impossible_task) {
+		?awarded_assemble(AgentA,Items,Storage);
+		.send(AgentA,tell,winner(Items,Storage));
 		for (awarded(Agent,Shop,List)) {
 	    	.send(Agent,tell,winner(List));
 			-awarded(Agent,Shop,List);	
-		}	
+		}
 	}
 	else { -impossible_task; .print("Impossible job, aborting it."); }
 	.	

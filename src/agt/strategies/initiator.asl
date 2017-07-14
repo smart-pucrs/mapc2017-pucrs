@@ -51,7 +51,7 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	.
 	
 @selectBids[atomic]
-+bids(item(_,_),_,_)
++bids(_,_,_)
 	: .count(initiator::bids(_,_,_),NumberOfBids) & number_of_tasks(NumberOfTasks) & NumberOfBids == NumberOfTasks
 <-
 	-number_of_tasks(NumberOfTasks);
@@ -83,8 +83,8 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 				+awarded(Agent,Shop,[tool(ItemId)]);
 			}
 			else {
-				?awarded(Agent,Shop,List);
-	    		-awarded(Agent,Shop,List);
+				?awarded(Agent,_,List);
+	    		-awarded(Agent,_,List);
 	    		.concat(List,[tool(ItemId)],NewList);
 	    		+awarded(Agent,Shop,NewList);
 			}

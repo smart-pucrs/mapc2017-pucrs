@@ -46,9 +46,9 @@ free.
 	for ( .member(item(ItemId,Qty),TaskList) ) {
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
+		getShopItem(item(ClosestShop,ItemId),QtyCap);
 		if (buyList(ItemId,Qty2,ClosestShop)) {
 			-buyList(ItemId,Qty2,ClosestShop);
-			getShopItem(item(ClosestShop,ItemId),QtyCap);
 			if (Qty+Qty2 > QtyCap) {
 				for ( .range(I,1,math.floor((Qty+Qty2)/QtyCap)) ) {
 					+buyList(ItemId,QtyCap,ClosestShop);

@@ -1,4 +1,4 @@
-package coalition;
+package old.coalition.artefact;
 
 import java.util.ArrayList;
 import java.util.Arrays;

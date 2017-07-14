@@ -204,12 +204,7 @@
 +!dump(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
-		dump(
-			item(ItemId),
-			amount(Amount)
-		)
-	);
+	!localActions::commitAction(dump(ItemId,Amount));
 	.
 
 // Assemble

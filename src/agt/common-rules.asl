@@ -14,14 +14,18 @@ enough_battery_charging(FacilityId, Result) :- role(Role, Speed, _, _, _) & acti
 enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId, RouteLen) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
 
 select_bid([],bid(AuxBidAgent,AuxBid,AuxShopId),bid(BidAgentWinner,BidWinner,ShopIdWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId.
-select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( ((not initiator::awarded(BidAgent,_,_)) )  | (initiator::awarded(BidAgent,ShopId2,_) & (ShopId2 == ShopId | ShopId2 == tool) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
-select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & ( (initiator::awarded(BidAgent,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- not initiator::awarded_assemble(BidAgent,_,_,_) & Bid \== -1 & Bid < AuxBid & ( ((not initiator::awarded(BidAgent,_,_)))  | (initiator::awarded(BidAgent,ShopId,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty ) ) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- not initiator::awarded_assemble(BidAgent,_,_,_) & Bid \== -1 & Bid < AuxBid & initiator::awarded(BidAgent,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
 select_bid([bid(BidAgent,Bid,ShopId,Item,TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- select_bid(Bids,bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner).
 
-select_bid_tool([],bid(AuxBidAgent,AuxBid),bid(BidAgentWinner,BidWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent.
-select_bid_tool([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- Bid == 1 & initiator::awarded(BidAgent,tool,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume & select_bid_tool([],bid(BidAgent,Bid),BidWinner).
-select_bid_tool([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- Bid \== -1 & Bid < AuxBid & not initiator::awarded(BidAgent,tool,_) & select_bid_tool(Bids,bid(BidAgent,Bid),BidWinner).
-select_bid_tool([bid(BidAgent,Bid,ShopId,Item,TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- select_bid_tool(Bids,bid(AuxBidAgent,AuxBid),BidWinner).
+select_bid_tool([],bid(AuxBidAgent,AuxBid,AuxShopId),bid(BidAgentWinner,BidWinner,ShopIdWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId.
+select_bid_tool([bid(BidAgent,Bid,ShopId,tool(ItemId),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- not initiator::awarded_assemble(BidAgent,_,_,_)  & Bid \== -1 & Bid < AuxBid & ( ((not initiator::awarded(BidAgent,_,_))) | (initiator::awarded(BidAgent,ShopId,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume ) ) & select_bid_tool([],bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid_tool([bid(BidAgent,Bid,ShopId,tool(ItemId),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- not initiator::awarded_assemble(BidAgent,_,_,_) & Bid \== -1 & Bid < AuxBid & initiator::awarded(BidAgent,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume & select_bid_tool(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid_tool([bid(BidAgent,Bid,ShopId,Task,TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- select_bid_tool(Bids,bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner).
+
+select_bid_assemble([],bid(AuxBidAgent,AuxBid),bid(BidAgentWinner,BidWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent.
+select_bid_assemble([bid(BidAgent,Bid,ShopId,assemble(Storage),TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- Bid \== -1 & Bid < AuxBid & select_bid_assemble(Bids,bid(BidAgent,Bid),BidWinner).
+select_bid_assemble([bid(BidAgent,Bid,ShopId,Task,TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- select_bid_assemble(Bids,bid(AuxBidAgent,AuxBid),BidWinner).
 
 select_bid_mission([],bid(AuxAgent,AuxDistance),bid(AgentWinner,DistanceWinner)) :- AgentWinner = AuxAgent & DistanceWinner = AuxDistance.
 select_bid_mission([bid(Agent,Distance)|Bids],bid(AuxAgent,AuxDistance),BidWinner) :- Distance \== -1 & Distance < AuxDistance & select_bid_mission(Bids,bid(Agent,Distance),BidWinner).

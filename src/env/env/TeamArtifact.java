@@ -1,7 +1,6 @@
 package env;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +15,8 @@ public class TeamArtifact extends Artifact {
 	private static Map<String, Integer> shopItemsPrice = new HashMap<String, Integer>();
 	private static Map<String, Integer> shopItemsQty = new HashMap<String, Integer>();
 	private static Map<String, String> agentNames = new HashMap<String, String>();
-	private static Map<String, String[]> toolHalf = new HashMap<String, String[]>();
 	private static Map<String, Integer> loads = new HashMap<String, Integer>();
 	private static List<String> shops = new ArrayList<String>();
-	private int count = 0;
-	private List<String> tools = new ArrayList<String>();
 	
 	void init(){
 		logger.info("Team Artifact has been created!");
@@ -95,25 +91,6 @@ public class TeamArtifact extends Artifact {
 		if (prop == null) {
 			this.defineObsProperty("resNode",resourceId,lat,lon,resource);
 		}
-	}
-	
-	@OPERATION void addTools(Object[] tool){
-		String[] toolsAux = Arrays.copyOf(tool, tool.length, String[].class);
-		count+=1;
-		for (String s:  toolsAux) {
-			tools.add(s);
-		}		
-		if (count == 4) {
-			toolsAux = tools.toArray(new String[tools.size()]);
-			String[] firstHalf = Arrays.copyOfRange(toolsAux, 0, toolsAux.length/2);
-			toolHalf.put("first", firstHalf);
-			String[] secondHalf = Arrays.copyOfRange(toolsAux, toolsAux.length/2, toolsAux.length);
-			toolHalf.put("second", secondHalf);
-		}
-	}
-	
-	@OPERATION void getTools(String half, OpFeedbackParam<String[]> toolList){
-		toolList.set(toolHalf.get(half));
 	}
 	
 }

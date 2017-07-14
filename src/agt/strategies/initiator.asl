@@ -1,5 +1,9 @@
+free_agents([vehicle1,vehicle2,vehicle3,vehicle4,vehicle5,vehicle6,vehicle7,vehicle8,vehicle9,vehicle10,vehicle11,vehicle12,vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20,vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
+free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
+
+@mission[atomic]
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
-	: true
+	: not job(_,_,_,_)
 <- 
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
@@ -23,7 +27,7 @@
 	.
 	
 +!separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items))
-	: new::max_bid_time(Deadline) & new::number_of_trucks(NumberOfTrucks) & new::number_of_agents(NumberOfAgents)
+	: new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents)
 <-
 	?default::decomposeRequirements(Items,[],Bases);
 	+bases([]);
@@ -57,6 +61,12 @@
 		if (Distance \== 99999) {
 			?initiator::job(JobId, _, _, Items);
 			+awarded_assemble(Agent,Items,StorageId,JobId);
+			?initiator::free_agents(FreeAgents);
+			?initiator::free_trucks(FreeTrucks);
+			.delete(Agent,FreeAgents,FreeAgentsNew);
+			.delete(Agent,FreeTrucks,FreeTrucksNew);
+			-+initiator::free_agents(FreeAgentsNew);
+			-+initiator::free_trucks(FreeTrucksNew);
 //			.print("Awarding assemble to ",Agent);
 		}
 		else { +impossible_task; .print("Unable to allocate assemble to deliver at ",StorageId); }
@@ -106,6 +116,14 @@
 		-awarded_assemble(AgentA,Items,Storage,Id);
 		+job_members(Id,[]);
 		for (awarded(Agent,Shop,List)) {
+			?initiator::free_agents(FreeAgents);
+			.delete(Agent,FreeAgents,FreeAgentsNew);
+			-+initiator::free_agents(FreeAgentsNew);
+			?initiator::free_trucks(FreeTrucks);
+			if (.member(Agent,FreeTrucks)) {
+				.delete(Agent,FreeTrucks,FreeTrucksNew);
+				-+initiator::free_trucks(FreeTrucksNew);
+			}
 			?job_members(Id,Aux);
 			-+job_members(Id,[Agent|Aux]);
 	    	.send(Agent,tell,winner(List,assist(Storage,AgentA)));
@@ -117,7 +135,21 @@
 		.send(AgentA,tell,winner(Items,assemble(Storage,Id,JobMembers)));
 	}
 	else { -impossible_task; -job(_, _, _, _)[source(_)]; .print("Impossible job, aborting it."); }
-	.	
+	.
+
+@add_me_to_free[atomic]
++!add_me_to_free[source(Agent)]
+	: initiator::free_agents(FreeAgents)
+<-
+	-+initiator::free_agents([Agent|FreeAgents]);
+	.
+@add_me_to_free2[atomic]
++!add_me_to_free2[source(Agent)]
+	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks)
+<-
+	-+initiator::free_agents([Agent|FreeAgents]);
+	-+initiator::free_trucks([Agent|FreeTrucks]);
+	.
 	
 +default::step(End)
 	: job(Id, _, End, _)

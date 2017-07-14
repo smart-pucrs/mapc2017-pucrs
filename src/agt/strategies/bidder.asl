@@ -1,5 +1,5 @@
 +default::task(item(ItemId, Qty), CNPBoard, TaskId)
-	: .my_name(Me)
+	: not default::winner(_, _) & .my_name(Me)
 <- 
 	lookupArtifact(CNPBoard, BoardId);
 	focus(BoardId);
@@ -7,7 +7,7 @@
     bid(Me, Bid, Shop, item(ItemId, Qty), TaskId)[artifact_id(BoardId)];
   	.
 +default::task(tool(ItemId), CNPBoard, TaskId)
-	: .my_name(Me)
+	: not default::winner(_, _) & .my_name(Me)
 <- 
 	lookupArtifact(CNPBoard, BoardId);
 	focus(BoardId);
@@ -15,7 +15,7 @@
 	bid(Me, Bid, Shop, tool(ItemId), TaskId)[artifact_id(BoardId)];
 	.
 +default::task(assemble(StorageId), CNPBoard, TaskId)
-	: .my_name(Me) & default::role(truck,_,_,_,_)
+	: not default::winner(_, _) & .my_name(Me) & default::role(truck,_,_,_,_)
 <- 
 	lookupArtifact(CNPBoard, BoardId);
 	focus(BoardId);
@@ -27,7 +27,7 @@
 +!create_bid_task(item(ItemId, Qty), Bid, Shop)
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
 <-
-	if (not default::winner(_, _) & LoadCap - MyLoad >= Vol * Qty) {
+	if (LoadCap - MyLoad >= Vol * Qty) {
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
 		actions.route(Role,Speed,ClosestShop,RouteShop);
@@ -40,7 +40,7 @@
 +!create_bid_task(tool(ItemId), Bid, Shop)
 	: default::role(Role, _, _, _, Tools) & new::shopList(SList)
 <-
-	if ( not default::winner(_, _) & .sublist([ItemId],Tools) ) {
+	if (.sublist([ItemId],Tools) ) {
 		for ( default::tools(_,T) ) {
 			if (Role == drone & .sublist([ItemId],T) & not multiple_roles) { +multiple_roles }
 		}
@@ -56,13 +56,10 @@
 +!create_bid_task(assemble(StorageId), Bid, Shop)
 	: default::role(Role, Speed, _, _, _) & new::workshopList(WList)
 <-
-	if ( not default::winner(_, _) ) {
-		actions.closest(Role,WList,StorageId,ClosestWorkshop);
-		actions.route(Role,Speed,ClosestWorkshop,RouteWorkshop);
-		Bid = RouteWorkshop;
-		Shop = StorageId;
-	}
-	else { Bid = -1; Shop = null; }
+	actions.closest(Role,WList,StorageId,ClosestWorkshop);
+	actions.route(Role,Speed,ClosestWorkshop,RouteWorkshop);
+	Bid = RouteWorkshop;
+	Shop = StorageId;
 	.
 	
 +default::winner(TaskList, assist(Storage, Assembler))

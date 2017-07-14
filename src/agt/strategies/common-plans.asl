@@ -27,6 +27,7 @@ free.
 	!action::goto(Storage);
 	!action::deliver_job(JobId);
 	.print("$$$ I have just delivered job ",JobId);
+	.send(vehicle1,achieve,initiator::add_me_to_free2);
 	.send(vehicle1,achieve,strategies::job_finished(JobId));
 	-default::winner(_,_);
 	+free;
@@ -96,7 +97,7 @@ free.
 +!go_buy.
 
 +!go_dump
-	:  default::role(Role, _, _, _, _) & new::dumpList(DList)
+	: default::role(Role, _, _, _, _) & new::dumpList(DList)
 <-
 	actions.closest(Role,DList,ClosestDump);
 	!action::goto(ClosestDump);
@@ -106,9 +107,18 @@ free.
 	.
 	
 +!stop_assisting
+	: default::role(Role, _, _, _, _) & .my_name(Me)
 <- 
 	-assembling;
 	if ( default::hasItem(_,_) ) { !go_dump; }
+	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_me_to_free2); }
+	else { 
+		if (Me == vehicle1) {  
+			?initiator::free_agents(FreeAgents);
+			-+initiator::free_agents([Me|FreeAgents]);
+		}
+		else { .send(vehicle1,achieve,initiator::add_me_to_free); }
+	}
 	-default::winner(_,_);
 	.
 

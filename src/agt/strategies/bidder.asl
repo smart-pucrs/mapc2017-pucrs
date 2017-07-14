@@ -1,6 +1,7 @@
 +default::task(item(ItemId, Qty), CNPBoard, TaskId)
 	: not default::winner(_, _) & .my_name(Me)
 <- 
+	-strategies::free;
 	lookupArtifact(CNPBoard, BoardId);
 	focus(BoardId);
     !create_bid_task(item(ItemId, Qty), Bid, Shop);
@@ -9,6 +10,7 @@
 +default::task(tool(ItemId), CNPBoard, TaskId)
 	: not default::winner(_, _) & .my_name(Me)
 <- 
+	-strategies::free;
 	lookupArtifact(CNPBoard, BoardId);
 	focus(BoardId);
   	!create_bid_task(tool(ItemId), Bid, Shop);
@@ -17,6 +19,7 @@
 +default::task(assemble(StorageId), CNPBoard, TaskId)
 	: not default::winner(_, _) & .my_name(Me) & default::role(truck,_,_,_,_)
 <- 
+	-strategies::free;
 	lookupArtifact(CNPBoard, BoardId);
 	focus(BoardId);
 	!create_bid_task(assemble(StorageId), Bid, Shop);

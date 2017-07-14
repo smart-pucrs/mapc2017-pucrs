@@ -133,6 +133,10 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 		-job_members(Id,JobMembers);
 //		.print("Job members ",JobMembers);
 		.send(AgentA,tell,winner(Items,assemble(Storage,Id,JobMembers)));
+		?initiator::free_agents(FreeAgents);
+		for( .member(FreeAgent,FreeAgents) ) {
+			.send(FreeAgent,achieve,strategies::not_selected);
+		}
 	}
 	else { -impossible_task; -job(_, _, _, _)[source(_)]; .print("Impossible job, aborting it."); }
 	.

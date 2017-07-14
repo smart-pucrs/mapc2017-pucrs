@@ -1,12 +1,12 @@
 {begin namespace(localActions, local)}
 +!commitAction(Action)
-	: default::step(S) & not action(S)
+	: default::step(S) & not default::action(S)
 <-
-	+action(S);
+	+default::action(S);
 	action(Action);
 //	.print("Doing action ",Action, " at step ",S);
 	.wait({ +default::lastActionResult(Result) });
-	-action(S);
+	-default::action(S);
 	if (Result == failed) {
 //		.print("Failed to execute action ",Action," due to the 1% random error. Executing it again.");
 		!commitAction(Action);

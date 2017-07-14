@@ -23,13 +23,13 @@ free.
 	for ( .member(Agent,Members) ) {
 		.send(Agent,achieve,strategies::stop_assisting);
 	}
-	.print("Finished assembly all items, ready to deliver.");
+	.print("Finished assembling all items, going to deliver.");
 	!action::goto(Storage);
 	!action::deliver_job(JobId);
 	.print("$$$ I have just delivered job ",JobId);
 	.send(vehicle1,achieve,initiator::add_me_to_free2);
 	.send(vehicle1,achieve,strategies::job_finished(JobId));
-	-default::winner(_,_);
+	-default::winner(_,_)[source(_)];
 	+free;
 	!action::skip;
 	.
@@ -119,8 +119,10 @@ free.
 		}
 		else { .send(vehicle1,achieve,initiator::add_me_to_free); }
 	}
-	-default::winner(_,_);
+	-default::winner(_,_)[source(_)];
 	.
+	
++!not_selected <- +free; !action::skip; .
 
 +!job_finished(JobId) <- -initiator::job(JobId, _, _, _)[source(_)].
 

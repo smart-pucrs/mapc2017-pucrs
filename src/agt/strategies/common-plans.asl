@@ -74,7 +74,7 @@ free.
 		}
 	}
 	!go_buy;
-	actions.closest(Role,WList,Storage,ClosestWorkshop);
+	actions.closest(truck,WList,Storage,ClosestWorkshop);
 	!action::goto(ClosestWorkshop);
 	+assembling;
 	!action::assist_assemble(Assembler);

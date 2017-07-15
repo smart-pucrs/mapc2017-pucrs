@@ -48,24 +48,34 @@
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
 		if (buyList(ItemId,Qty2,ClosestShop)) {
-			-+buyList(ItemId,Qty+Qty2,ClosestShop);
+			-buyList(ItemId,Qty2,ClosestShop)
+			+buyList(ItemId,Qty+Qty2,ClosestShop);
 		}
 		else { +buyList(ItemId,Qty,ClosestShop); }
 	}
+	+buy_list_id(0);
 	for ( buyList(ItemId,Qty,Shop) ) {
 		getShopItem(item(Shop,ItemId),QtyCap);
-//		.print("Need to buy #",Qty," of ",ItemId," from ",Shop," cap ",QtyCap);
+		-buyList(ItemId,Qty,Shop);
 		if (Qty > QtyCap) {
-			-buyList(ItemId,Qty,Shop);
+//			.print("Need to buy #",Qty," of ",ItemId," from ",Shop," cap ",QtyCap);
 			for ( .range(I,1,math.floor(Qty/QtyCap)) ) {
-				+buyList(ItemId,QtyCap,Shop);
+				?buy_list_id(Id);
+				-+buy_list_id(Id+1);
+				+buyList(ItemId,QtyCap,Shop,Id+1);
+//				.print("Adding buylist #",QtyCap," ",ItemId);
 			}
 			Mod = Qty mod QtyCap;
 			if ( Mod \== 0 ) {
-				+buyList(ItemId,Mod,Shop);
+				?buy_list_id(Id);
+				-+buy_list_id(Id+1);
+				+buyList(ItemId,Mod,Shop,Id+1);
+//				.print("Adding buylist #",Mod," ",ItemId);
 			}
 		}
+		else { ?buy_list_id(Id); -+buy_list_id(Id+1); +buyList(ItemId,Qty,Shop,Id+1);  }
 	}
+	-buy_list_id(_);
 	!go_buy;
 	actions.closest(truck,WList,Storage,ClosestWorkshop);
 	!action::goto(ClosestWorkshop);
@@ -76,14 +86,14 @@
 	.
 	
 +!go_buy
-	: buyList(_,_,Shop)
+	: buyList(_,_,Shop,_)
 <-
 //	.print("Going to shop ",Shop);
 	!action::goto(Shop);
-	for ( buyList(ItemId,Qty,Shop) ) {
+	for ( buyList(ItemId,Qty,Shop,Id) ) {
 		!action::buy(ItemId,Qty);
 //		.print("Buying #",Qty," of ",ItemId);
-		-buyList(ItemId,Qty,Shop);
+		-buyList(ItemId,Qty,Shop,Id);
 	}
 	!go_buy
 	.

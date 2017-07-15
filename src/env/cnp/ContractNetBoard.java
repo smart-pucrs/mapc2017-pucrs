@@ -79,6 +79,15 @@ public class ContractNetBoard extends Artifact {
 		bidList.set(aux);
 	}
 	
+	@OPERATION void remove(){
+		try {
+			this.dispose(this.getId());
+		} catch (OperationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	@GUARD boolean biddingClosed(){
 		return isClosed();
 	}

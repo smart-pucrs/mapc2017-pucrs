@@ -38,6 +38,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private Map<String, String> agentToEntity;
 	private List<Literal> start = new ArrayList<Literal>();
 	private List<Literal> percs = new ArrayList<Literal>();
+	private List<Literal> signalList = new ArrayList<Literal>();
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
 
@@ -166,7 +167,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 
 	private void updatePerception(String agent, Collection<Percept> previousPercepts, Collection<Percept> percepts) throws JasonException {
 		for (Percept old: previousPercepts) {
-			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(old.getName())) || step_obs_prop.contains(old.getName())) {
+			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(old.getName()) && !old.getName().equals("job") && !old.getName().equals("mission") ) || step_obs_prop.contains(old.getName())) {
 				if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore
 					Literal literal = Translator.perceptToLiteral(old);
 					removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
@@ -194,7 +195,9 @@ public class EISArtifact extends Artifact implements AgentListener {
 //							logger.info("adding "+literal);
 						if (percept.getName().equals("lastActionResult")) {
 							lastActionResult = literal;
-						} else if (percept.getName().equals("actionID")) { actionID = literal; }
+						} 
+						else if (percept.getName().equals("job") || percept.getName().equals("mission")) { signalList.add(literal); }
+						else if (percept.getName().equals("actionID")) { actionID = literal; }
 						else if (percept.getName().equals("shop") || percept.getName().equals("workshop") || percept.getName().equals("routeLength") || percept.getName().equals("facility")) { percs.add(0,literal); }
 						else { percs.add(literal); }
 					}
@@ -221,6 +224,12 @@ public class EISArtifact extends Artifact implements AgentListener {
 				defineObsProperty(lit.getFunctor(), (Object[]) lit.getTermsArray());
 			}
 			percs.clear();
+			if (agent.equals("vehicle1") && !signalList.isEmpty()) {
+				for (Literal lit: signalList) {
+					signal(agentIds.get(agent),lit.getFunctor(),(Object[]) lit.getTermsArray());
+				}
+				signalList.clear();
+			}
 			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
 			defineObsProperty(actionID.getFunctor(), (Object[]) actionID.getTermsArray());
 			defineObsProperty(lastActionResult.getFunctor(), (Object[]) lastActionResult.getTermsArray());

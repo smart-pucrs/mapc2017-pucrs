@@ -10,7 +10,7 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	+job(Id, Storage, End, Items);
 	!!separate_tasks(Id, Storage, Items);
 	.
-
+	
 @mission[atomic]
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: not job(_,_,_,_)
@@ -33,6 +33,7 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	else {
 		.print("No bids.");
 	}
+	remove[artifact_name(CNPBoardName)];
 	clear(CNPBoardName);
 	.
 	

@@ -53,7 +53,7 @@ public class ContractNetBoard extends Artifact {
 		}
 		if(!isClosed()){
 			state = false;
-			logger.info("bidding stage closed by all agents bids.");
+//			logger.info("bidding stage closed by all agents bids.");
 		}
 	}
 	

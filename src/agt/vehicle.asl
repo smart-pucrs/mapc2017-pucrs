@@ -24,15 +24,17 @@
 <-
 	addServerName(Me,ServerMe);
 	.
-	
 //+default::hasItem(Item,Qty)
 //<- .print("Just got #",Qty," of ",Item).
 	
 +default::role(Role,_,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)
 <- 
+	.wait(1000);
 	if ( .sublist([Me],Agents) ) { .broadcast(tell,tools(Role,Tools)); }
 	addLoad(Me,LoadCap);
+	+strategies::free;
+	!strategies::firstskip;
     .
     
--tools(Role,Tools) : default::role(Role,_,_,_,_).
++tools(Role,Tools) : default::role(Role,_,_,_,_) <- -tools(Role,Tools)[source(_)].

@@ -1,11 +1,12 @@
 { include("action/actions.asl",action) }
-free.
 
++default::actionID(0).
 +default::actionID(X) 
 	: free
 <-
 	!action::skip;
 	.
++!firstskip <- !action::skip.
 	
 +!go_assemble(AssembleList,Storage,JobId,Members)
 	: default::role(Role, _, _, _, _) & new::workshopList(WList)
@@ -46,31 +47,23 @@ free.
 	for ( .member(item(ItemId,Qty),TaskList) ) {
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
-		getShopItem(item(ClosestShop,ItemId),QtyCap);
 		if (buyList(ItemId,Qty2,ClosestShop)) {
-			-buyList(ItemId,Qty2,ClosestShop);
-			if (Qty+Qty2 > QtyCap) {
-				for ( .range(I,1,math.floor((Qty+Qty2)/QtyCap)) ) {
-					+buyList(ItemId,QtyCap,ClosestShop);
-				}
-				Mod = (Qty+Qty2) mod QtyCap;
-				if ( Mod \== 0 ) {
-					+buyList(ItemId,Mod,ClosestShop);
-				}
-			}
-			else { +buyList(ItemId,Qty+Qty2,ClosestShop); }
+			-+buyList(ItemId,Qty+Qty2,ClosestShop);
 		}
-		else { 
-			if (Qty > QtyCap) {
-				for ( .range(I,1,math.floor(Qty/QtyCap)) ) {
-					+buyList(ItemId,QtyCap,ClosestShop);
-				}
-				Mod = Qty mod QtyCap;
-				if ( Mod \== 0 ) {
-					+buyList(ItemId,Mod,ClosestShop);
-				}
+		else { +buyList(ItemId,Qty,ClosestShop); }
+	}
+	for ( buyList(ItemId,Qty,Shop) ) {
+		getShopItem(item(Shop,ItemId),QtyCap);
+//		.print("Need to buy #",Qty," of ",ItemId," from ",Shop," cap ",QtyCap);
+		if (Qty > QtyCap) {
+			-buyList(ItemId,Qty,Shop);
+			for ( .range(I,1,math.floor(Qty/QtyCap)) ) {
+				+buyList(ItemId,QtyCap,Shop);
 			}
-			else { +buyList(ItemId,Qty,ClosestShop); }
+			Mod = Qty mod QtyCap;
+			if ( Mod \== 0 ) {
+				+buyList(ItemId,Mod,Shop);
+			}
 		}
 	}
 	!go_buy;

@@ -80,13 +80,13 @@ removeDuplicateTool([item(ItemId,Qty)|B],ListTools) :- .member(item(ItemId,Qty),
 removeDuplicateTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools]) :- removeDuplicateTool(B,ListTools).
 
 get_assemble([],Aux,AssembleList) :- AssembleList = Aux.
-get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts_mult(Parts,Assemble,Qty) & .concat([item(2,ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList).
+get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts(Parts,[],Assemble,Qty) & .concat([item(2,ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList).
 get_assemble([required(ItemId,Qty)|TaskList],[item(2,ItemId,Qty)|Aux],AssembleList) :- get_assemble(TaskList,Aux,AssembleList).
-get_parts([],[]).
-get_parts([[Item,Qty]|Parts],[item(1,Item,Qty)|Assemble]) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts_mult(Parts2,Assemble,Qty) & get_parts(Parts,Assemble).
-get_parts([[Item,Qty]|Parts],Assemble) :- get_parts(Parts,Assemble).
-get_parts_mult(Parts,Assemble,1) :- get_parts(Parts,Assemble).
-get_parts_mult(Parts,Assemble,Qty) :- get_parts(Parts,Assemble) & get_parts_mult(Parts,Assemble,Qty-1).
+get_parts([],Aux,AssembleList,Qty) :- AssembleList = Aux.
+get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts(Parts2,[],Assemble,Qty) & .concat([item(1,Item,Qty*Qty2)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_parts(Parts,NewAux,AssembleList,Qty2).
+get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2) :- get_parts(Parts,Aux,AssembleList,Qty2).
+//get_parts_mult(Parts,Assemble,1) :- get_parts(Parts,Assemble).
+//get_parts_mult(Parts,Assemble,Qty) :- get_parts(Parts,Assemble) & get_parts_mult(Parts,Assemble,Qty-1).
 
 getQuadLatLon(quad1,QLat,QLon) :- coalition::quad1(QLat,QLon).
 getQuadLatLon(quad2,QLat,QLon) :- coalition::quad2(QLat,QLon).

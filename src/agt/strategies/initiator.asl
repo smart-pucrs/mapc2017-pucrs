@@ -1,4 +1,6 @@
 free_agents([vehicle1,vehicle2,vehicle3,vehicle4,vehicle5,vehicle6,vehicle7,vehicle8,vehicle9,vehicle10,vehicle11,vehicle12,vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20,vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
+//free_agents([vehicle1,vehicle5,vehicle13,vehicle27,vehicle28]).
+//free_trucks([vehicle27,vehicle28]).
 free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
 
 @mission[atomic]
@@ -78,7 +80,7 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 			getLoad(Agent,Load);
 			?default::item(ItemId,Volume,_,_);
 	    	addLoad(Agent,Load-Volume);
-//	    	.print("Awarding ",ItemId," to ",Agent);
+//	    	.print("Awarding ",ItemId," to ",Agent," at",Shop);
 			if (not awarded(Agent,_,_)) {
 				+awarded(Agent,Shop,[tool(ItemId)]);
 			}
@@ -98,7 +100,7 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 			getLoad(Agent,Load);
 			?default::item(ItemId,Volume,_,_);
 	    	addLoad(Agent,Load-Volume*Qty);
-//	    	.print("Awarding #",Qty," of ",ItemId," to ",Agent);
+//	    	.print("Awarding #",Qty," of ",ItemId," to ",Agent," at",Shop);
 			if (not initiator::awarded(Agent,_,_)) {
 				+awarded(Agent,Shop,[item(ItemId,Qty)]);
 			}

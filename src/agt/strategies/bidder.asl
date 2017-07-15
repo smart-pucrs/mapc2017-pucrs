@@ -44,13 +44,13 @@
 	: default::role(Role, _, _, _, Tools) & new::shopList(SList)
 <-
 	if (.sublist([ItemId],Tools) ) {
+		?default::find_shops(ItemId,SList,Shops);
+		actions.closest(Role,Shops,ClosestShop);
 		for ( default::tools(_,T) ) {
 			if (Role == drone & .sublist([ItemId],T) & not multiple_roles) { +multiple_roles }
 		}
 		if (multiple_roles) { -multiple_roles; Bid = 2; }
 		else { Bid = 1; }
-		?default::find_shops(ItemId,SList,Shops);
-		actions.closest(Role,Shops,ClosestShop);
 		Shop = ClosestShop;
 	}
 	else { Bid = -1; Shop = null; }

@@ -15,13 +15,13 @@ enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role,
 
 select_bid([],bid(AuxBidAgent,AuxBid,AuxShopId),bid(BidAgentWinner,BidWinner,ShopIdWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId.
 select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- initiator::awarded(BidAgent,ShopId,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty & select_bid([],bid(BidAgent,Bid,ShopId),BidWinner).
-select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- not initiator::awarded_assemble(BidAgent,_,_,_) & Bid \== -1 & Bid < AuxBid & initiator::awarded(BidAgent,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & initiator::awarded(BidAgent,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
 select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- not initiator::awarded_assemble(BidAgent,_,_,_) & Bid \== -1 & Bid < AuxBid & not initiator::awarded(BidAgent,_,_) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
 select_bid([bid(BidAgent,Bid,ShopId,Item,TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- select_bid(Bids,bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner).
 
 select_bid_tool([],bid(AuxBidAgent,AuxBid,AuxShopId),bid(BidAgentWinner,BidWinner,ShopIdWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId.
 select_bid_tool([bid(BidAgent,Bid,ShopId,tool(ItemId),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- initiator::awarded(BidAgent,ShopId,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty & select_bid([],bid(BidAgent,Bid,ShopId),BidWinner).
-select_bid_tool([bid(BidAgent,Bid,ShopId,tool(ItemId),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- not initiator::awarded_assemble(BidAgent,_,_,_) & Bid \== -1 & Bid < AuxBid & initiator::awarded(BidAgent,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
+select_bid_tool([bid(BidAgent,Bid,ShopId,tool(ItemId),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- Bid \== -1 & Bid < AuxBid & initiator::awarded(BidAgent,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
 select_bid_tool([bid(BidAgent,Bid,ShopId,tool(ItemId),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- not initiator::awarded_assemble(BidAgent,_,_,_) & Bid \== -1 & Bid < AuxBid & not initiator::awarded(BidAgent,_,_) & select_bid(Bids,bid(BidAgent,Bid,ShopId),BidWinner).
 select_bid_tool([bid(BidAgent,Bid,ShopId,Task,TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- select_bid_tool(Bids,bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner).
 
@@ -80,11 +80,13 @@ removeDuplicateTool([item(ItemId,Qty)|B],ListTools) :- .member(item(ItemId,Qty),
 removeDuplicateTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools]) :- removeDuplicateTool(B,ListTools).
 
 get_assemble([],Aux,AssembleList) :- AssembleList = Aux.
-get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts(Parts,Assemble) & .concat([item(2,ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList).
+get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts_mult(Parts,Assemble,Qty) & .concat([item(2,ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList).
 get_assemble([required(ItemId,Qty)|TaskList],[item(2,ItemId,Qty)|Aux],AssembleList) :- get_assemble(TaskList,Aux,AssembleList).
 get_parts([],[]).
-get_parts([[Item,Qty]|Parts],[item(1,Item,Qty)|Assemble]) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts(Parts2,Assemble) & get_parts(Parts,Assemble).
+get_parts([[Item,Qty]|Parts],[item(1,Item,Qty)|Assemble]) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts_mult(Parts2,Assemble,Qty) & get_parts(Parts,Assemble).
 get_parts([[Item,Qty]|Parts],Assemble) :- get_parts(Parts,Assemble).
+get_parts_mult(Parts,Assemble,1) :- get_parts(Parts,Assemble).
+get_parts_mult(Parts,Assemble,Qty) :- get_parts(Parts,Assemble) & get_parts_mult(Parts,Assemble,Qty-1).
 
 getQuadLatLon(quad1,QLat,QLon) :- coalition::quad1(QLat,QLon).
 getQuadLatLon(quad2,QLat,QLon) :- coalition::quad2(QLat,QLon).

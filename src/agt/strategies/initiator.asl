@@ -1,6 +1,16 @@
 free_agents([vehicle1,vehicle2,vehicle3,vehicle4,vehicle5,vehicle6,vehicle7,vehicle8,vehicle9,vehicle10,vehicle11,vehicle12,vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20,vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
 free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
 
+@job[atomic]
++default::job(Id, Storage, Reward, Start, End, Items)
+	: not job(_,_,_,_)
+<- 
+	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
+	.print("Items required: ",Items);
+	+job(Id, Storage, End, Items);
+	!!separate_tasks(Id, Storage, Items);
+	.
+
 @mission[atomic]
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: not job(_,_,_,_)
@@ -8,7 +18,7 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
 	+job(Id, Storage, End, Items);
-	!!separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items));
+	!!separate_tasks(Id, Storage, Items);
 	.
 	
 +!announce(Task,Deadline,NumberOfAgents,JobId)
@@ -26,7 +36,7 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	clear(CNPBoardName);
 	.
 	
-+!separate_tasks(mission(Id, Storage, Reward, Start, End, Fine, Items))
++!separate_tasks(Id, Storage, Items)
 	: new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents)
 <-
 	?default::decomposeRequirements(Items,[],Bases);

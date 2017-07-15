@@ -41,16 +41,17 @@
 	.
 @create_bid_task_tool[atomic]
 +!create_bid_task(tool(ItemId), Bid, Shop)
-	: default::role(Role, _, _, _, Tools) & new::shopList(SList)
+	: default::role(Role, Speed, _, _, Tools) & new::shopList(SList)
 <-
 	if (.sublist([ItemId],Tools) ) {
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
+		actions.route(Role,Speed,ClosestShop,RouteShop);
 		for ( default::tools(_,T) ) {
 			if (Role == drone & .sublist([ItemId],T) & not multiple_roles) { +multiple_roles }
 		}
-		if (multiple_roles) { -multiple_roles; Bid = 2; }
-		else { Bid = 1; }
+		if (multiple_roles) { -multiple_roles; Bid = RouteShop*10; }
+		else { Bid = RouteShop; }
 		Shop = ClosestShop;
 	}
 	else { Bid = -1; Shop = null; }

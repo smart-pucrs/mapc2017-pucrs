@@ -76,8 +76,8 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	}
 	for ( bids(tool(ItemId),Bids,JobId) ) {
 		-bids(tool(ItemId),Bids,JobId);
-		?default::select_bid_tool(Bids,bid(99999,99999,99999),bid(Agent,Bid,Shop));
-		if (Bid \== 99999) {
+		?default::select_bid_tool(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
+		if (Distance \== 99999) {
 			getLoad(Agent,Load);
 			?default::item(ItemId,Volume,_,_);
 	    	addLoad(Agent,Load-Volume);

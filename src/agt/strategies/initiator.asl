@@ -1,6 +1,4 @@
 free_agents([vehicle1,vehicle2,vehicle3,vehicle4,vehicle5,vehicle6,vehicle7,vehicle8,vehicle9,vehicle10,vehicle11,vehicle12,vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20,vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
-//free_agents([vehicle1,vehicle5,vehicle13,vehicle27,vehicle28]).
-//free_trucks([vehicle27,vehicle28]).
 free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
 
 @mission[atomic]
@@ -40,8 +38,11 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	}
 	?bases(B);
 	-bases(B);
-	?default::separateItemTool(B,ListTools,ListItems);
-	?default::removeDuplicateTool(ListTools,ListToolsNew);
+	if (.substring("tool",B)) {
+		?default::separateItemTool(B,ListTools,ListItems);
+		?default::removeDuplicateTool(ListTools,ListToolsNew);
+	}
+	else { ListToolsNew = []; ListItems = B; }
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1);
 	!!announce(assemble(Storage),Deadline,NumberOfTrucks,Id);
 	for ( .member(item(ItemId,Qty),ListToolsNew) ) {

@@ -75,8 +75,8 @@ separateItemTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools],ListItems) :-
 separateItemTool([item(ItemId,Qty)|B],ListTools,[item(ItemId,Qty)|ListItems]) :- .substring("item",ItemId) & separateItemTool(B,ListTools,ListItems).
 
 removeDuplicateTool([],[]).
-removeDuplicateTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools]) :- not .member(item(ItemId,Qty),B) & separateItemTool(B,ListTools,ListItems).
-removeDuplicateTool([item(ItemId,Qty)|B],ListTools) :- separateItemTool(B,ListTools,ListItems).
+removeDuplicateTool([item(ItemId,Qty)|B],ListTools) :- .member(item(ItemId,Qty),B) & removeDuplicateTool(B,ListTools).
+removeDuplicateTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools]) :- removeDuplicateTool(B,ListTools).
 
 get_assemble([],Aux,AssembleList) :- AssembleList = Aux.
 get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts(Parts,Assemble) & .concat([item(2,ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList).

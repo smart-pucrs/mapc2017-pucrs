@@ -122,6 +122,12 @@
 	-default::winner(_,_)[source(_)];
 	.
 	
++!remove_truck_from_free(Agent)
+<-
+	remove_truck(Agent);
+	remove_agent(Agent);
+	.
+	
 +!not_selected <- +free; !action::skip; .
 
 +!job_finished(JobId) <- -initiator::job(JobId, _, _, _)[source(_)].

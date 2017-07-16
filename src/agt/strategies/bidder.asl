@@ -1,19 +1,19 @@
 +default::task(item(ItemId, Qty), CNPBoard, TaskId)
-	: not default::winner(_, _) & .my_name(Me)
+	: .my_name(Me)
 <- 
 	-strategies::free;
     !create_bid_task(item(ItemId, Qty), Bid, Shop);
     bid(Me, Bid, Shop, item(ItemId, Qty), TaskId)[artifact_name(CNPBoard)];
   	.
 +default::task(tool(ItemId), CNPBoard, TaskId)
-	: not default::winner(_, _) & .my_name(Me)
+	: .my_name(Me)
 <- 
 	-strategies::free;
   	!create_bid_task(tool(ItemId), Bid, Shop);
 	bid(Me, Bid, Shop, tool(ItemId), TaskId)[artifact_name(CNPBoard)];
 	.
 +default::task(assemble(StorageId), CNPBoard, TaskId)
-	: not default::winner(_, _) & .my_name(Me) & default::role(truck,_,_,_,_)
+	: .my_name(Me)
 <- 
 	-strategies::free;
 	!create_bid_task(assemble(StorageId), Bid, Shop);

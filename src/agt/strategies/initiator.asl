@@ -1,5 +1,6 @@
 free_agents([vehicle1,vehicle2,vehicle3,vehicle4,vehicle5,vehicle6,vehicle7,vehicle8,vehicle9,vehicle10,vehicle11,vehicle12,vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20,vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
 free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
+task_id(0).
 
 @job[atomic]
 +default::job(Id, Storage, Reward, Start, End, Items)
@@ -22,9 +23,27 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	!!separate_tasks(Id, Storage, Items);
 	.
 	
-+!announce(Task,Deadline,NumberOfAgents,JobId)
+@sendfreetrucks[atomic]
++!send_to_free_trucks(FreeTrucks,Task,CNPBoardName,TaskId)
+<-
+	for ( .member(Agent,FreeTrucks) ) {
+		.send(Agent,tell,task(Task,CNPBoardName,TaskId));
+	}
+	.
+@sendfreeagents[atomic]
++!send_to_free_agents(FreeAgents,Task,CNPBoardName,TaskId)
+<-
+	for ( .member(Agent,FreeAgents) ) {
+		.send(Agent,tell,task(Task,CNPBoardName,TaskId));
+	}
+	.
+
++!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)
 <- 
-	announce(Task,Deadline,NumberOfAgents,CNPBoardName);
+	.concat("cnp_board_",TaskId,CNPBoardName);
+	makeArtifact(CNPBoardName, "cnp.ContractNetBoard", [Task, Deadline, NumberOfAgents]);
+	if (.substring("assemble",Task)) { !send_to_free_trucks(FreeTrucks,Task,CNPBoardName,TaskId); }
+	else { !send_to_free_agents(FreeAgents,Task,CNPBoardName,TaskId); }
 //	.print("Created cnp ",CNPBoardName," for task #",Qty," of ",ItemId);
 	getBidsTask(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
@@ -35,7 +54,6 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 		.print("No bids.");
 	}
 	remove[artifact_name(CNPBoardName)];
-	clear(CNPBoardName);
 	.
 	
 +!separate_tasks(Id, Storage, Items)
@@ -56,12 +74,18 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 	}
 	else { ListToolsNew = []; ListItems = B; }
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
-	!!announce(assemble(Storage),Deadline,NumberOfTrucks,Id);
+	?task_id(TaskIdA);
+	!!announce(assemble(Storage),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
+	-+task_id(TaskIdA+1);
 	for ( .member(item(ItemId,Qty),ListToolsNew) ) {
-		!!announce(tool(ItemId),Deadline,NumberOfAgents,Id);
+		?task_id(TaskId);
+		-+task_id(TaskId+1);
+		!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	for ( .member(item(ItemId,Qty),ListItems) ) {
-		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id);
+		?task_id(TaskId);
+		-+task_id(TaskId+1);
+		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	.
 	
@@ -167,8 +191,8 @@ free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle
 		for( .member(FreeAgent,FreeAgents) ) {
 			.send(FreeAgent,achieve,strategies::not_selected);
 		}
-		-job(_, _, _, _)[source(_)];
-		-awarded_assemble(_,_,_,_);
+		-job(JobId, _, _, _)[source(_)];
+		-awarded_assemble(_,_,_,JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_));
 		.print("Impossible job, aborting it.");

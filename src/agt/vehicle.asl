@@ -4,16 +4,14 @@
 { include("strategies/common-plans.asl", strategies) }
 { include("strategies/bidder.asl", bidder) }
 
-+!create_taskboard 
++!add_initiator
 <- 
-	makeArtifact("task_board","cnp.TaskBoard",[]);
 	.include("strategies/initiator.asl", initiator); 
 	.
 
 +!register(E)
 	: .my_name(Me)
 <- 
-	focusWhenAvailable("task_board");
 	!new::new_round;
     .print("Registering...");
     register(E);

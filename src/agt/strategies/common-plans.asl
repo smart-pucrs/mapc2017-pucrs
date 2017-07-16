@@ -11,7 +11,6 @@
 +!go_assemble(AssembleList,Storage,JobId,Members)
 	: default::role(Role, _, _, _, _) & new::workshopList(WList)
 <-
-	-free;
 	actions.closest(Role,WList,Storage,ClosestWorkshop);
 	!action::goto(ClosestWorkshop);
 //	.print("Assemble List ",AssembleList);
@@ -38,7 +37,6 @@
 +!go_work(TaskList, Storage, Assembler)
 	: default::role(Role, _, _, _, _) & new::workshopList(WList) & new::shopList(SList)
 <-
-	-free;
 	for ( .member(tool(ItemId),TaskList) ) {
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
@@ -116,9 +114,8 @@
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_me_to_free2); }
 	else { 
-		if (Me == vehicle1) {  
-			?initiator::free_agents(FreeAgents);
-			-+initiator::free_agents([Me|FreeAgents]);
+		if (Me == vehicle1) {
+			!initiator::add_myself_to_free;
 		}
 		else { .send(vehicle1,achieve,initiator::add_me_to_free); }
 	}

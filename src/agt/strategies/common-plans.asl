@@ -2,7 +2,7 @@
 
 +default::actionID(0).
 +default::actionID(X) 
-	: free
+	: free & not default::winner(_,_)
 <-
 	!action::skip;
 	.
@@ -27,11 +27,10 @@
 	!action::goto(Storage);
 	!action::deliver_job(JobId);
 	.print("$$$ I have just delivered job ",JobId);
-	.send(vehicle1,achieve,initiator::add_me_to_free2);
-	.send(vehicle1,achieve,strategies::job_finished(JobId));
+	.send(vehicle1,achieve,initiator::add_truck_to_free);
+	.send(vehicle1,achieve,initiator::job_finished(JobId));
 	-default::winner(_,_)[source(_)];
-	+free;
-	!action::skip;
+	!free;
 	.
 	
 +!go_work(TaskList, Storage, Assembler)
@@ -79,8 +78,6 @@
 	!action::goto(ClosestWorkshop);
 	+assembling;
 	!action::assist_assemble(Assembler);
-	+free;
-	!action::skip;
 	.
 	
 +!go_buy
@@ -112,14 +109,15 @@
 <- 
 	-assembling;
 	if ( default::hasItem(_,_) ) { !go_dump; }
-	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_me_to_free2); }
+	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		if (Me == vehicle1) {
 			!initiator::add_myself_to_free;
 		}
-		else { .send(vehicle1,achieve,initiator::add_me_to_free); }
+		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
 	-default::winner(_,_)[source(_)];
+	!free;
 	.
 	
 +!remove_truck_from_free(Agent)
@@ -128,9 +126,8 @@
 	remove_agent(Agent);
 	.
 	
-+!not_selected <- +free; !action::skip; .
-
-+!job_finished(JobId) <- -initiator::job(JobId, _, _, _)[source(_)].
+@free[atomic]
++!free <- +free; !action::skip; .
 
 +default::lastAction(Action)
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)

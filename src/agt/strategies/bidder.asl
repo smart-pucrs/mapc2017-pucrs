@@ -1,24 +1,30 @@
-+default::task(item(ItemId, Qty), CNPBoard, TaskId)
++default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
+	-default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)];
 	-strategies::free;
     !create_bid_task(item(ItemId, Qty), Bid, Shop);
     bid(Me, Bid, Shop, item(ItemId, Qty), TaskId)[artifact_name(CNPBoard)];
   	.
-+default::task(tool(ItemId), CNPBoard, TaskId)
+-default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)].
++default::task(tool(ItemId), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
+	-default::task(tool(ItemId), CNPBoard, TaskId)[source(X)];
 	-strategies::free;
   	!create_bid_task(tool(ItemId), Bid, Shop);
 	bid(Me, Bid, Shop, tool(ItemId), TaskId)[artifact_name(CNPBoard)];
 	.
-+default::task(assemble(StorageId), CNPBoard, TaskId)
+-default::task(tool(ItemId), CNPBoard, TaskId)[source(X)].
++default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
+	-default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)];
 	-strategies::free;
 	!create_bid_task(assemble(StorageId), Bid, Shop);
 	bid(Me, Bid, Shop, assemble(StorageId), TaskId)[artifact_name(CNPBoard)];
 	.
+-default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)].
 
 +!create_bid_task(item(ItemId, Qty), Bid, Shop)
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)

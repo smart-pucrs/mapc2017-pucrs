@@ -44,7 +44,7 @@ task_id(0).
 	makeArtifact(CNPBoardName, "cnp.ContractNetBoard", [Task, Deadline, NumberOfAgents]);
 	if (.substring("assemble",Task)) { !send_to_free_trucks(FreeTrucks,Task,CNPBoardName,TaskId); }
 	else { !send_to_free_agents(FreeAgents,Task,CNPBoardName,TaskId); }
-//	.print("Created cnp ",CNPBoardName," for task #",Qty," of ",ItemId);
+//	.print("Created cnp ",CNPBoardName," for task ",Task);
 	getBidsTask(Bids) [artifact_name(CNPBoardName)];
 	if (.length(Bids) \== 0) {		
 //		.print("Got bids (",.length(Bids),") for task #",Qty," ",ItemId," Bids: ",Bids);
@@ -182,14 +182,14 @@ task_id(0).
 		.send(AgentA,tell,winner(Items,assemble(Storage,Id,JobMembers)));
 		?initiator::free_agents(FreeAgents);
 		for( .member(FreeAgent,FreeAgents) ) {
-			.send(FreeAgent,achieve,strategies::not_selected);
+			.send(FreeAgent,achieve,strategies::free);
 		}
 	}
 	else { 
 		-impossible_task; 
 		?initiator::free_agents(FreeAgents);
 		for( .member(FreeAgent,FreeAgents) ) {
-			.send(FreeAgent,achieve,strategies::not_selected);
+			.send(FreeAgent,achieve,strategies::free);
 		}
 		-job(JobId, _, _, _)[source(_)];
 		-awarded_assemble(_,_,_,JobId);
@@ -199,29 +199,32 @@ task_id(0).
 	}
 	.
 
-@add_me_to_free[atomic]
-+!add_me_to_free[source(Agent)]
+@addAgentFree[atomic]
++!add_agent_to_free[source(Agent)]
 	: initiator::free_agents(FreeAgents)
 <-
 	-+initiator::free_agents([Agent|FreeAgents]);
 	.
-@add_me_to_free2[atomic]
-+!add_me_to_free2[source(Agent)]
+@addTruckFree[atomic]
++!add_truck_to_free[source(Agent)]
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks)
 <-
 	-+initiator::free_agents([Agent|FreeAgents]);
 	-+initiator::free_trucks([Agent|FreeTrucks]);
 	.
-@add_me_to_free3[atomic]
+@addMeFree[atomic]
 +!add_myself_to_free
 	: initiator::free_agents(FreeAgents) & .my_name(Me)
 <-
 	-+initiator::free_agents([Me|FreeAgents]);
 	.
 	
+@jobFinished[atomic]	
++!job_finished(JobId) <- -initiator::job(JobId, _, _, _).
+	
 +default::step(End)
 	: job(Id, _, End, _)
 <-
-	.print("Job ",Id," failed: deadline.");
+	.print("!!!!!!!!!!!!!!!!! Job ",Id," failed: deadline.");
 	-job(Id, _, End, _);
 	.

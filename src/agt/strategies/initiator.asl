@@ -151,8 +151,8 @@ task_id(0).
 		}
 	}
 	if (not initiator::impossible_task) {
-		?awarded_assemble(AgentA,Items,Storage,Id);
-		-awarded_assemble(AgentA,Items,Storage,Id);
+		?awarded_assemble(AgentA,Items,Storage,JobId);
+		-awarded_assemble(AgentA,Items,Storage,JobId);
 		?initiator::free_agents(FreeAgentsA);
 		?initiator::free_trucks(FreeTrucksA);
 		.delete(AgentA,FreeTrucksA,FreeTrucksNewA);
@@ -160,7 +160,7 @@ task_id(0).
 		.delete(AgentA,FreeAgentsA,FreeAgentsNewA);
 		-+initiator::free_agents(FreeAgentsNewA);
 //		.print("Removing ",AgentA," from free lists.");
-		+job_members(Id,[]);
+		+job_members(JobId,[]);
 		for (awarded(Agent,Shop,List)) {
 //			.print("Removing ",Agent," from free lists.");
 			?initiator::free_agents(FreeAgents);
@@ -171,15 +171,14 @@ task_id(0).
 				.delete(Agent,FreeTrucks,FreeTrucksNew);
 				-+initiator::free_trucks(FreeTrucksNew);
 			}
-			?job_members(Id,Aux);
-			-+job_members(Id,[Agent|Aux]);
+			?job_members(JobId,Aux);
+			-+job_members(JobId,[Agent|Aux]);
 	    	.send(Agent,tell,winner(List,assist(Storage,AgentA)));
 			-awarded(Agent,Shop,List);	
 		}
-		?job_members(Id,JobMembers);
-		-job_members(Id,JobMembers);
+		?job_members(JobId,JobMembers);
 //		.print("Job members ",JobMembers);
-		.send(AgentA,tell,winner(Items,assemble(Storage,Id,JobMembers)));
+		.send(AgentA,tell,winner(Items,assemble(Storage,JobId,JobMembers)));
 		?initiator::free_agents(FreeAgents);
 		for( .member(FreeAgent,FreeAgents) ) {
 			.send(FreeAgent,achieve,strategies::free);
@@ -191,7 +190,8 @@ task_id(0).
 		for( .member(FreeAgent,FreeAgents) ) {
 			.send(FreeAgent,achieve,strategies::free);
 		}
-		-job(JobId, _, _, _)[source(_)];
+		-job(JobId, _, _, _);
+		-job_members(JobId,_);
 		-awarded_assemble(_,_,_,JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_));
@@ -223,8 +223,12 @@ task_id(0).
 +!job_finished(JobId) <- -initiator::job(JobId, _, _, _).
 	
 +default::step(End)
-	: job(Id, _, End, _)
+	: job(Id, _, End, _) & job_members(Id,JobMembers)
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",Id," failed: deadline.");
+	for ( .member(Agent,JobMembers) ) {
+		.send(Agent,achieve,strategies::stop_assisting);
+	}
+	-job_members(Id,JobMembers);
 	-job(Id, _, End, _);
 	.

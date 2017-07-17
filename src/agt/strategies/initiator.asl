@@ -6,6 +6,7 @@ task_id(0).
 +default::job(Id, Storage, Reward, Start, End, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
+	!strategies::not_free;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
 	+job(Id, Storage, End, Items);
@@ -75,23 +76,26 @@ task_id(0).
 	else { ListToolsNew = []; ListItems = B; }
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
 	?task_id(TaskIdA);
+//	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
 	!!announce(assemble(Storage),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
 	-+task_id(TaskIdA+1);
 	for ( .member(item(ItemId,Qty),ListToolsNew) ) {
 		?task_id(TaskId);
 		-+task_id(TaskId+1);
+//		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
 		!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	for ( .member(item(ItemId,Qty),ListItems) ) {
 		?task_id(TaskId);
 		-+task_id(TaskId+1);
+//		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
 		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	.
 	
 @selectBids[atomic]
 +bids(_,_,JobId)
-	: .count(initiator::bids(_,_,JobId),NumberOfBids) & number_of_tasks(NumberOfTasks,JobId) & NumberOfBids == NumberOfTasks
+	: .count(initiator::bids(_,_,JobId),NumberOfBids) & number_of_tasks(NumberOfTasks,JobId) & NumberOfBids == NumberOfTasks & .my_name(Me)
 <-
 	-number_of_tasks(NumberOfTasks,JobId);
 	for ( bids(assemble(StorageId),Bids,JobId) ) {
@@ -179,23 +183,19 @@ task_id(0).
 		?job_members(JobId,JobMembers);
 //		.print("Job members ",JobMembers);
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId,JobMembers)));
-		?initiator::free_agents(FreeAgents);
-		for( .member(FreeAgent,FreeAgents) ) {
-			.send(FreeAgent,achieve,strategies::free);
-		}
 	}
 	else { 
 		-impossible_task; 
-		?initiator::free_agents(FreeAgents);
-		for( .member(FreeAgent,FreeAgents) ) {
-			.send(FreeAgent,achieve,strategies::free);
-		}
 		-job(JobId, _, _, _);
 		-job_members(JobId,_);
 		-awarded_assemble(_,_,_,JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_));
 		.print("Impossible job, aborting it.");
+	}
+	?initiator::free_agents(FreeAgentsB);
+	if ( .sublist([Me],FreeAgentsB)) {
+		!strategies::free;
 	}
 	.
 
@@ -220,7 +220,7 @@ task_id(0).
 	.
 	
 @jobFinished[atomic]	
-+!job_finished(JobId) <- -initiator::job(JobId, _, _, _).
++!job_finished(JobId) <- -initiator::job_members(JobId,_); -initiator::job(JobId, _, _, _).
 	
 +default::step(End)
 	: job(Id, _, End, _) & job_members(Id,JobMembers)

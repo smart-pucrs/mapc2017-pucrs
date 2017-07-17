@@ -127,7 +127,11 @@
 	.
 	
 @free[atomic]
-+!free <- +free; !action::skip; .
++!free : not free <- +free; !action::skip; .
++!free.
+
+@notFree[atomic]
++!not_free <- -free.
 
 +default::lastAction(Action)
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)

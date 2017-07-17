@@ -6,7 +6,7 @@
 //	+storageList([]);
 	+shopList([]);
 	+workshopList([]);
-	+max_bid_time(3000);
+	+max_bid_time(10000);
 	+tool_types([vehicle1,vehicle5,vehicle13,vehicle21]);
 	+number_of_trucks(8);
 	+number_of_agents(28);

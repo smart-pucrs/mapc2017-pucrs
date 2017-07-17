@@ -33,7 +33,7 @@
 	.
 // Tests if there is enough battery to go to my goal AND to the nearest charging station around that goal	
 +!goto(FacilityId)
-: not .desire(go_charge(_)) & new::chargingList(List) & default::closest_facility(List, FacilityId, FacilityId2) & default::enough_battery(FacilityId, FacilityId2, Result)
+: not .desire(action::go_charge(_)) & new::chargingList(List) & default::closest_facility(List, FacilityId, FacilityId2) & default::enough_battery(FacilityId, FacilityId2, Result)
 <-	
 	.term2string(Result,ResultS);
     if (ResultS == "false") { !go_charge(FacilityId); }

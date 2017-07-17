@@ -1,26 +1,26 @@
+@itemTask[atomic]
 +default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
 	-default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)];
-	-strategies::free;
     !create_bid_task(item(ItemId, Qty), Bid, Shop);
     bid(Me, Bid, Shop, item(ItemId, Qty), TaskId)[artifact_name(CNPBoard)];
   	.
 -default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)].
+@toolTask[atomic]
 +default::task(tool(ItemId), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
 	-default::task(tool(ItemId), CNPBoard, TaskId)[source(X)];
-	-strategies::free;
   	!create_bid_task(tool(ItemId), Bid, Shop);
 	bid(Me, Bid, Shop, tool(ItemId), TaskId)[artifact_name(CNPBoard)];
 	.
 -default::task(tool(ItemId), CNPBoard, TaskId)[source(X)].
+@assembleTask[atomic]
 +default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
 	-default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)];
-	-strategies::free;
 	!create_bid_task(assemble(StorageId), Bid, Shop);
 	bid(Me, Bid, Shop, assemble(StorageId), TaskId)[artifact_name(CNPBoard)];
 	.
@@ -65,11 +65,13 @@
 	
 +default::winner(TaskList, assist(Storage, Assembler))
 <-
+	!strategies::not_free;
 	.print("I won the tasks ",TaskList);
 	!strategies::go_work(TaskList, Storage, Assembler);
 	.
 +default::winner(TaskList, assemble(Storage, JobId, Members))
 <-
+	!strategies::not_free;
 	?default::get_assemble(TaskList, [], AssembleList);
 	.sort(AssembleList,AssembleListSorted);
 	.print("I won the tasks to assemble ",AssembleListSorted," and deliver to ",Storage," for ",JobId);

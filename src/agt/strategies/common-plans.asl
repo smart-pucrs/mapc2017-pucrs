@@ -31,7 +31,7 @@
 	.print("Finished assembling all items, going to deliver.");
 	!action::goto(Storage);
 	!action::deliver_job(JobId);
-	.print("$$$ I have just delivered job ",JobId);
+//	.print("$$$ I have just delivered job ",JobId);
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	.send(vehicle1,achieve,initiator::job_finished(JobId));
 	!free;

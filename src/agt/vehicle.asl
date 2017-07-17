@@ -29,7 +29,7 @@
 	: .my_name(Me) & new::tool_types(Agents)
 <- 
 	.wait(1000);
-	if ( .sublist([Me],Agents) ) { .broadcast(tell,tools(Role,Tools)); }
+	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
 	addLoad(Me,LoadCap);
 	+strategies::free;
 	!strategies::firstskip;

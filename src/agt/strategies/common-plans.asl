@@ -6,6 +6,11 @@
 <-
 	!action::skip;
 	.
++default::actionID(X) 
+	: not free & not default::winner(_,_) & not initiator::cnp(_)
+<-
+	!free;
+	.
 +!firstskip <- !action::skip.
 	
 +!go_assemble(AssembleList,Storage,JobId,Members)
@@ -108,6 +113,8 @@
 	: default::role(Role, _, _, _, _) & .my_name(Me)
 <- 
 	-assembling;
+	-default::winner(_,_)[source(_)];
+	!free;
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
@@ -116,14 +123,6 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-	-default::winner(_,_)[source(_)];
-	!free;
-	.
-	
-+!remove_truck_from_free(Agent)
-<-
-	remove_truck(Agent);
-	remove_agent(Agent);
 	.
 	
 @free[atomic]

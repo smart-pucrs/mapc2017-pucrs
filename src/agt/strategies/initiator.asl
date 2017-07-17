@@ -10,7 +10,7 @@ task_id(0).
 	+job(Id, Storage, End, Items);
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
-	!separate_tasks(Id, Storage, Items);
+	!!separate_tasks(Id, Storage, Items);
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 	
@@ -21,7 +21,7 @@ task_id(0).
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
 	+job(Id, Storage, End, Items);
-	!separate_tasks(Id, Storage, Items);
+	!!separate_tasks(Id, Storage, Items);
 	.
 	
 @sendfreetrucks[atomic]
@@ -59,7 +59,6 @@ task_id(0).
 	.
 
 
-@separate[atomic]
 +!separate_tasks(Id, Storage, Items)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents)
 <-
@@ -237,10 +236,10 @@ task_id(0).
 	: job(Id, _, End, _) & job_members(Id,JobMembers,Assembler)
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",Id," failed: deadline.");
-//	.send(Assembler,achieve,strategies::job_failed_assemble);
-//	for ( .member(Agent,JobMembers) ) {
-//		.send(Agent,achieve,strategies::job_failed_assist);
-//	}
-	-job_members(Id,JobMembers,Assembler);
-	-job(Id, _, End, _);
+	.send(Assembler,achieve,strategies::job_failed_assemble);
+	for ( .member(Agent,JobMembers) ) {
+		.send(Agent,achieve,strategies::job_failed_assist);
+	}
+	-job_members(Id,_,_);
+	-job(Id, _, _, _);
 	.

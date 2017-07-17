@@ -2,7 +2,7 @@
 
 +default::actionID(0).
 +default::actionID(X) 
-	: free & not default::winner(_,_)
+	: free
 <-
 	!action::skip;
 	.
@@ -34,7 +34,6 @@
 	.print("$$$ I have just delivered job ",JobId);
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	.send(vehicle1,achieve,initiator::job_finished(JobId));
-	-default::winner(_,_)[source(_)];
 	!free;
 	.
 	
@@ -115,7 +114,6 @@
 	-assembling;
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!free;
-	-default::winner(_,_)[source(_)];
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		if (Me == vehicle1) {
@@ -130,12 +128,11 @@
 <-
 	.drop_desire(strategies::go_work(_,_,_));
 	-assembling;
-//	!action::abort;
+	!action::abort;
 	.abolish(strategies::buyList(_,_,_));
 	 -buy_list_id(_);
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!free;
-	-default::winner(_,_)[source(_)];
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		if (Me == vehicle1) {
@@ -148,15 +145,14 @@
 	: true
 <-
 	.drop_desire(strategies::go_assemble(_,_,_,_));
-//	!action::abort;
+	!action::abort;
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!free;
-	-default::winner(_,_)[source(_)];
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	.
 	
 @free[atomic]
-+!free : not free <- +free; !action::skip; .
++!free : not free <- +free; -default::winner(_,_)[source(_)]; !action::skip; .
 +!free <- !action::skip.
 
 @notFree[atomic]

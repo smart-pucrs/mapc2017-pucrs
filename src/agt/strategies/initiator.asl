@@ -20,12 +20,13 @@ task_id(0).
 <- 
 	!strategies::not_free;
 	+job(Id, Storage, End, Items);
-	+mission(Id, Fine);
+	+mission(Id, Fine, End);
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
 
 	!!separate_tasks(Id, Storage, Items);
 	.
++default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Fine, End); .print("Ignoring mission ",Id).
 	
 @sendfreetrucks[atomic]
 +!send_to_free_trucks(FreeTrucks,Task,CNPBoardName,TaskId)
@@ -237,14 +238,14 @@ task_id(0).
 <- 
 	-initiator::job_members(JobId,_,_); 
 	-initiator::job(JobId, _, _, _);
-	if ( initiator::mission(JobId,_) ) { .print("$$$ Completed mission ",JobId); -initiator::mission(JobId,_); }
+	if ( initiator::mission(JobId,_,_) ) { .print("$$$ Completed mission ",JobId); -initiator::mission(JobId,_,_); }
 	else { .print("$$$ Completed job ",JobId); }
 	.
 	
 +default::step(End)
 	: job(Id, _, End, _) & job_members(Id,JobMembers,Assembler)
 <-
-	if ( initiator::mission(Id,Fine) ) { .print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline, paying fine of ",Fine); -initiator::mission(Id,_); }
+	if ( initiator::mission(Id,Fine,_) ) { .print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline, paying fine of ",Fine); -initiator::mission(Id,_,_); }
 	else { .print("!!!!!!!!!!!!!!!!! Job ",Id," failed: deadline."); }
 	.send(Assembler,achieve,strategies::job_failed_assemble);
 	for ( .member(Agent,JobMembers) ) {
@@ -252,4 +253,10 @@ task_id(0).
 	}
 	-job_members(Id,_,_);
 	-job(Id, _, _, _);
+	.
++default::step(End)
+	: mission(Id,Fine,End)
+<-
+	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline, paying fine of ",Fine);
+	-mission(Id,_,_); 
 	.

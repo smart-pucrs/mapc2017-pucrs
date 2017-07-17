@@ -113,9 +113,9 @@
 	: default::role(Role, _, _, _, _) & .my_name(Me)
 <- 
 	-assembling;
-	-default::winner(_,_)[source(_)];
-	!free;
 	if ( default::hasItem(_,_) ) { !go_dump; }
+	!free;
+	-default::winner(_,_)[source(_)];
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		if (Me == vehicle1) {
@@ -124,10 +124,40 @@
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
 	.
+
++!job_failed_assist
+	: default::role(Role, _, _, _, _) & .my_name(Me)
+<-
+	.drop_desire(strategies::go_work(_,_,_));
+	-assembling;
+//	!action::abort;
+	.abolish(strategies::buyList(_,_,_));
+	 -buy_list_id(_);
+	if ( default::hasItem(_,_) ) { !go_dump; }
+	!free;
+	-default::winner(_,_)[source(_)];
+	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
+	else { 
+		if (Me == vehicle1) {
+			!initiator::add_myself_to_free;
+		}
+		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
+	}
+	.
++!job_failed_assemble
+	: true
+<-
+	.drop_desire(strategies::go_assemble(_,_,_,_));
+//	!action::abort;
+	if ( default::hasItem(_,_) ) { !go_dump; }
+	!free;
+	-default::winner(_,_)[source(_)];
+	.send(vehicle1,achieve,initiator::add_truck_to_free);
+	.
 	
 @free[atomic]
 +!free : not free <- +free; !action::skip; .
-+!free.
++!free <- !action::skip.
 
 @notFree[atomic]
 +!not_free <- -free.

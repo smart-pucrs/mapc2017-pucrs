@@ -6,7 +6,6 @@ task_id(0).
 +default::job(Id, Storage, Reward, Start, End, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
-	+cnp(Id);
 	!strategies::not_free;
 	+job(Id, Storage, End, Items);
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
@@ -41,6 +40,7 @@ task_id(0).
 	.
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)
+	: true
 <- 
 	.concat("cnp_board_",TaskId,CNPBoardName);
 	makeArtifact(CNPBoardName, "cnp.ContractNetBoard", [Task, Deadline, NumberOfAgents]);
@@ -58,10 +58,12 @@ task_id(0).
 	remove[artifact_name(CNPBoardName)];
 	.
 
+
 @separate[atomic]
 +!separate_tasks(Id, Storage, Items)
-	: new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents)
+	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents)
 <-
+	+cnp(Id);
 	?default::decomposeRequirements(Items,[],Bases);
 	+bases([]);
 	for ( .member(Item,Bases) ) {
@@ -93,6 +95,11 @@ task_id(0).
 //		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
 		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
+	.
++!separate_tasks(Id, Storage, Items)
+<-
+	.wait(500);
+	!separate_tasks(Id, Storage, Items);
 	.
 	
 @selectBids[atomic]
@@ -166,7 +173,7 @@ task_id(0).
 		.delete(AgentA,FreeAgentsA,FreeAgentsNewA);
 		-+initiator::free_agents(FreeAgentsNewA);
 //		.print("Removing ",AgentA," from free lists.");
-		+job_members(JobId,[]);
+		+job_members(JobId,[],AgentA);
 		for (awarded(Agent,Shop,List,JobId)) {
 //			.print("Removing ",Agent," from free lists.");
 			?initiator::free_agents(FreeAgents);
@@ -177,12 +184,12 @@ task_id(0).
 				.delete(Agent,FreeTrucks,FreeTrucksNew);
 				-+initiator::free_trucks(FreeTrucksNew);
 			}
-			?job_members(JobId,Aux);
-			-+job_members(JobId,[Agent|Aux]);
+			?job_members(JobId,Aux,AgentA);
+			-+job_members(JobId,[Agent|Aux],AgentA);
 	    	.send(Agent,tell,winner(List,assist(Storage,AgentA)));
 			-awarded(Agent,Shop,List,JobId);	
 		}
-		?job_members(JobId,JobMembers);
+		?job_members(JobId,JobMembers,AgentA);
 //		.print("Job members ",JobMembers);
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId,JobMembers)));
 		-cnp(JobId);
@@ -191,7 +198,7 @@ task_id(0).
 		-impossible_task(JobId);
 		-cnp(JobId);
 		-job(JobId, _, _, _);
-		-job_members(JobId,_);
+		-job_members(JobId,_,_);
 		-awarded_assemble(_,_,_,JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_,JobId));
@@ -224,15 +231,16 @@ task_id(0).
 	.
 	
 @jobFinished[atomic]	
-+!job_finished(JobId) <- -initiator::job_members(JobId,_); -initiator::job(JobId, _, _, _).
++!job_finished(JobId) <- -initiator::job_members(JobId,_,_); -initiator::job(JobId, _, _, _).
 	
 +default::step(End)
-	: job(Id, _, End, _) & job_members(Id,JobMembers)
+	: job(Id, _, End, _) & job_members(Id,JobMembers,Assembler)
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",Id," failed: deadline.");
-	for ( .member(Agent,JobMembers) ) {
-		.send(Agent,achieve,strategies::stop_assisting);
-	}
-	-job_members(Id,JobMembers);
+//	.send(Assembler,achieve,strategies::job_failed_assemble);
+//	for ( .member(Agent,JobMembers) ) {
+//		.send(Agent,achieve,strategies::job_failed_assist);
+//	}
+	-job_members(Id,JobMembers,Assembler);
 	-job(Id, _, End, _);
 	.

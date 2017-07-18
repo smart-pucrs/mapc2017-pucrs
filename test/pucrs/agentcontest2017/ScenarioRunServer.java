@@ -17,7 +17,8 @@ public class ScenarioRunServer {
 			@Override
 			public void run() {
 				try {
-					Server.main(new String[] {"-conf", "conf/SampleConfig.json", "--monitor"});
+//					Server.main(new String[] {"-conf", "conf/SampleConfig.json", "--monitor"});					
+					Server.main(new String[] {"-conf", "conf/TwoMapsConfig.json", "--monitor"});
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

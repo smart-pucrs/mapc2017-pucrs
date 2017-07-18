@@ -1,11 +1,14 @@
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("common-rules.asl") }
-{ include("strategies/new-round.asl", new) }
+//{ include("strategies/round/new-round.asl", new) }
+{ include("strategies/round/new-round.asl") }
 { include("strategies/common-plans.asl", strategies) }
 { include("strategies/bidder.asl", bidder) }
+{ include("strategies/round/end-round.asl") }
 
 +!add_initiator
 <- 
+	+default::imTheInitiator[source(initiator)];
 	.include("strategies/initiator.asl", initiator); 
 	.
 
@@ -25,7 +28,6 @@
 //+default::hasItem(Item,Qty)
 //<- .print("Just got #",Qty," of ",Item).
 
-+default::simEnd <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@ SIM END").
 	
 +default::role(Role,_,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)

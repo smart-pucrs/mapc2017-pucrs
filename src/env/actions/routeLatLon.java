@@ -34,7 +34,8 @@ public class routeLatLon extends DefaultInternalAction {
 		double locationLon = a2.solve();
 		// Location is first LONGITUDE and then LATITUDE
 		Location to = new Location(locationLon, locationLat);
-		route = MapHelper.getNewRoute(from, to, type);
+//		route = MapHelper.getNewRoute(from, to, type);
+		route = MapHelper.getInstance().getNewRoute(from, to, type);
 
 		boolean ret = true;
 		ret = ret & un.unifies(args[4], new NumberTermImpl(route.getRouteDuration(speed)));

@@ -33,6 +33,7 @@
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
 		actions.route(Role,Speed,ClosestShop,RouteShop);
+		.print("####### Route: ",RouteShop);
 		Bid = RouteShop;
 		Shop = ClosestShop;
 	}

@@ -46,11 +46,12 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private boolean receiving;
 	private int lastStep = -1;
 	private int round = 0;
-//	private String maps[] = new String[] { "paris" };
+	private String maps[] = new String[] { "paris", "london" };
 	public EISArtifact() {
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
-		MapHelper.init("paris", 200, 5);
+//		MapHelper.init("paris", 200, 5);
+		MapHelper.getInstance().init("paris", 200, 5);
 	}
 
 	protected void init() throws IOException, InterruptedException {
@@ -107,12 +108,12 @@ public class EISArtifact extends Artifact implements AgentListener {
 		}
 	}
 	
-//	@INTERNAL_OPERATION
-//	void setMap(){
-//		round++;
-//		MapHelper.init(maps[round], 0.001, 0.0002);
-//		System.out.println("$> MAP: " + maps[round]);
-//	}
+	@INTERNAL_OPERATION
+	void setMap(){
+		round++;
+		MapHelper.getInstance().changeMap(maps[round]);
+		System.out.println("$> MAP: " + maps[round]);
+	}
 	
 	@INTERNAL_OPERATION
 	void receiving() throws JasonException {
@@ -341,16 +342,19 @@ public class EISArtifact extends Artifact implements AgentListener {
 				boolean isEntity = perception.getName().equals("entity"); // Second parameter of entity is the team. :(
 				LinkedList<Parameter> parameters = perception.getParameters();
 				String facility = parameters.get(0).toString();
-				if (!MapHelper.hasLocation(facility)) {
+//				if (!MapHelper.hasLocation(facility)) {
+				if (!MapHelper.getInstance().hasLocation(facility)) {
 					String local = parameters.get(0).toString();
 					double lat = Double.parseDouble(parameters.get(isEntity ? 2 : 1).toString());
 					double lon = Double.parseDouble(parameters.get(isEntity ? 3 : 2).toString());
-					MapHelper.addLocation(local, new Location(lon, lat));
+//					MapHelper.addLocation(local, new Location(lon, lat));
+					MapHelper.getInstance().addLocation(local, new Location(lon, lat));
 				}
 			}
 		}
 		if(!Double.isNaN(agLat) && !Double.isNaN(agLon)){
-			MapHelper.addLocation(agent, new Location(agLon, agLat));
+//			MapHelper.addLocation(agent, new Location(agLon, agLat));
+			MapHelper.getInstance().addLocation(agent, new Location(agLon, agLat));
 		}
 	}
 

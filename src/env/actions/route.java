@@ -38,11 +38,13 @@ public class route extends DefaultInternalAction {
 		if (args.length == 4){
 			String from = ts.getUserAgArch().getAgName();
 			String to = args[2].toString();
-			route = MapHelper.getNewRoute(from, to, type);
+//			route = MapHelper.getNewRoute(from, to, type);
+			route = MapHelper.getInstance().getNewRoute(from, to, type);
 		} else if (args.length == 5) {
 			String from = args[2].toString();
 			String to = args[3].toString();
-			route = MapHelper.getNewRoute(from, to, type);
+//			route = MapHelper.getNewRoute(from, to, type);
+			route = MapHelper.getInstance().getNewRoute(from, to, type);
 		} else if (args.length == 6) {
 			String from = args[2].toString();
 			// Create a location with Lat (1) and Lon (2) parameter
@@ -52,7 +54,8 @@ public class route extends DefaultInternalAction {
 			double locationLon = a2.solve();
 			// Location is first LONGITUDE and then LATITUDE
 			Location to = new Location(locationLon, locationLat);
-			route = MapHelper.getNewRoute(from, to, type);
+//			route = MapHelper.getNewRoute(from, to, type);
+			route = MapHelper.getInstance().getNewRoute(from, to, type);
 		}
 		else if (args.length == 7) {
 			// Create a location with Lat (1) and Lon (2) parameter
@@ -63,7 +66,8 @@ public class route extends DefaultInternalAction {
 			// Location is first LONGITUDE and then LATITUDE
 			Location from = new Location(locationLon, locationLat);
 			String to = args[4].toString();
-			route = MapHelper.getNewRoute(from, to, type);
+//			route = MapHelper.getNewRoute(from, to, type);
+			route = MapHelper.getInstance().getNewRoute(from, to, type);
 		}
 		else if (args.length == 8) {
 			// Create a location with Lat (1) and Lon (2) parameter
@@ -74,7 +78,8 @@ public class route extends DefaultInternalAction {
 			// Location is first LONGITUDE and then LATITUDE
 			Location to = new Location(locationLon, locationLat);
 			String from = ts.getUserAgArch().getAgName();
-			route = MapHelper.getNewRoute(from, to, type);
+//			route = MapHelper.getNewRoute(from, to, type);
+			route = MapHelper.getInstance().getNewRoute(from, to, type);
 		}  else {
 			return false;
 		}

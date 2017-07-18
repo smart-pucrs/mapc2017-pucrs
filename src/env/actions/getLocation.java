@@ -15,7 +15,8 @@ public class getLocation extends DefaultInternalAction {
 	@Override
 	public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 		String locationId = args[0].toString();
-		Location location = MapHelper.getLocation(locationId);
+//		Location location = MapHelper.getLocation(locationId);
+		Location location = MapHelper.getInstance().getLocation(locationId);
 		un.unifies(args[1], new NumberTermImpl(location.getLat()));
 		un.unifies(args[2], new NumberTermImpl(location.getLon()));
 		return true;

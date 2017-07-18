@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Logger;
+
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -17,49 +19,80 @@ import massim.scenario.city.data.Location;
 import massim.scenario.city.data.Route;
 
 public class MapHelper {
+	private static MapHelper instance;
+	
+	private Logger logger = Logger.getLogger(MapHelper.class.getName());
+	
+	private String mapName = null;
+	private GraphHopper hopper = null;
+	private Map<String, Location> locations = null;
+	private double cellSize;
+	private int proximity;
 
-	private static String mapName = null;
-	private static GraphHopper hopper = null;
-	private static Map<String, Location> locations = null;
-	private static double cellSize;
-
-	public static void init(String newMapName, double cellSize, int proximity) {
-		if (newMapName.equals(mapName)) {
+	public static MapHelper getInstance(){
+		if (instance == null)
+			instance = new MapHelper();
+		return instance;
+	}
+	
+	public void init(String newMapName, double cellSize, int proximity) {
+		initCellSetting(cellSize, proximity);
+		initMap(newMapName);
+	}
+	public void changeMap(String newMapName) {
+		initMap(newMapName);
+	}
+	private void initCellSetting(double cellSize, int proximity){
+		this.cellSize 	= cellSize;
+		this.proximity 	= proximity;
+	}
+	private void initMap(String newMapName){
+		if (newMapName.equals(this.mapName)) 
 			return;
-		}
-		MapHelper.cellSize = cellSize;
-		Location.setProximity(proximity);
-		mapName = newMapName;
-		locations = new HashMap<String, Location>();
-		hopper = new GraphHopper().forDesktop();
-		hopper.setOSMFile("osm" + File.separator + mapName + ".osm.pbf");
-		hopper.setCHEnabled(false); // CH does not work with shortest weighting (at the moment)
-		hopper.setGraphHopperLocation("graphs" + File.separator + mapName);
-		hopper.setEncodingManager(new EncodingManager("car"));
-		hopper.importOrLoad();
+		this.mapName = newMapName;
+		
+		if (this.hopper != null)
+			clean();
+		
+		logger.info("Iniciando troca mapa");
+		Location.setProximity(this.proximity);		
+		this.locations = new HashMap<String, Location>();
+		this.hopper = new GraphHopper().forDesktop();
+		this.hopper.setOSMFile("osm" + File.separator + this.mapName + ".osm.pbf");
+		this.hopper.setCHEnabled(false); // CH does not work with shortest weighting (at the moment)
+		this.hopper.setGraphHopperLocation("graphs" + File.separator + this.mapName);
+		this.hopper.setEncodingManager(new EncodingManager("car"));
+		this.hopper.importOrLoad();
+		logger.info("FInalizado troca mapa");
+	}
+	private void clean(){
+		this.hopper.close();
+		this.hopper.clean();
+		this.hopper = null;
+		this.locations = null;
 	}
 
-	public static GraphHopper getHopper() {
+	public GraphHopper getHopper() {
 		return hopper;
 	}
 
-	public static Location getLocation(String id) {
+	public Location getLocation(String id) {
 		return locations.get(id);
 	}
 	
-	public static Route getNewRoute(String from, String to, String type) {
+	public Route getNewRoute(String from, String to, String type) {
 		return getNewRoute(getLocation(from), getLocation(to), type);
 	}
 	
-	public static Route getNewRoute(Location from, String to, String type) {
+	public Route getNewRoute(Location from, String to, String type) {
 		return getNewRoute(from, getLocation(to), type);
 	}
 	
-	public static Route getNewRoute(String from, Location to, String type) {
+	public Route getNewRoute(String from, Location to, String type) {
 		return getNewRoute(getLocation(from), to, type);
 	}
 
-	public static Route getNewRoute(Location from, Location to, String type) {
+	public Route getNewRoute(Location from, Location to, String type) {
 		if (from == null || to == null) {
 			return null;
 		}
@@ -72,9 +105,9 @@ public class MapHelper {
 		return route;
 	}
 
-	private static Route getNewAirRoute(Location from, Location to) {
+	private Route getNewAirRoute(Location from, Location to) {
 		Route route = new Route();
-		double fractions = getLength(from, to) / MapHelper.cellSize;
+		double fractions = getLength(from, to) / this.cellSize;
 		Location loc = null;
 		for (long i = 1; i <= fractions; i++) {
 			loc = getIntermediateLoc(from, to, fractions, i);
@@ -85,19 +118,12 @@ public class MapHelper {
 		}
 		return route;
 	}
-
-//	private GHResponse queryGH(Location from, Location to){
-//        GHRequest req = new GHRequest(from.getLat(), from.getLon(), to.getLat(), to.getLon())
-//                .setWeighting("shortest")
-//                .setVehicle("car");
-//        return MapHelper.getHopper().route(req);
-//    }
 	
-	private static Route getNewCarRoute(Location from, Location to) {
+	private Route getNewCarRoute(Location from, Location to) {
 
 //		GHResponse rsp = queryGH(from, to);
 		GHRequest req = new GHRequest(from.getLat(), from.getLon(), to.getLat(), to.getLon()).setWeighting("shortest").setVehicle("car");
-		GHResponse rsp = MapHelper.getHopper().route(req);
+		GHResponse rsp = getHopper().route(req);
 
 		if (rsp.hasErrors()) {
 			return null;
@@ -121,13 +147,13 @@ public class MapHelper {
 			}
 
 			long i = 0;
-			for (; i * MapHelper.cellSize + remainder < length; i++) {
-				loc = getIntermediateLoc(prevPoint, nextPoint, length, i * MapHelper.cellSize + remainder);
+			for (; i * this.cellSize + remainder < length; i++) {
+				loc = getIntermediateLoc(prevPoint, nextPoint, length, i * this.cellSize + remainder);
 				if (!from.equals(loc)) {
 					route.addPoint(loc);
 				}
 			}
-			remainder = i * MapHelper.cellSize + remainder - length;
+			remainder = i * this.cellSize + remainder - length;
 			prevPoint = nextPoint;
 		}
 
@@ -138,33 +164,33 @@ public class MapHelper {
 		return route;
 	}
 
-	public static double getLength(Location loc1, Location loc2) {
+	public double getLength(Location loc1, Location loc2) {
         return LocationUtil.calculateRange(loc1.getLat(), loc1.getLon(), loc2.getLat(), loc2.getLon());
 	}
 	
 	
-	public static Location getIntermediateLoc(Location loc1, Location loc2, double fractions, long i) {
+	public Location getIntermediateLoc(Location loc1, Location loc2, double fractions, long i) {
 		double lon = (loc2.getLon() - loc1.getLon())*i/fractions + loc1.getLon();
 		double lat = (loc2.getLat() - loc1.getLat())*i/fractions + loc1.getLat();
 		return new Location(lon,lat);
 	}
 	
 	
-	public static double getLength(GHPoint loc1, GHPoint loc2) {
+	public double getLength(GHPoint loc1, GHPoint loc2) {
         return LocationUtil.calculateRange(loc1.getLat(), loc1.getLon(), loc2.getLat(), loc2.getLon());
 	}
 	
-	public static Location getIntermediateLoc(GHPoint loc1, GHPoint loc2, double length, double i) {
+	public Location getIntermediateLoc(GHPoint loc1, GHPoint loc2, double length, double i) {
 		double lon = (loc2.getLon() - loc1.getLon())*i/length + loc1.getLon();
 		double lat = (loc2.getLat() - loc1.getLat())*i/length + loc1.getLat();
 		return new Location(lon,lat);
 	}
 
-	public static boolean hasLocation(String name) {
+	public boolean hasLocation(String name) {
 		return locations.containsKey(name);
 	}
 
-	public static void addLocation(String name, Location location) {
+	public void addLocation(String name, Location location) {
 		locations.put(name, location);
 	}
 }

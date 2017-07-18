@@ -24,6 +24,8 @@
 	.
 //+default::hasItem(Item,Qty)
 //<- .print("Just got #",Qty," of ",Item).
+
++default::simEnd <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@ SIM END").
 	
 +default::role(Role,_,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)

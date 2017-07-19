@@ -1,5 +1,6 @@
 task_id(0).
 
++default::job(_, _, _, _, _, _) : default::step(0).
 @job[atomic]
 +default::job(Id, Storage, Reward, Start, End, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
@@ -11,7 +12,8 @@ task_id(0).
 	!!separate_tasks(Id, Storage, Items);
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
-	
+
++default::mission(_, _, _, _, _, _, _, _, _) : default::step(0).
 @mission[atomic]
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2

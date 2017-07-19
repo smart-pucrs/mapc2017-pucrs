@@ -241,6 +241,13 @@ task_id(0).
 	else { .print("$$$ Completed job ",JobId); }
 	.
 	
++!job_failed_enemy(Id)
+	: true
+<-
+	-job_members(Id,_,_);
+	-job(Id, _, _, _);
+	.
+	
 +default::step(End)
 	: job(Id, _, End, _) & job_members(Id,JobMembers,Assembler)
 <-
@@ -252,10 +259,4 @@ task_id(0).
 	}
 	-job_members(Id,_,_);
 	-job(Id, _, _, _);
-	.
-+default::step(End)
-	: mission(Id,Fine,End)
-<-
-	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline, paying fine of ",Fine);
-	-mission(Id,_,_); 
 	.

@@ -31,9 +31,15 @@
 	.print("Finished assembling all items, going to deliver.");
 	!action::goto(Storage);
 	!action::deliver_job(JobId);
-//	.print("$$$ I have just delivered job ",JobId);
+	?default::lastActionResult(Result);
+	if ( default::lastActionResult(failed_job_status) ) {
+		.print("!!!!!!!!!!!!!!!!! Job ",Id," failed: another team delivered first.");
+		+failed(JobId);
+		!job_failed_assemble2(JobId);
+	}
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
-	.send(vehicle1,achieve,initiator::job_finished(JobId));
+	if ( not failed(JobId) ) { .send(vehicle1,achieve,initiator::job_finished(JobId)); }
+	else { -failed(JobId) };
 	!free;
 	.
 	
@@ -113,7 +119,6 @@
 <- 
 	-assembling;
 	if ( default::hasItem(_,_) ) { !go_dump; }
-	!free;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		if (Me == vehicle1) {
@@ -121,6 +126,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
+	!!free;
 	.
 
 +!job_failed_assist
@@ -132,7 +138,6 @@
 	.abolish(strategies::buyList(_,_,_));
 	 -buy_list_id(_);
 	if ( default::hasItem(_,_) ) { !go_dump; }
-	!free;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		if (Me == vehicle1) {
@@ -140,6 +145,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
+	!!free;
 	.
 +!job_failed_assemble
 	: true
@@ -147,8 +153,14 @@
 	.drop_desire(strategies::go_assemble(_,_,_,_));
 	!action::abort;
 	if ( default::hasItem(_,_) ) { !go_dump; }
-	!free;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
+	!!free;
+	.
++!job_failed_assemble2(JobId)
+	: true
+<-
+	.send(vehicle1,achieve,initiator::job_failed_enemy(JobId));
+	if ( default::hasItem(_,_) ) { !go_dump; }
 	.
 	
 @free[atomic]

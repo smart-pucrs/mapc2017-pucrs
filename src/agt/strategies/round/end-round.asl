@@ -21,28 +21,22 @@
     .drop_all_desires;
     .drop_all_events;	
 	.
-//@changeV1[atomic]
-//+!change_round
-//	: .my_name(vehicle1)
-//<-
-//	!end_round;
-//	setMap;
-//	!new::new_round;
-//	.
-//@change[atomic]
-//+!change_round
-//	: true
-//<-
-//	!end_round;
-//	!new::new_round;
-//	.	
-@change[atomic]
+	
+@changeV1[atomic]
 +!change_round
+	: .my_name(vehicle1)
 <-
 	!end_round;
 	setMap;
 	!new::new_round;
 	.
+@change[atomic]
++!change_round
+	: true
+<-
+	!end_round;
+	!new::new_round;
+	.	
 
 {end}
 

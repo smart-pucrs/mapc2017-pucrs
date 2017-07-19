@@ -67,7 +67,6 @@ public class MapHelper {
 	}
 	private void clean(){
 		this.hopper.close();
-//		this.hopper.clean();
 		this.hopper = null;
 		this.locations = null;
 	}

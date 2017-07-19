@@ -54,7 +54,7 @@ public class MapHelper {
 		if (this.hopper != null)
 			clean();
 		
-		logger.info("Iniciando troca mapa");
+//		logger.info("Iniciando troca mapa");
 		Location.setProximity(this.proximity);		
 		this.locations = new HashMap<String, Location>();
 		this.hopper = new GraphHopper().forDesktop();
@@ -63,7 +63,7 @@ public class MapHelper {
 		this.hopper.setGraphHopperLocation("graphsMapHelper" + File.separator + this.mapName);
 		this.hopper.setEncodingManager(new EncodingManager("car"));
 		this.hopper.importOrLoad();
-		logger.info("FInalizado troca mapa");
+//		logger.info("FInalizado troca mapa");
 	}
 	private void clean(){
 		this.hopper.close();

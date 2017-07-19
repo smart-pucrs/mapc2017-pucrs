@@ -220,6 +220,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 			
 		if (step != null) {
 //			logger.info("adding "+step);
+			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
 			for (Literal lit: percs) {
 				defineObsProperty(lit.getFunctor(), (Object[]) lit.getTermsArray());
 			}
@@ -230,9 +231,8 @@ public class EISArtifact extends Artifact implements AgentListener {
 				}
 				signalList.clear();
 			}
-			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
-			defineObsProperty(actionID.getFunctor(), (Object[]) actionID.getTermsArray());
 			defineObsProperty(lastActionResult.getFunctor(), (Object[]) lastActionResult.getTermsArray());
+			defineObsProperty(actionID.getFunctor(), (Object[]) actionID.getTermsArray());
 		}
 
 	}

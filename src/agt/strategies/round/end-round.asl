@@ -28,6 +28,7 @@
 <-
 	!end_round;
 	setMap;
+	clearMaps;
 	!new::new_round;
 	.
 @change[atomic]
@@ -35,6 +36,8 @@
 	: true
 <-
 	!end_round;
+	addJob("");
+	.wait(500);
 	!new::new_round;
 	.	
 

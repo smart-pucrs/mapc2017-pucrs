@@ -93,4 +93,11 @@ public class TeamArtifact extends Artifact {
 		}
 	}
 	
+	@OPERATION void clearMaps() {
+		shopItemsQty.clear();
+		agentNames.clear();
+		loads.clear();
+		
+	}
+	
 }

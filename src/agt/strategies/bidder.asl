@@ -1,4 +1,3 @@
-@itemTask[atomic]
 +default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
@@ -7,7 +6,6 @@
     bid(Me, Bid, Shop, item(ItemId, Qty), TaskId)[artifact_name(CNPBoard)];
   	.
 -default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)].
-@toolTask[atomic]
 +default::task(tool(ItemId), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
@@ -16,7 +14,6 @@
 	bid(Me, Bid, Shop, tool(ItemId), TaskId)[artifact_name(CNPBoard)];
 	.
 -default::task(tool(ItemId), CNPBoard, TaskId)[source(X)].
-@assembleTask[atomic]
 +default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
@@ -65,6 +62,7 @@
 	Bid = RouteWorkshop;
 	Shop = StorageId;
 	.
++!create_bid_task(Task, Bid, Shop) <- .wait(500); !create_bid_task(Task, Bid, Shop).
 	
 +default::winner(TaskList, assist(Storage, Assembler))
 <-

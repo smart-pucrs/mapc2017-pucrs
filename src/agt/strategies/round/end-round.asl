@@ -10,29 +10,30 @@
 	?default::focused(vehicleart,ArtMe,Id2);
 	?default::joined(vehicleart,Id3);
 	?default::joined(main,Id4);
+	if (Me == vehicle1) { ?initiator::task_id(TaskId); }
 	.abolish(_::_[source(_)]);
 	+default::focused(vehicleart,team_artifact,Id1);
 	+default::focused(vehicleart,ArtMe,Id2);
 	+default::joined(vehicleart,Id3);
 	+default::joined(main,Id4);
+	if (Me == vehicle1) { +initiator::task_id(TaskId); }
     .drop_all_intentions;
     .drop_all_desires;
     .drop_all_events;	
 	.
-
+@changeV1[atomic]
 +!change_round
 	: .my_name(vehicle1)
 <-
 	!end_round;
 	setMap;
-	.wait(500);
 	!new::new_round;
 	.
+@change[atomic]
 +!change_round
 	: true
 <-
 	!end_round;
-	.wait(500);
 	!new::new_round;
 	.	
 

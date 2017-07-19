@@ -16,9 +16,9 @@ Pull whenever you see new commits in order to keep your local version up to date
 If you only wish to run the current code, then download the zip, extract it to a folder, and import that folder as an existing project to Eclipse.
 
 
-To run the simulation with one round, right-click test/pucrs.agentcontest2017/ScenarioRunOneRound.java file, "Run as", "jUnit Test".
+To run the simulation with one round, right-click test/pucrs.agentcontest2017/ScenarioRun1sim.java file, "Run as", "jUnit Test".
 
-To run the simulation with two rounds, right-click test/pucrs.agentcontest2017/ScenarioRunTwoRounds.java file, "Run as", "jUnit Test".
+To run the simulation with three rounds, right-click test/pucrs.agentcontest2017/ScenarioRun3sims.java file, "Run as", "jUnit Test".
 
 To watch the match click [this link](http://localhost:8000/).
 

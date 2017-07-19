@@ -60,7 +60,7 @@ public class MapHelper {
 		this.hopper = new GraphHopper().forDesktop();
 		this.hopper.setOSMFile("osm" + File.separator + this.mapName + ".osm.pbf");
 		this.hopper.setCHEnabled(false); // CH does not work with shortest weighting (at the moment)
-		this.hopper.setGraphHopperLocation("graphs" + File.separator + this.mapName);
+		this.hopper.setGraphHopperLocation("graphsMapHelper" + File.separator + this.mapName);
 		this.hopper.setEncodingManager(new EncodingManager("car"));
 		this.hopper.importOrLoad();
 //		logger.info("FInalizado troca mapa");

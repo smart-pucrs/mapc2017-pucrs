@@ -33,7 +33,7 @@
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
 		actions.route(Role,Speed,ClosestShop,RouteShop);
-		.print("####### Route: ",RouteShop);
+//		.print("####### Route: ",RouteShop," role ",Role);
 		Bid = RouteShop;
 		Shop = ClosestShop;
 	}
@@ -46,6 +46,7 @@
 		?default::find_shops(ItemId,SList,Shops);
 		actions.closest(Role,Shops,ClosestShop);
 		actions.route(Role,Speed,ClosestShop,RouteShop);
+//		.print("####### Route: ",RouteShop," role ",Role);
 		for ( default::tools(_,T) ) {
 			if (Role == drone & .member(ItemId,T) & not multiple_roles) { +multiple_roles }
 		}
@@ -60,6 +61,7 @@
 <-
 	actions.closest(Role,WList,StorageId,ClosestWorkshop);
 	actions.route(Role,Speed,ClosestWorkshop,RouteWorkshop);
+//	.print("####### Route: ",RouteWorkshop," role ",Role);
 	Bid = RouteWorkshop;
 	Shop = StorageId;
 	.

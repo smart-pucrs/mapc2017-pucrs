@@ -71,11 +71,9 @@ decomposeRequirements([required(Item,Qtd) | Requirements],Temp,Result):- item(It
 decomposeRequirementsNoTools([],Temp,Result):- Result = Temp.
 decomposeRequirementsNoTools([required(Item,_) | Requirements],Temp,Result):- item(Item,_,_,parts(Parts)) & decomposeItemNoTools(Item,Parts,[],ListItensJob) & .union(ListItensJob,Temp,New) & decomposeRequirementsNoTools(Requirements,New,Result).
 
-separateItemTool([],[],[]).
 separateItemTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools],ListItems) :- .substring("tool",ItemId) & separateItemTool(B,ListTools,ListItems).
 separateItemTool([item(ItemId,Qty)|B],ListTools,[item(ItemId,Qty)|ListItems]) :- .substring("item",ItemId) & separateItemTool(B,ListTools,ListItems).
 
-removeDuplicateTool([],[]).
 removeDuplicateTool([item(ItemId,Qty)|B],ListTools) :- .member(item(ItemId,Qty),B) & removeDuplicateTool(B,ListTools).
 removeDuplicateTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools]) :- removeDuplicateTool(B,ListTools).
 

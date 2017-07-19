@@ -112,7 +112,6 @@ public class EISArtifact extends Artifact implements AgentListener {
 	void setMap(){
 		round++;
 		MapHelper.getInstance().changeMap(maps[round]);
-		System.out.println("$> MAP: " + maps[round]);
 	}
 	
 	@INTERNAL_OPERATION

@@ -8,7 +8,6 @@
 
 +!add_initiator
 <- 
-	+default::imTheInitiator[source(initiator)];
 	.include("strategies/initiator.asl", initiator); 
 	.
 
@@ -25,9 +24,9 @@
 <-
 	addServerName(Me,ServerMe);
 	.
+	
 //+default::hasItem(Item,Qty)
 //<- .print("Just got #",Qty," of ",Item).
-
 	
 +default::role(Role,_,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)

@@ -8,7 +8,7 @@ import jason.JasonException;
 import massim.Server;
 
 
-public class ScenarioRunServer {
+public class ScenarioRunTwoRounds {
 
 	@Before
 	public void setUp() {
@@ -17,7 +17,6 @@ public class ScenarioRunServer {
 			@Override
 			public void run() {
 				try {
-//					Server.main(new String[] {"-conf", "conf/SampleConfig.json", "--monitor"});					
 					Server.main(new String[] {"-conf", "conf/TwoMapsConfig.json", "--monitor"});
 				} catch (Exception e) {
 					e.printStackTrace();

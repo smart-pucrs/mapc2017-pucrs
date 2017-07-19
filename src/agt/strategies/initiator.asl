@@ -1,7 +1,3 @@
-//free_agents([vehicle1,vehicle2,vehicle3,vehicle4,vehicle5,vehicle6,vehicle7,vehicle8,vehicle9,vehicle10,vehicle11,vehicle12,vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20,vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
-//free_trucks([vehicle21,vehicle22,vehicle23,vehicle24,vehicle25,vehicle26,vehicle27,vehicle28]).
-//task_id(0).
-
 @job[atomic]
 +default::job(Id, Storage, Reward, Start, End, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
@@ -204,7 +200,7 @@
 		-awarded_assemble(_,_,_,JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_,JobId));
-		.print("Impossible job, aborting it.");
+		.print("Impossible job ",JobId,", aborting it.");
 	}
 	?initiator::free_agents(FreeAgentsB);
 	if ( .member(Me,FreeAgentsB) ) {

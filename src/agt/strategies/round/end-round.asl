@@ -1,36 +1,40 @@
-
-
 {begin namespace(lEndRound, local)}
 
-abolishNotPercepts(Suffix,29).
-abolishNotPercepts(Suffix,Id) :- .concat(Suffix,Id,AgentName) & .term2string(TermName,AgentName) & .abolish(_::_[source(TermName)]) & abolishNotPercepts(Suffix,Id+1).
-
 +!end_round
-	: true
+	: .my_name(Me)
 <-
-	.print("-------------------- END OF THE ROUND ----------------");
-	.abolish(_::_[source(self)]);
-//	.abolish(_::_[source(X)]);
-	?abolishNotPercepts("vehicle",1);
+	.print("---------------- END OF THE ROUND ----------------");
+	?default::focused(vehicleart,team_artifact,Id1);
+	.concat("eis_art_",Me,ArtMeS);
+	.term2string(ArtMe,ArtMeS);
+	?default::focused(vehicleart,ArtMe,Id2);
+	?default::joined(vehicleart,Id3);
+	?default::joined(main,Id4);
+	.abolish(_::_[source(_)]);
+	+default::focused(vehicleart,team_artifact,Id1);
+	+default::focused(vehicleart,ArtMe,Id2);
+	+default::joined(vehicleart,Id3);
+	+default::joined(main,Id4);
     .drop_all_intentions;
     .drop_all_desires;
     .drop_all_events;	
 	.
 
 +!change_round
+	: .my_name(vehicle1)
+<-
+	!end_round;
+	setMap;
+	.wait(500);
+	!new::new_round;
+	.
++!change_round
 	: true
 <-
 	!end_round;
-	
-	setMap;
 	.wait(500);
-	
 	!new::new_round;
-	.
-
-{end}
-
-{begin namespace(gEndRound, global)}
+	.	
 
 {end}
 
@@ -38,9 +42,3 @@ abolishNotPercepts(Suffix,Id) :- .concat(Suffix,Id,AgentName) & .term2string(Ter
 <- 
 	!lEndRound::change_round;
 	.
-	
-+default::bye 
-<- 
-	.print("################# ACABOU POHAAA!!! ");
-	.
-

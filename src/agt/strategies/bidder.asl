@@ -73,6 +73,7 @@
 +default::winner(TaskList, assemble(Storage, JobId, Members))
 <-
 	!strategies::not_free;
+	addJob(JobId);
 	?default::get_assemble(TaskList, [], AssembleList);
 	.sort(AssembleList,AssembleListSorted);
 	.print("I won the tasks to assemble ",AssembleListSorted," and deliver to ",Storage," for ",JobId);

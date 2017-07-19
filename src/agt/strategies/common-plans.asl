@@ -32,14 +32,11 @@
 	!action::goto(Storage);
 	!action::deliver_job(JobId);
 	?default::lastActionResult(Result);
-	if ( default::lastActionResult(failed_job_status) ) {
-		.print("!!!!!!!!!!!!!!!!! Job ",Id," failed: another team delivered first.");
-		+failed(JobId);
-		!job_failed_assemble2(JobId);
+	if ( not default::lastActionResult(failed_job_status) ) {
+		+jobDone(JobId);
 	}
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
-	if ( not failed(JobId) ) { .send(vehicle1,achieve,initiator::job_finished(JobId)); }
-	else { -failed(JobId) };
+	.send(vehicle1,achieve,initiator::job_finished(JobId)); 
 	!free;
 	.
 	
@@ -115,7 +112,7 @@
 	.
 	
 +!stop_assisting
-	: default::role(Role, _, _, _, _) & .my_name(Me)
+	: default::winner(_,_) & default::role(Role, _, _, _, _) & .my_name(Me)
 <- 
 	-assembling;
 	if ( default::hasItem(_,_) ) { !go_dump; }
@@ -130,7 +127,7 @@
 	.
 
 +!job_failed_assist
-	: default::role(Role, _, _, _, _) & .my_name(Me)
+	: default::winner(_,_) & default::role(Role, _, _, _, _) & .my_name(Me)
 <-
 	.drop_desire(strategies::go_work(_,_,_));
 	-assembling;
@@ -148,19 +145,13 @@
 	!!free;
 	.
 +!job_failed_assemble
-	: true
+	: default::winner(_,_)
 <-
 	.drop_desire(strategies::go_assemble(_,_,_,_));
 	!action::abort;
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!free;
-	.
-+!job_failed_assemble2(JobId)
-	: true
-<-
-	.send(vehicle1,achieve,initiator::job_failed_enemy(JobId));
-	if ( default::hasItem(_,_) ) { !go_dump; }
 	.
 	
 @free[atomic]
@@ -177,5 +168,34 @@
 	.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> I have done ",Count+1," noActions.");
 	.
 	
-//+default::hasItem(Item,Qty)
-//<- .print("I now have #",Qty," of item ",Item).
++default::job_done(JobId, _, Reward, _, _, _)
+	: jobDone(JobId)
+<-
+	-jobDone(JobId);
+	.print("$$$$$$$$$$$$ Job ",JobId," completed, got reward ",Reward);
+	.
++default::job_done(JobId, _, _, _, _, _)
+	: default::winner(_, assemble(_, JobId, Members))
+<-
+	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
+	for ( .member(Agent,Members) ) {
+		.send(Agent,achieve,strategies::job_failed_assist);
+	}
+	!job_failed_assemble;
+	.
++default::job_done(JobId, _, Reward, _, _, Fine, _, _, _)
+	: jobDone(JobId)
+<-
+	-jobDone(JobId);
+	.print("$$$$$$$$$$$$ Mission ",JobId," completed, got reward ",Reward);
+	
+	.
++default::job_done(JobId, _, _, _, _, Fine, _, _, _)
+	: default::winner(_, assemble(_, JobId, Members))
+<-
+	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
+	for ( .member(Agent,Members) ) {
+		.send(Agent,achieve,strategies::job_failed_assist);
+	}
+	!job_failed_assemble;
+	.

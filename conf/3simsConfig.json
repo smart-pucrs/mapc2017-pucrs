@@ -11,7 +11,7 @@
     {
       "id" : "2017-SampleSimulation-1of3",
       "scenarioClass" : "city.CitySimulation",
-      "steps" : 10,
+      "steps" : 5,
       "map" : "paris",
       "seedCapital" : 50000,
       "minLon" : 2.26,
@@ -36,7 +36,7 @@
     {
       "id" : "2017-SampleSimulation-2of3",
       "scenarioClass" : "city.CitySimulation",
-      "steps" : 10,
+      "steps" : 100,
       "map" : "london",
       "seedCapital" : 10,
       "minLon" : -0.1978,

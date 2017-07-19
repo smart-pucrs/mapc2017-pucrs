@@ -108,10 +108,12 @@ public class EISArtifact extends Artifact implements AgentListener {
 		}
 	}
 	
-	@INTERNAL_OPERATION
+	@OPERATION
 	void setMap(){
 		round++;
-		MapHelper.getInstance().changeMap(maps[round]);
+		synchronized(MapHelper.getInstance()){
+			MapHelper.getInstance().changeMap(maps[round]);
+		}
 	}
 	
 	@INTERNAL_OPERATION

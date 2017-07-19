@@ -29,7 +29,7 @@ public class MapHelper {
 	private double cellSize;
 	private int proximity;
 
-	public static MapHelper getInstance(){
+	public synchronized static MapHelper getInstance(){
 		if (instance == null)
 			instance = new MapHelper();
 		return instance;
@@ -54,7 +54,7 @@ public class MapHelper {
 		if (this.hopper != null)
 			clean();
 		
-//		logger.info("Iniciando troca mapa");
+		logger.info("Iniciando troca mapa");
 		Location.setProximity(this.proximity);		
 		this.locations = new HashMap<String, Location>();
 		this.hopper = new GraphHopper().forDesktop();
@@ -63,11 +63,11 @@ public class MapHelper {
 		this.hopper.setGraphHopperLocation("graphsMapHelper" + File.separator + this.mapName);
 		this.hopper.setEncodingManager(new EncodingManager("car"));
 		this.hopper.importOrLoad();
-//		logger.info("FInalizado troca mapa");
+		logger.info("FInalizado troca mapa");
 	}
 	private void clean(){
 		this.hopper.close();
-		this.hopper.clean();
+//		this.hopper.clean();
 		this.hopper = null;
 		this.locations = null;
 	}

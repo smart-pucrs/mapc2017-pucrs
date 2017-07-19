@@ -3,6 +3,7 @@
 backup/
 cache/
 graphs/
+graphsMapHelper/
 /perceptlog/
 perceptlog/
 replays/

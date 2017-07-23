@@ -95,3 +95,7 @@ check_tools(Tools,FreeAgents,Result) :- Result = "false".
 check_agent(Tool,[],Result) :- Result = "false".
 check_agent(Tool,[Agent|FreeAgents],Result) :- actions.getAgentRole(Agent,Role)  & ( (default::role(Role,_,_,_,MyTools) & .member(Tool,MyTools)) | (default::tools(Role,Tools) & .member(Tool,Tools)) ) & Result = "true".
 check_agent(Tool,[Agent|FreeAgents],Result) :- check_agent(Tool,FreeAgents,Result).
+
+check_buy_list([],Result) :- Result = "true".
+check_buy_list([item(ItemId,Qty)|Items],Result) :- actions.getItemQty(ItemId,Qty2) & Qty <= Qty2 * 3 & check_buy_list(Items,Result).
+check_buy_list(Items,Result) :- Result == "false".

@@ -14,6 +14,7 @@ public class TeamArtifact extends Artifact {
 	private static Logger logger = Logger.getLogger(TeamArtifact.class.getName());
 	private static Map<String, Integer> shopItemsPrice = new HashMap<String, Integer>();
 	private static Map<String, Integer> shopItemsQty = new HashMap<String, Integer>();
+	private static Map<String, Integer> itemsQty = new HashMap<String, Integer>();
 	private static Map<String, String> agentNames = new HashMap<String, String>();
 	private static Map<String, String> agentRoles = new HashMap<String, String>();
 	private static Map<String, Integer> loads = new HashMap<String, Integer>();
@@ -83,8 +84,16 @@ public class TeamArtifact extends Artifact {
 		load.set(loads.get(agent));
 	}
 	
-	@OPERATION void addShopItem(String item, int qty){
+	@OPERATION void addShopItem(String item, int qty, String itemId){
 		shopItemsQty.put(item,qty);
+		if (itemsQty.containsKey(itemId)) {
+			if (itemsQty.get(itemId) > qty) {
+				itemsQty.replace(itemId, qty);
+			}
+		}
+		else {
+			itemsQty.put(itemId, qty);
+		}
 	}
 	
 	@OPERATION void getShopItem(String item, OpFeedbackParam<Integer> qty){
@@ -97,6 +106,10 @@ public class TeamArtifact extends Artifact {
 	
 	public static String getAgentRole(String agent) {
 		return agentRoles.get(agent);
+	}
+	
+	public static int getItemQty(String item) {
+		return itemsQty.get(item);
 	}
 		
 	@OPERATION void addResourceNode(String resourceId, double lat, double lon, String resource){

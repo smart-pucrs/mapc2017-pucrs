@@ -114,9 +114,7 @@ task_id(0).
 +!evaluate_job(ListToolsNew, ListItems, BadJob)
 	: initiator::free_agents(FreeAgents)
 <-
-	if (.empty(ListToolsNew) | (default::check_tools(ListToolsNew,FreeAgents,Result) & Result == "true") ) {
-		
-		
+	if (.empty(ListToolsNew) | (default::check_tools(ListToolsNew,FreeAgents,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true") ) {
 		BadJob = "false";
 	}
 	else { BadJob = "true"; }

@@ -38,7 +38,7 @@
 //	.print("Adding Shop: ",ShopId," Lat: ",Lat," Lon: ",Lon," Restock: ",Restock," Items: ",Items);
 //	-+shopList([shop(ShopId,Items)|List]);
 	for (.member(item(ItemId,_,Qty,_,_,_),Items)) {
-		addShopItem(item(ShopId,ItemId),Qty);
+		addShopItem(item(ShopId,ItemId),Qty,ItemId);
 	}
 	-+shopList([ShopId|List]);
 	.

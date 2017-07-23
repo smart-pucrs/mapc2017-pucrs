@@ -34,8 +34,9 @@
 	if ( not default::lastActionResult(failed_job_status) ) {
 		+jobDone(JobId);
 	}
-	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	.send(vehicle1,achieve,initiator::job_finished(JobId)); 
+	!check_charge;
+	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!free;
 	.
 	
@@ -115,6 +116,7 @@
 <- 
 	-assembling;
 	if ( default::hasItem(_,_) ) { !go_dump; }
+	!check_charge;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		if (Me == vehicle1) {
@@ -126,7 +128,7 @@
 	.
 
 +!job_failed_assist
-	: default::winner(_,_) & default::role(Role, _, _, _, _) & .my_name(Me)
+	: default::role(Role, _, _, _, _) & .my_name(Me)
 <-
 	.drop_desire(strategies::go_work(_,_,_));
 	-assembling;
@@ -144,7 +146,7 @@
 	!!free;
 	.
 +!job_failed_assemble
-	: default::winner(_,_)
+	: true
 <-
 	.drop_desire(strategies::go_assemble(_,_,_,_));
 	!action::abort;
@@ -152,6 +154,16 @@
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!free;
 	.
+	
++!check_charge
+	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= BatteryCap div 2 & new::chargingList(CList)
+<-
+	.print("Running low on battery, going to charge before taking any new tasks.");
+	actions.closest(Role,CList,ClosestChargingStation);
+	!action::goto(ClosestChargingStation);
+	!action::charge;
+	.
+-!check_charge.
 	
 @free[atomic]
 +!free : not free <- +free; -default::winner(_,_)[source(_)]; !action::skip; .

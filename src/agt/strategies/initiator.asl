@@ -8,7 +8,7 @@ task_id(0).
 	!strategies::not_free;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
-	!separate_tasks(Id, Storage, Items, End - Start);
+	!!separate_tasks(Id, Storage, Items, End, End - Start);
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
@@ -20,7 +20,7 @@ task_id(0).
 	!strategies::not_free;
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
-	!separate_tasks(Id, Storage, Items, End - Start);
+	!!separate_tasks(Id, Storage, Items, End, End - Start);
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Fine, End); .print("Ignoring mission ",Id).
 	
@@ -58,9 +58,12 @@ task_id(0).
 	remove[artifact_name(CNPBoardName)];
 	.
 
-+!separate_tasks(Id, Storage, Items, Duration)
+@addCNP[atomic]
++!add_cnp(Id) <- +cnp(Id).
++!separate_tasks(Id, Storage, Items, End, Duration)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
 <-
+	!add_cnp(Id);
 	?default::decomposeRequirements(Items,[],Bases);
 	+bases([]);
 	for ( .member(Item,Bases) ) {
@@ -79,7 +82,6 @@ task_id(0).
 	!evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, BadJob);
 	if (BadJob == "false") {
 		+job(Id, Storage, End, Items);
-		+cnp(Id);
 		+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
 		?task_id(TaskIdA);
 	//	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
@@ -100,23 +102,24 @@ task_id(0).
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
+		-cnp(Id);
 		.my_name(Me);
 		if ( .member(Me,FreeAgents) ) { 
 			!strategies::free; 
 		}
 	}
 	.
-+!separate_tasks(Id, Storage, Items, Duration)
++!separate_tasks(Id, Storage, Items, End, Duration)
 <-
 	.wait(500);
-	!separate_tasks(Id, Storage, Items, Duration);
+	!separate_tasks(Id, Storage, Items, End, Duration);
 	.
-	
+
+@eval[atomic]
 +!evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, BadJob)
-	: initiator::free_agents(FreeAgents) & new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & .length(ListToolsNew,NumberOfBuyTool) & .length(ListItems,NumberOfBuyItem)
+	: initiator::free_agents(FreeAgents) & new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & .length(ListToolsNew,NumberOfBuyTool) & .length(ListItems,NumberOfBuyItem) & default::steps(TotalSteps) & default::step(Step)
 <-
-	if (.empty(ListToolsNew) | (default::check_tools(ListToolsNew,FreeAgents,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,FarthestShop,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+30+10 < Duration ) ) {
-//		?default::step(Step);
+	if (.empty(ListToolsNew) | (default::check_tools(ListToolsNew,FreeAgents,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,FarthestShop,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+30+10 & Estimate < Duration & Step + Estimate < TotalSteps) ) {
 //		+estimate(Id,Step,RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+30+10);
 		BadJob = "false";
 	}

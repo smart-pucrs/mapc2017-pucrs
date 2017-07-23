@@ -22,7 +22,7 @@
 	+workshopList([]);
 	+max_bid_time(10000);
 	+tool_types([vehicle1,vehicle5,vehicle13,vehicle21]);
-	+vehicle_job(truck,5);
+	+vehicle_job(truck,2);
 	+noActionCount(0);
 	
 	+default::separateItemTool([],[],[]);

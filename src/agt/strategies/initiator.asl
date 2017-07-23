@@ -8,7 +8,7 @@ task_id(0).
 	!strategies::not_free;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
-	!separate_tasks(Id, Storage, Items);
+	!separate_tasks(Id, Storage, Items, End - Start);
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
@@ -20,7 +20,7 @@ task_id(0).
 	!strategies::not_free;
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
-	!separate_tasks(Id, Storage, Items);
+	!separate_tasks(Id, Storage, Items, End - Start);
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Fine, End); .print("Ignoring mission ",Id).
 	
@@ -58,7 +58,7 @@ task_id(0).
 	remove[artifact_name(CNPBoardName)];
 	.
 
-+!separate_tasks(Id, Storage, Items)
++!separate_tasks(Id, Storage, Items, Duration)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
 <-
 	?default::decomposeRequirements(Items,[],Bases);
@@ -75,7 +75,8 @@ task_id(0).
 		?default::removeDuplicateTool(ListTools,ListToolsNew);
 	}
 	else { ListToolsNew = []; ListItems = B; }
-	!evaluate_job(ListToolsNew, ListItems, BadJob);
+	.length(Items,NumberOfAssemble);
+	!evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, BadJob);
 	if (BadJob == "false") {
 		+job(Id, Storage, End, Items);
 		+cnp(Id);
@@ -105,16 +106,18 @@ task_id(0).
 		}
 	}
 	.
-+!separate_tasks(Id, Storage, Items)
++!separate_tasks(Id, Storage, Items, Duration)
 <-
 	.wait(500);
-	!separate_tasks(Id, Storage, Items);
+	!separate_tasks(Id, Storage, Items, Duration);
 	.
 	
-+!evaluate_job(ListToolsNew, ListItems, BadJob)
-	: initiator::free_agents(FreeAgents)
++!evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, BadJob)
+	: initiator::free_agents(FreeAgents) & new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & .length(ListToolsNew,NumberOfBuyTool) & .length(ListItems,NumberOfBuyItem)
 <-
-	if (.empty(ListToolsNew) | (default::check_tools(ListToolsNew,FreeAgents,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true") ) {
+	if (.empty(ListToolsNew) | (default::check_tools(ListToolsNew,FreeAgents,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,FarthestShop,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+30+10 < Duration ) ) {
+//		?default::step(Step);
+//		+estimate(Id,Step,RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+30+10);
 		BadJob = "false";
 	}
 	else { BadJob = "true"; }
@@ -253,6 +256,10 @@ task_id(0).
 <- 
 	-initiator::job_members(JobId,_); 
 	-initiator::job(JobId, _, _, _);
+//	?estimate(JobId,Start,Estimate);
+//	?default::step(Step);
+//	.print("Finished job ",JobId," at step ",Step," estimated to end in ",Start+Estimate);
+//	-estimate(JobId,Start,Estimate);
 	.
 	
 +default::step(End)

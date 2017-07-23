@@ -8,8 +8,6 @@ import jason.asSyntax.Term;
 import massim.scenario.city.data.Location;
 import massim.scenario.city.data.Route;
 
-import javax.sound.midi.MidiDevice.Info;
-
 import env.MapHelper;
 
 public class route extends DefaultInternalAction {

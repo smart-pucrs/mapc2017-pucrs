@@ -1,8 +1,6 @@
 package env;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -12,52 +10,15 @@ import cartago.*;
 public class TeamArtifact extends Artifact {
 
 	private static Logger logger = Logger.getLogger(TeamArtifact.class.getName());
-	private static Map<String, Integer> shopItemsPrice = new HashMap<String, Integer>();
 	private static Map<String, Integer> shopItemsQty = new HashMap<String, Integer>();
 	private static Map<String, Integer> itemsQty = new HashMap<String, Integer>();
+	private static Map<String, Integer> itemsPrice = new HashMap<String, Integer>();
 	private static Map<String, String> agentNames = new HashMap<String, String>();
 	private static Map<String, String> agentRoles = new HashMap<String, String>();
 	private static Map<String, Integer> loads = new HashMap<String, Integer>();
-	private static List<String> shops = new ArrayList<String>();
 	
 	void init(){
 		logger.info("Team Artifact has been created!");
-	}
-	
-	public synchronized static void addShopItemsPrice(String shopId, String itemsPrice){
-		//logger.info("$> Team Artifact (Shop - Items Price): " + shopId);
-		if(shops.contains(shopId)){
-			
-		} else {
-			shops.add(shopId);
-			String itemsPriceAux = itemsPrice.replaceAll("availableItem\\(", "").replaceAll("\\)", "").replaceAll("\\[", "").replaceAll("\\]", "");
-			String[] s = itemsPriceAux.split(",");
-			int x = 0;
-			String itemId = null;
-			for (int i=0; i<s.length; i++) {
-				if (x == 0)
-					itemId = s[i];
-				else if (x == 1) {
-					if (shopItemsPrice.containsKey(itemId)) {
-						if (shopItemsPrice.get(itemId) < Integer.parseInt(s[i]))
-							shopItemsPrice.put(itemId, Integer.parseInt(s[i]));
-					}
-					else
-						shopItemsPrice.put(itemId, Integer.parseInt(s[i]));
-				}
-				x++;
-				if (x == 4)
-					x = 0;
-			}
-//			logger.info("$> Team Artifact (Item - Price): " + shopItemsPrice);		
-		}
-	}
-	
-	@OPERATION void addPrices(){
-		for (String key : shopItemsPrice.keySet()) {
-			this.defineObsProperty("itemPrice",key,shopItemsPrice.get(key));
-		}
-		
 	}
 	
 	@OPERATION void addServerName(String agent, String agentServer){
@@ -72,10 +33,6 @@ public class TeamArtifact extends Artifact {
 		agentRoles.put(agent,role);
 	}
 	
-	@OPERATION void getAgentRole(String agent, OpFeedbackParam<String> role){
-		role.set(agentRoles.get(agent));
-	}
-	
 	@OPERATION void addLoad(String agent, int load){
 		loads.put(agent,load);
 	}
@@ -84,7 +41,7 @@ public class TeamArtifact extends Artifact {
 		load.set(loads.get(agent));
 	}
 	
-	@OPERATION void addShopItem(String item, int qty, String itemId){
+	@OPERATION void addShopItem(String item, int qty, String itemId, int price){
 		shopItemsQty.put(item,qty);
 		if (itemsQty.containsKey(itemId)) {
 			if (itemsQty.get(itemId) > qty) {
@@ -93,6 +50,14 @@ public class TeamArtifact extends Artifact {
 		}
 		else {
 			itemsQty.put(itemId, qty);
+		}
+		if (itemsPrice.containsKey(itemId)) {
+			if (itemsPrice.get(itemId) < price) {
+				itemsPrice.replace(itemId, price);
+			}
+		}
+		else {
+			itemsPrice.put(itemId, price);
 		}
 	}
 	
@@ -110,6 +75,10 @@ public class TeamArtifact extends Artifact {
 	
 	public static int getItemQty(String item) {
 		return itemsQty.get(item);
+	}
+	
+	public static int getItemPrice(String item) {
+		return itemsPrice.get(item);
 	}
 		
 	@OPERATION void addResourceNode(String resourceId, double lat, double lon, String resource){

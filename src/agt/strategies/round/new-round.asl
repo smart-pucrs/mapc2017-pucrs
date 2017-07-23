@@ -37,8 +37,8 @@
 <-
 //	.print("Adding Shop: ",ShopId," Lat: ",Lat," Lon: ",Lon," Restock: ",Restock," Items: ",Items);
 //	-+shopList([shop(ShopId,Items)|List]);
-	for (.member(item(ItemId,_,Qty,_,_,_),Items)) {
-		addShopItem(item(ShopId,ItemId),Qty,ItemId);
+	for (.member(item(ItemId,Price,Qty,_,_,_),Items)) {
+		addShopItem(item(ShopId,ItemId),Qty,ItemId,Price);
 	}
 	-+shopList([ShopId|List]);
 	.

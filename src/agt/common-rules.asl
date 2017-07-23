@@ -89,13 +89,10 @@ getQuadLatLon(quad2,QLat,QLon) :- coalition::quad2(QLat,QLon).
 getQuadLatLon(quad3,QLat,QLon) :- coalition::quad3(QLat,QLon).
 getQuadLatLon(quad4,QLat,QLon) :- coalition::quad4(QLat,QLon).
 
-check_tools([],FreeAgents,Result) :- Result = "true".
-check_tools([item(Tool,_)|Tools],FreeAgents,Result) :- check_agent(Tool,FreeAgents,Result2) & Result2 == "true" & check_tools(Tools,FreeAgents,Result).
-check_tools(Tools,FreeAgents,Result) :- Result = "false".
-check_agent(Tool,[],Result) :- Result = "false".
-check_agent(Tool,[Agent|FreeAgents],Result) :- actions.getAgentRole(Agent,Role)  & ( (default::role(Role,_,_,_,MyTools) & .member(Tool,MyTools)) | (default::tools(Role,Tools) & .member(Tool,Tools)) ) & Result = "true".
-check_agent(Tool,[Agent|FreeAgents],Result) :- check_agent(Tool,FreeAgents,Result).
-
 check_buy_list([],Result) :- Result = "true".
 check_buy_list([item(ItemId,Qty)|Items],Result) :- actions.getItemQty(ItemId,Qty2) & Qty <= Qty2 * 3 & check_buy_list(Items,Result).
 check_buy_list(Items,Result) :- Result == "false".
+
+check_price([],[],Aux,Result) :- Result = Aux.
+check_price([],[item(ItemId,Qty)|Items],Aux,Result) :- actions.getItemPrice(ItemId,Price) & check_price([],Items,Aux+Price*Qty,Result).
+check_price([item(Tool,_)|Tools],Items,Aux,Result) :- actions.getItemPrice(Tool,Price) & check_price(Tools,Items,Aux+Price,Result).

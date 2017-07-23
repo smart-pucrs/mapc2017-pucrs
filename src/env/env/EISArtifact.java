@@ -158,18 +158,6 @@ public class EISArtifact extends Artifact implements AgentListener {
 		return -10;
 	}
 	
-//	private void populateTeamArtifact(Collection<Percept> percepts){
-//		for (Percept percept : percepts) {
-//			String name = percept.getName();
-//			/*Verifying available items in a nearby shop*/
-//			if(name.equals("shop")){
-//				for(Parameter p: percept.getParameters())
-//					if(p.toString().contains("availableItem"))
-//						TeamArtifact.addShopItemsPrice(percept.getParameters().get(0).toString(), percept.getParameters().get(3).toString());
-//			}
-//		}
-//	}
-
 	private void updatePerception(String agent, Collection<Percept> previousPercepts, Collection<Percept> percepts) throws JasonException {
 		for (Percept old: previousPercepts) {
 			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(old.getName()) && !old.getName().equals("job") && !old.getName().equals("mission") ) || step_obs_prop.contains(old.getName())) {

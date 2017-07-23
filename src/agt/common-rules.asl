@@ -6,12 +6,12 @@ closest_facility(List, Facility) :- role(Role, _, _, _, _) & actions.closest(Rol
 closest_facility(List, Facility1, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility1, Facility2).
 closest_facility(List, Lat, Lon, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Lat, Lon, Facility2).
 
-enough_battery(FacilityId1, FacilityId2, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId1, RouteLen1) & actions.route(Role, Speed, FacilityId1, FacilityId2, RouteLen2) & charge(Battery) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
-enough_battery(Lat, Lon, FacilityId2, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, Lat, Lon, _, _, _, RouteLen1) & actions.route(Role, Speed, Lat, Lon, FacilityId2, _, RouteLen2) & charge(Battery) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
-enough_battery2(FacilityAux, FacilityId1, FacilityId2, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId1, RouteLen1) & actions.route(Role, Speed, FacilityId1, FacilityId2, RouteLen2) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
-enough_battery2(FacilityAux, Lat, Lon, FacilityId2, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, Lat, Lon, RouteLen1) & actions.route(Role, Speed, Lat, Lon, FacilityId2, _, RouteLen2) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = true) | (Result = false)).
-enough_battery_charging(FacilityId, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId, RouteLen) & charge(Battery) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
-enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId, RouteLen) & ((Battery > ((RouteLen * 10) + 10) & Result = true) | (Result = false)).
+enough_battery(FacilityId1, FacilityId2, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId1, RouteLen1) & actions.route(Role, Speed, FacilityId1, FacilityId2, RouteLen2) & charge(Battery) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = "true") | (Result = "false")).
+enough_battery(Lat, Lon, FacilityId2, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, Lat, Lon, _, _, _, RouteLen1) & actions.route(Role, Speed, Lat, Lon, FacilityId2, _, RouteLen2) & charge(Battery) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = "true") | (Result = "false")).
+enough_battery2(FacilityAux, FacilityId1, FacilityId2, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId1, RouteLen1) & actions.route(Role, Speed, FacilityId1, FacilityId2, RouteLen2) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = "true") | (Result = "false")).
+enough_battery2(FacilityAux, Lat, Lon, FacilityId2, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, Lat, Lon, RouteLen1) & actions.route(Role, Speed, Lat, Lon, FacilityId2, _, RouteLen2) & ((Battery > ((RouteLen1 * 10) + (RouteLen2 * 10) + 10) & Result = "true") | (Result = "false")).
+enough_battery_charging(FacilityId, Result) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityId, RouteLen) & charge(Battery) & ((Battery > ((RouteLen * 10) + 10) & Result = "true") | (Result = "false")).
+enough_battery_charging2(FacilityAux, FacilityId, Result, Battery) :- role(Role, Speed, _, _, _) & actions.route(Role, Speed, FacilityAux, FacilityId, RouteLen) & ((Battery > ((RouteLen * 10) + 10) & Result = "true") | (Result = "false")).
 
 select_bid([],bid(AuxBidAgent,AuxBid,AuxShopId),bid(BidAgentWinner,BidWinner,ShopIdWinner)) :- BidWinner = AuxBid & BidAgentWinner = AuxBidAgent & ShopIdWinner = AuxShopId.
 select_bid([bid(BidAgent,Bid,ShopId,item(ItemId,Qty),TaskId)|Bids],bid(AuxBidAgent,AuxBid,AuxShopId),BidWinner) :- initiator::awarded(BidAgent,ShopId,_,_) & item(ItemId,Volume,_,_) & actions.getLoad(BidAgent,Load) & Load >= Volume*Qty & select_bid([],bid(BidAgent,Bid,ShopId),BidWinner).
@@ -88,3 +88,10 @@ getQuadLatLon(quad1,QLat,QLon) :- coalition::quad1(QLat,QLon).
 getQuadLatLon(quad2,QLat,QLon) :- coalition::quad2(QLat,QLon).
 getQuadLatLon(quad3,QLat,QLon) :- coalition::quad3(QLat,QLon).
 getQuadLatLon(quad4,QLat,QLon) :- coalition::quad4(QLat,QLon).
+
+check_tools([],FreeAgents,Result) :- Result = "true".
+check_tools([item(Tool,_)|Tools],FreeAgents,Result) :- check_agent(Tool,FreeAgents,Result2) & Result2 == "true" & check_tools(Tools,FreeAgents,Result).
+check_tools(Tools,FreeAgents,Result) :- Result = "false".
+check_agent(Tool,[],Result) :- Result = "false".
+check_agent(Tool,[Agent|FreeAgents],Result) :- actions.getAgentRole(Agent,Role)  & ( (default::role(Role,_,_,_,MyTools) & .member(Tool,MyTools)) | (default::tools(Role,Tools) & .member(Tool,Tools)) ) & Result = "true".
+check_agent(Tool,[Agent|FreeAgents],Result) :- check_agent(Tool,FreeAgents,Result).

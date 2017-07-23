@@ -251,7 +251,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 			if (!jobDone.isEmpty()) {
 				for (Literal lit: jobDone) {
 					await_time(100);
-					signal("job_done",(Object[]) lit.getTermsArray());
+					signal(agentIds.get(agent),"job_done",(Object[]) lit.getTermsArray());
 				}
 				jobDone.clear();
 			}

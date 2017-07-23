@@ -15,6 +15,7 @@ public class TeamArtifact extends Artifact {
 	private static Map<String, Integer> shopItemsPrice = new HashMap<String, Integer>();
 	private static Map<String, Integer> shopItemsQty = new HashMap<String, Integer>();
 	private static Map<String, String> agentNames = new HashMap<String, String>();
+	private static Map<String, String> agentRoles = new HashMap<String, String>();
 	private static Map<String, Integer> loads = new HashMap<String, Integer>();
 	private static List<String> shops = new ArrayList<String>();
 	
@@ -66,6 +67,14 @@ public class TeamArtifact extends Artifact {
 		agentServer.set(agentNames.get(agent));
 	}
 	
+	@OPERATION void addRole(String agent, String role){
+		agentRoles.put(agent,role);
+	}
+	
+	@OPERATION void getAgentRole(String agent, OpFeedbackParam<String> role){
+		role.set(agentRoles.get(agent));
+	}
+	
 	@OPERATION void addLoad(String agent, int load){
 		loads.put(agent,load);
 	}
@@ -85,6 +94,10 @@ public class TeamArtifact extends Artifact {
 	public static int getLoad(String agent) {
 		return loads.get(agent);
 	}
+	
+	public static String getAgentRole(String agent) {
+		return agentRoles.get(agent);
+	}
 		
 	@OPERATION void addResourceNode(String resourceId, double lat, double lon, String resource){
 		ObsProperty prop = this.getObsPropertyByTemplate("resNode", resourceId,lat,lon,resource);
@@ -97,7 +110,6 @@ public class TeamArtifact extends Artifact {
 		shopItemsQty.clear();
 		agentNames.clear();
 		loads.clear();
-		
 	}
 	
 }

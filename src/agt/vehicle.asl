@@ -31,11 +31,11 @@
 +default::role(Role,_,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)
 <- 
+	addLoad(Me,LoadCap);
+	addRole(Me,Role);
 	.wait(1000);
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
-	addLoad(Me,LoadCap);
-	+strategies::free;
-	!strategies::firstskip;
+	!strategies::free;
     .
     
 +tools(Role,Tools) : default::role(Role,_,_,_,_) <- -tools(Role,Tools)[source(_)].

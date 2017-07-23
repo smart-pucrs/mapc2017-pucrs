@@ -35,8 +35,7 @@
 +!goto(FacilityId)
 : not .desire(action::go_charge(_)) & new::chargingList(List) & default::closest_facility(List, FacilityId, FacilityId2) & default::enough_battery(FacilityId, FacilityId2, Result)
 <-	
-	.term2string(Result,ResultS);
-    if (ResultS == "false") { !go_charge(FacilityId); }
+    if (Result == "false") { !go_charge(FacilityId); }
     else { !localActions::commitAction(goto(FacilityId)); }
 	!goto(FacilityId);
 	.
@@ -66,8 +65,7 @@
 +!goto(Lat, Lon)
 : not .desire(go_charge(_,_)) & new::chargingList(List) & default::closest_facility(List, Lat, Lon, FacilityId2) & default::enough_battery(Lat, Lon, FacilityId2, Result)
 <-	
-	.term2string(Result,ResultS);
-    if (ResultS == "false") { !go_charge(Lat, Lon); }
+    if (Result == "false") { !go_charge(Lat, Lon); }
     else { +going(Lat,Lon); !localActions::commitAction(goto(Lat,Lon)); }
 	!goto(Lat, Lon);
 	.
@@ -373,8 +371,7 @@
 		?default::closest_facility(List,Facility);
 		?default::closest_facility(List,Flat,Flon,FacilityId2);
 		?default::enough_battery2(Facility, Flat, Flon, FacilityId2, Result, BatteryCap);
-		.term2string(Result,ResultS);
-		if (ResultS == "false") {
+		if (Result == "false") {
 			+impossible;
 			.print("@@@@ Impossible route, going to try anyway.");
 			+going(Flat,Flon);
@@ -389,12 +386,10 @@
 	else{
 		?default::closest_facility(Aux2List,Facility);
 		?default::enough_battery_charging(Facility, Result);
-		.term2string(Result,ResultS);
-		if (ResultS == "false") {
+		if (Result == "false") {
 			?default::closest_facility(List,FacilityAux);
 			?default::enough_battery_charging2(FacilityAux, Facility, Result2, BatteryCap);
-			.term2string(Result2,Result2S);
-			if (Result2S == "false") {
+			if (Result2 == "false") {
 				+impossible;
 				.print("@@@@ Impossible route, going to try anyway and hopefully call service breakdown.");
 				+going(Flat,Flon);
@@ -409,8 +404,7 @@
 		else {
 			?default::closest_facility(Aux2List,Flat,Flon,FacilityAux);
 			?default::enough_battery_charging(FacilityAux, ResultAux);
-			.term2string(ResultAux,ResultAuxS);
-			if (ResultAuxS == "true") {
+			if (ResultAux == "true") {
 				FacilityAux2 = FacilityAux;
 			}
 			else {
@@ -437,8 +431,7 @@
 <-
 	?default::closest_facility(List,Lat,Lon,Facility);
 	?default::enough_battery_charging(Facility, ResultC);
-	.term2string(ResultC,ResultCS);
-	if (ResultCS == "true") {
+	if (ResultC == "true") {
 		+charge_in(Facility);
 	}
 	else {
@@ -471,8 +464,7 @@
 		?default::closest_facility(List,FacilityId,FacilityId2);
 //		?enough_battery_charging2(Facility, FacilityId, Result, BatteryCap);
 		?default::enough_battery2(Facility, FacilityId, FacilityId2, Result, BatteryCap);
-		.term2string(Result,ResultS);
-		if (ResultS == "false") {
+		if (Result == "false") {
 			+impossible;
 			.print("@@@@ Impossible route, going to try anyway.");
 			!localActions::commitAction(goto(FacilityId));
@@ -486,12 +478,10 @@
 	else{
 		?default::closest_facility(Aux2List,Facility);
 		?default::enough_battery_charging(Facility, Result);
-		.term2string(Result,ResultS);
-		if (ResultS == "false") {
+		if (Result == "false") {
 			?default::closest_facility(List2,FacilityAux);
 			?default::enough_battery_charging2(FacilityAux, Facility, Result2, BatteryCap);
-			.term2string(Result2,Result2S);
-			if (Result2S == "false") {
+			if (Result2 == "false") {
 				+impossible;
 				.print("@@@@ Impossible route, going to try anyway and hopefully call service breakdown.");
 				!localActions::commitAction(goto(FacilityId));
@@ -505,8 +495,7 @@
 		else {
 			?default::closest_facility(Aux2List,FacilityId,FacilityAux);
 			?default::enough_battery_charging(FacilityAux, ResultAux);
-			.term2string(ResultAux,ResultAuxS);
-			if (ResultAuxS == "true") {
+			if (ResultAux == "true") {
 				FacilityAux2 = FacilityAux;
 			}
 			else {
@@ -533,8 +522,7 @@
 <-
 	?default::closest_facility(List,FacilityId,Facility);
 	?default::enough_battery_charging(Facility, ResultC);
-	.term2string(ResultC,ResultCS);
-	if (ResultCS == "true") {
+	if (ResultC == "true") {
 		+charge_in(Facility);
 	}
 	else {

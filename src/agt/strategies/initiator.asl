@@ -6,10 +6,9 @@ task_id(0).
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
 	!strategies::not_free;
-	+job(Id, Storage, End, Items);
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
-	!!separate_tasks(Id, Storage, Items);
+	!separate_tasks(Id, Storage, Items);
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
@@ -19,10 +18,9 @@ task_id(0).
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
 	!strategies::not_free;
-	+job(Id, Storage, End, Items);
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
-	!!separate_tasks(Id, Storage, Items);
+	!separate_tasks(Id, Storage, Items);
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Fine, End); .print("Ignoring mission ",Id).
 	
@@ -61,9 +59,8 @@ task_id(0).
 	.
 
 +!separate_tasks(Id, Storage, Items)
-	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents)
+	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
 <-
-	+cnp(Id);
 	?default::decomposeRequirements(Items,[],Bases);
 	+bases([]);
 	for ( .member(Item,Bases) ) {
@@ -78,28 +75,51 @@ task_id(0).
 		?default::removeDuplicateTool(ListTools,ListToolsNew);
 	}
 	else { ListToolsNew = []; ListItems = B; }
-	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
-	?task_id(TaskIdA);
-//	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
-	!!announce(assemble(Storage),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
-	-+task_id(TaskIdA+1);
-	for ( .member(item(ItemId,Qty),ListToolsNew) ) {
-		?task_id(TaskId);
-		-+task_id(TaskId+1);
-//		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
-		!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
+	!evaluate_job(ListToolsNew, ListItems, BadJob);
+	if (BadJob == "false") {
+		+job(Id, Storage, End, Items);
+		+cnp(Id);
+		+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
+		?task_id(TaskIdA);
+	//	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
+		!!announce(assemble(Storage),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
+		-+task_id(TaskIdA+1);
+		for ( .member(item(ItemId,Qty),ListToolsNew) ) {
+			?task_id(TaskId);
+			-+task_id(TaskId+1);
+	//		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
+			!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
+		}
+		for ( .member(item(ItemId,Qty),ListItems) ) {
+			?task_id(TaskId);
+			-+task_id(TaskId+1);
+	//		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
+			!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
+		}
 	}
-	for ( .member(item(ItemId,Qty),ListItems) ) {
-		?task_id(TaskId);
-		-+task_id(TaskId+1);
-//		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
-		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
+	else { 
+		.print("Job ",Id," failed evaluation, ignoring it.");
+		.my_name(Me);
+		if ( .member(Me,FreeAgents) ) { 
+			!strategies::free; 
+		}
 	}
 	.
 +!separate_tasks(Id, Storage, Items)
 <-
 	.wait(500);
 	!separate_tasks(Id, Storage, Items);
+	.
+	
++!evaluate_job(ListToolsNew, ListItems, BadJob)
+	: initiator::free_agents(FreeAgents)
+<-
+	if (.empty(ListToolsNew) | (default::check_tools(ListToolsNew,FreeAgents,Result) & Result == "true") ) {
+		
+		
+		BadJob = "false";
+	}
+	else { BadJob = "true"; }
 	.
 	
 @selectBids[atomic]

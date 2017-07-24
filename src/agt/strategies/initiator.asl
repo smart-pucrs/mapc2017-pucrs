@@ -58,6 +58,14 @@ task_id(0).
 	remove[artifact_name(CNPBoardName)];
 	.
 
+@upTaskId[atomic]
++!update_taskid(TaskId)
+	: task_id(TaskIdAux)
+<-
+	-+task_id(TaskIdAux+1);
+	TaskId = TaskIdAux;
+	.
+
 @addCNP[atomic]
 +!add_cnp(Id) <- +cnp(Id).
 +!separate_tasks(Id, Storage, Items, End, Duration, Reward)
@@ -65,14 +73,14 @@ task_id(0).
 <-
 	!add_cnp(Id);
 	?default::decomposeRequirements(Items,[],Bases);
-	+bases([]);
+	+bases([],Id);
 	for ( .member(Item,Bases) ) {
-		?bases(L);
+		?bases(L,Id);
 		.concat(L,Item,New);
-		-+bases(New);
+		-+bases(New,Id);
 	}
-	?bases(B);
-	-bases(B);
+	?bases(B,Id);
+	-bases(B,Id);
 	if (.substring("tool",B)) {
 		?default::separateItemTool(B,ListTools,ListItems); 
 		?default::removeDuplicateTool(ListTools,ListToolsNew);
@@ -83,19 +91,16 @@ task_id(0).
 	if (BadJob == "false") {
 		+job(Id, Storage, End, Items);
 		+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
-		?task_id(TaskIdA);
+		!update_taskid(TaskIdA);
 	//	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
 		!!announce(assemble(Storage),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
-		-+task_id(TaskIdA+1);
 		for ( .member(item(ItemId,Qty),ListToolsNew) ) {
-			?task_id(TaskId);
-			-+task_id(TaskId+1);
+			!update_taskid(TaskId);
 	//		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
 			!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 		}
 		for ( .member(item(ItemId,Qty),ListItems) ) {
-			?task_id(TaskId);
-			-+task_id(TaskId+1);
+			!update_taskid(TaskId);
 	//		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
 			!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 		}

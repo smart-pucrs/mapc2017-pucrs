@@ -330,6 +330,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //			"jobTaken",
 			"step",
 			"simEnd",
+			"money",
 //			"ranking",		
 //			"pricedJob",
 //			"auctionJob",

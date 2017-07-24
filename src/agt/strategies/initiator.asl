@@ -1,4 +1,5 @@
 task_id(0).
+completed_jobs(0). // debugging
 
 +default::job(_, _, _, _, _, _) : default::step(0).
 @job[atomic]
@@ -124,7 +125,7 @@ task_id(0).
 +!evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, Reward, BadJob)
 	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & .length(ListToolsNew,NumberOfBuyTool) & .length(ListItems,NumberOfBuyItem) & default::steps(TotalSteps) & default::step(Step)
 <-
-	if ( default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.5," reward ",Reward) & ResultP * 1.5 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,FarthestShop,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+30+10 & Estimate < Duration & Step + Estimate < TotalSteps ) {
+	if ( default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,FarthestShop,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+30+10 & Estimate < Duration & Step + Estimate < TotalSteps ) {
 //		+estimate(Id,Step,RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+30+10);
 		BadJob = "false";
 	}
@@ -264,6 +265,9 @@ task_id(0).
 <- 
 	-initiator::job_members(JobId,_); 
 	-initiator::job(JobId, _, _, _);
+		
+	?completed_jobs(Jobs);	// debugging
+	-+completed_jobs(Jobs+1);
 //	?estimate(JobId,Start,Estimate);
 //	?default::step(Step);
 //	.print("Finished job ",JobId," at step ",Step," estimated to end in ",Start+Estimate);
@@ -276,3 +280,8 @@ task_id(0).
 	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline, paying fine of ",Fine); 
 	-initiator::mission(Id,_,_); 
 	.
+// debugging
++default::step(998)
+	: default::money(Money) & completed_jobs(Jobs)
+<-	.print("$$$$$$$$$$$$$$$$$$$$ Money $",Money);
+	.print("$$$$$$$$$$$$$$$$$$$$ Completed ",Jobs," jobs!").

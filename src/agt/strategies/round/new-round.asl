@@ -17,7 +17,7 @@
 <-
 	+chargingList([]);
 	+dumpList([]);
-//	+storageList([]);
+	+storageList([]);
 	+shopList([]);
 	+workshopList([]);
 	+max_bid_time(10000);
@@ -51,12 +51,12 @@
 	-+shopList([ShopId|List]);
 	.
 			
-//@storageList[atomic]
-//+default::storage(StorageId, Lat, Lon, TotCap, UsedCap, Items)
-//	: storageList(List) & not .member(StorageId,List)
-//<-
-//	-+storageList([StorageId|List]);
-//	.	
+@storageList[atomic]
++default::storage(StorageId, Lat, Lon, TotCap, UsedCap, Items)
+	: storageList(List) & not .member(StorageId,List)
+<-
+	-+storageList([StorageId|List]);
+	.	
 
 @chargingList[atomic]
 +default::chargingStation(ChargingId,Lat,Lon,Rate) 

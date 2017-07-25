@@ -1,5 +1,29 @@
 task_id(0).
 completed_jobs(0). // debugging
+countCenter(0).
+
+@minLon[atomic]
++default::minLon(Lon) : X = Lon + 0.001 & countCenter(I) <- -minLon(Lon); +minLonReal(X); -+countCenter(I+1).
+@maxLon[atomic]
++default::maxLon(Lon) : X = Lon - 0.00001 & countCenter(I) <- -maxLon(Lon); +maxLonReal(X); -+countCenter(I+1).
+@minLat[atomic]
++default::minLat(Lat) : X = Lat + 0.001 & countCenter(I)  <- -minLat(Lat); +minLatReal(X); -+countCenter(I+1).
+@maxLat[atomic]
++default::maxLat(Lat) : X = Lat - 0.00001 & countCenter(I)  <- -maxLat(Lat); +maxLatReal(X); -+countCenter(I+1).
+
++countCenter(4)
+	: minLonReal(MinLon) & maxLonReal(MaxLon) & minLatReal(MinLat) & maxLatReal(MaxLat)
+<- 
+	-countCenter(4);
+	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
+	.
+	
++default::step(1)
+	: mapCenter(CLat,CLon) & new::storageList(SList) & actions.closest(truck,SList,CLat,CLon,ClosestStorage)
+<-
+	+default::center_storage(ClosestStorage);
+	.broadcast(tell,center_storage(ClosestStorage));
+	.
 
 +default::job(_, _, _, _, _, _) : default::step(0).
 @job[atomic]

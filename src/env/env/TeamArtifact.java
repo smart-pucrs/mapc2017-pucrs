@@ -1,6 +1,8 @@
 package env;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -16,9 +18,24 @@ public class TeamArtifact extends Artifact {
 	private static Map<String, String> agentNames = new HashMap<String, String>();
 	private static Map<String, String> agentRoles = new HashMap<String, String>();
 	private static Map<String, Integer> loads = new HashMap<String, Integer>();
+	private List<String> availableTools = new ArrayList<String>();
 	
 	void init(){
 		logger.info("Team Artifact has been created!");
+		String[] toolsAux = availableTools.toArray(new String[availableTools.size()]);
+		this.defineObsProperty("available_tools",new Object[] {toolsAux});
+	}
+	
+	@OPERATION void addAvailableTool(String tool){
+		availableTools.add(tool);
+		String[] toolsAux = availableTools.toArray(new String[availableTools.size()]);
+		this.updateObsProperty("available_tools",new Object[] {toolsAux});
+	}
+	
+	@OPERATION void removeAvailableTool(String tool){
+		availableTools.remove(tool);
+		String[] toolsAux = availableTools.toArray(new String[availableTools.size()]);
+		this.updateObsProperty("available_tools",new Object[] {toolsAux});
 	}
 	
 	@OPERATION void addServerName(String agent, String agentServer){

@@ -44,9 +44,17 @@
 	: default::role(Role, _, _, _, _) & new::workshopList(WList) & new::shopList(SList)
 <-
 	for ( .member(tool(ItemId),TaskList) ) {
-		?default::find_shops(ItemId,SList,Shops);
-		actions.closest(Role,Shops,ClosestShop);
-		+buyList(ItemId,1,ClosestShop);
+		?default::available_tools(AvailableT);
+		.term2string(ItemId,ToolS);
+		if (.member(ToolS,AvailableT)) {
+			removeAvailableTool(ItemId);
+			+retrieveList(ItemId,1);
+		}
+		else {
+			?default::find_shops(ItemId,SList,Shops);
+			actions.closest(Role,Shops,ClosestShop);
+			+buyList(ItemId,1,ClosestShop);
+		}
 	}
 	for ( .member(item(ItemId,Qty),TaskList) ) {
 		?default::find_shops(ItemId,SList,Shops);
@@ -81,6 +89,14 @@
 	}
 	-buy_list_id(_);
 	!go_buy;
+	if (retrieveList(_,_)) {
+		?default::center_storage(CenterStorage);
+		!action::goto(CenterStorage);
+		for ( retrieveList(ItemId,Qty) ) {
+			-retrieveList(ItemId,Qty);
+			!action::retrieve(ItemId,Qty);
+		}
+	}
 	actions.closest(truck,WList,Storage,ClosestWorkshop);
 	!action::goto(ClosestWorkshop);
 	+assembling;
@@ -111,11 +127,23 @@
 	}
 	.
 	
++!go_storage
+	: default::center_storage(Storage)
+<-
+	!action::goto(Storage);
+	for ( default::hasItem(ItemId,Qty) ) {
+		addAvailableTool(ItemId);
+		!action::store(ItemId,Qty);
+	}
+	.
+	
 +!stop_assisting
 	: default::winner(_,_) & default::role(Role, _, _, _, _) & .my_name(Me)
 <- 
 	-assembling;
-	if ( default::hasItem(_,_) ) { !go_dump; }
+	.wait(500);
+//	if ( default::hasItem(_,_) ) { !go_dump; }
+	if ( default::hasItem(_,_) ) { !go_storage; }
 	!check_charge;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 

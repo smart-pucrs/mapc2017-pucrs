@@ -160,12 +160,7 @@
 +!store(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
-		store(
-			item(ItemId),
-			amount(Amount)
-		)
-	);
+	!localActions::commitAction(store(ItemId,Amount));
 	.
 
 // Retrieve
@@ -174,12 +169,7 @@
 +!retrieve(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
-		retrieve(
-			item(ItemId),
-			amount(Amount)
-		)
-	);
+	!localActions::commitAction(retrieve(ItemId,Amount));
 	.
 
 // Retrieve delivered

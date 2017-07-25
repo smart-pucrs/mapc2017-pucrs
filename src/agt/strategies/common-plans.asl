@@ -6,11 +6,11 @@
 <-
 	!action::skip;
 	.
-+default::actionID(X) 
-	: not free & not default::winner(_,_) & not initiator::cnp(_)
-<-
-	!free;
-	.
+//+default::actionID(X) 
+//	: not free & not default::winner(_,_) & not initiator::cnp(_)
+//<-
+//	!free;
+//	.
 	
 +!go_assemble(AssembleList,Storage,JobId,Members)
 	: default::role(Role, _, _, _, _) & new::workshopList(WList)
@@ -115,6 +115,7 @@
 	: default::winner(_,_) & default::role(Role, _, _, _, _) & .my_name(Me)
 <- 
 	-assembling;
+	.wait(500);
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!check_charge;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }

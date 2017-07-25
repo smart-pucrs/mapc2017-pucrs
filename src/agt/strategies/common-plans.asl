@@ -131,19 +131,26 @@
 	: default::center_storage(Storage)
 <-
 	!action::goto(Storage);
-	for ( default::hasItem(ItemId,Qty) ) {
-		addAvailableTool(ItemId);
-		!action::store(ItemId,Qty);
+	?default::storage(Storage, _, _, TotCap, UsedCap, _);
+	if ( default::load(Load) & UsedCap + Load < TotCap ) {
+		for ( default::hasItem(ItemId,Qty) ) {
+			addAvailableTool(ItemId);
+			!action::store(ItemId,Qty);
+		}
 	}
+	else { !go_dump; }
 	.
 	
 +!stop_assisting
-	: default::winner(_,_) & default::role(Role, _, _, _, _) & .my_name(Me)
+	: default::winner(_,_) & default::role(Role, _, _, _, _) & .my_name(Me) & default::center_storage(CenterStorage)
 <- 
 	-assembling;
 	.wait(500);
-//	if ( default::hasItem(_,_) ) { !go_dump; }
-	if ( default::hasItem(_,_) ) { !go_storage; }
+	if ( default::hasItem(_,_) ) {
+		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);
+		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_storage; }
+		else { !go_dump; }
+	}
 	!check_charge;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
@@ -162,6 +169,7 @@
 	-assembling;
 	!action::abort;
 	.abolish(strategies::buyList(_,_,_));
+	.abolish(strategies::retrieveList(_,_));
 	 -buy_list_id(_);
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }

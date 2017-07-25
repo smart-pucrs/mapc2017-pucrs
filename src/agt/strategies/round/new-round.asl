@@ -50,13 +50,17 @@
 //	-+shopList([shop(ShopId,Items)|List]);
 	-+shopList([ShopId|List]);
 	.
-			
+
 @storageList[atomic]
 +default::storage(StorageId, Lat, Lon, TotCap, UsedCap, Items)
 	: storageList(List) & not .member(StorageId,List)
 <-
 	-+storageList([StorageId|List]);
-	.	
+	.
+//+default::storage(CenterStorage, _, _, TotCap, UsedCap, Items)
+//	: .my_name(vehicle1)
+//<-
+//	.print("ZZZZZZZZZZZZZZZ Items in storage: ",Items).
 
 @chargingList[atomic]
 +default::chargingStation(ChargingId,Lat,Lon,Rate) 

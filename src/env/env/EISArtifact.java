@@ -274,10 +274,10 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"steps",
 		"item",
 		"role",
-//		"minLon",
-//		"maxLon",
-//		"minLat",
-//		"maxLat",
+		"minLon",
+		"maxLon",
+		"minLat",
+		"maxLat",
 //		"team",
 	}));
 	

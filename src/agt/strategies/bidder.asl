@@ -40,16 +40,24 @@
 	: default::role(Role, Speed, _, _, Tools) & new::shopList(SList)
 <-
 	if (.member(ItemId,Tools) ) {
-		?default::find_shops(ItemId,SList,Shops);
-		actions.closest(Role,Shops,ClosestShop);
-		actions.route(Role,Speed,ClosestShop,RouteShop);
-//		.print("####### Route: ",RouteShop," role ",Role);
+		?default::available_tools(AvailableT);
+		.term2string(ItemId,ToolS);
+		if (.member(ToolS,AvailableT)) {
+			?default::center_storage(Facility);
+			actions.route(Role,Speed,Facility,Route);
+		}
+		else {
+			?default::find_shops(ItemId,SList,Shops);
+			actions.closest(Role,Shops,Facility);
+			actions.route(Role,Speed,Facility,Route);
+		}
+//		.print("####### Route: ",Route," role ",Role);
 		for ( default::tools(_,T) ) {
 			if (Role == drone & .member(ItemId,T) & not multiple_roles) { +multiple_roles }
 		}
-		if (multiple_roles) { -multiple_roles; Bid = RouteShop*10; }
-		else { Bid = RouteShop; }
-		Shop = ClosestShop;
+		if (multiple_roles) { -multiple_roles; Bid = Route*10; }
+		else { Bid = Route; }
+		Shop = Facility;
 	}
 	else { Bid = -1; Shop = null; }
 	.

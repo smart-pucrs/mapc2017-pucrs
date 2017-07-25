@@ -126,6 +126,17 @@
 		!action::dump(ItemId,Qty);
 	}
 	.
++!go_dump_no_tools
+	: default::role(Role, _, _, _, _) & new::dumpList(DList)
+<-
+	actions.closest(Role,DList,ClosestDump);
+	!action::goto(ClosestDump);
+	for ( default::hasItem(ItemId,Qty) ) {
+		if (.substring("item",ItemId)) {
+			!action::dump(ItemId,Qty);
+		}
+	}
+	.
 	
 +!go_storage
 	: default::center_storage(Storage)
@@ -171,7 +182,12 @@
 	.abolish(strategies::buyList(_,_,_));
 	.abolish(strategies::retrieveList(_,_));
 	 -buy_list_id(_);
-	if ( default::hasItem(_,_) ) { !go_dump; }
+	if ( default::hasItem(_,_) ) { !go_dump_no_tools; }
+	if ( default::hasItem(_,_) ) { 
+		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);
+		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_storage; }
+		else { !go_dump; }
+	}
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		if (Me == vehicle1) {

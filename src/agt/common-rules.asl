@@ -91,7 +91,11 @@ getQuadLatLon(quad4,QLat,QLon) :- coalition::quad4(QLat,QLon).
 
 check_buy_list([],Result) :- Result = "true".
 check_buy_list([item(ItemId,Qty)|Items],Result) :- actions.getItemQty(ItemId,Qty2) & Qty <= Qty2 * 3 & check_buy_list(Items,Result).
-check_buy_list(Items,Result) :- Result == "false".
+check_buy_list([item(ItemId,Qty)|Items],Result) :- actions.getItemQty(ItemId,Qty2) & Qty > Qty2 * 3 & Result = "false".
+
+check_multiple_buy([],AddSteps) :- AddSteps = 0.
+check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty <= Qty2 & check_multiple_buy(Items,AddSteps).
+check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty > Qty2 & AddSteps = 20.
 
 check_price([],[],Aux,Result) :- Result = Aux.
 check_price([],[item(ItemId,Qty)|Items],Aux,Result) :- actions.getItemPrice(ItemId,Price) & check_price([],Items,Aux+Price*Qty,Result).

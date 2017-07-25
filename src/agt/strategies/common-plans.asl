@@ -6,11 +6,11 @@
 <-
 	!action::skip;
 	.
-+default::actionID(X) 
-	: not free & not default::winner(_,_) & not initiator::cnp(_)
-<-
-	!free;
-	.
+//+default::actionID(X) 
+//	: not free & not default::winner(_,_) & not initiator::cnp(_)
+//<-
+//	!free;
+//	.
 	
 +!go_assemble(AssembleList,Storage,JobId,Members)
 	: default::role(Role, _, _, _, _) & new::workshopList(WList)

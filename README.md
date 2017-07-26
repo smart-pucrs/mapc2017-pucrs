@@ -20,6 +20,8 @@ To run the simulation with one round, right-click test/pucrs.agentcontest2017/Sc
 
 To run the simulation with three rounds, right-click test/pucrs.agentcontest2017/ScenarioRun3sims.java file, "Run as", "jUnit Test".
 
+To run the simulation with one round and two teams, right-click test/pucrs.agentcontest2017/ScenarioRun1sim2teams.java file, "Run as", "jUnit Test". This will start the server and Team A. Then, to start Team B, right-click pucrs-mapc2017B.jcm, "Run JaCaMo Application".
+
 To watch the match click [this link](http://localhost:8000/).
 
 To start the match, press enter on the Eclipse console.

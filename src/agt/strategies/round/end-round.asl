@@ -37,7 +37,6 @@
 	: true
 <-
 	!end_round;
-	addJob("");
 	!new::new_round;
 	.	
 

@@ -156,6 +156,7 @@
 	: default::winner(_,_) & default::role(Role, _, _, _, _) & .my_name(Me) & default::center_storage(CenterStorage)
 <- 
 	-assembling;
+	-default::winner(_,_)[source(_)];
 	.wait(500);
 	if ( default::hasItem(_,_) ) {
 		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);
@@ -182,7 +183,15 @@
 	.abolish(strategies::buyList(_,_,_));
 	.abolish(strategies::retrieveList(_,_));
 	 -buy_list_id(_);
-	if ( default::hasItem(_,_) ) { !go_dump_no_tools; }
+	if ( default::hasItem(_,_) ) {
+		for ( default::hasItem(ItemId,Qty) ) {
+			if (.substring("item",ItemId) & not go_dump_no_tools) {
+				+go_dump_no_tools;
+				!go_dump_no_tools;
+			}
+		}
+		-go_dump_no_tools;
+	}
 	if ( default::hasItem(_,_) ) { 
 		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);
 		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_storage; }
@@ -238,13 +247,16 @@
 	.print("$$$$$$$$$$$$ Job ",JobId," completed, got reward ",Reward);
 	.
 +default::job_done(JobId, _, _, _, _, _)
-	: default::winner(_, assemble(_, JobId, Members))
+	: default::winner(_, assemble(_, JobId, _))
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
-	for ( .member(Agent,Members) ) {
-		.send(Agent,achieve,strategies::job_failed_assist);
-	}
 	!job_failed_assemble;
+	.
++default::job_done(JobId, _, _, _, _, _)
+	: default::winner(_, assist(_, _, JobId))
+<-
+	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
+	!job_failed_assist;
 	.
 +default::job_done(JobId, _, Reward, _, _, Fine, _, _, _)
 	: jobDone(JobId)
@@ -254,11 +266,14 @@
 	
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)
-	: default::winner(_, assemble(_, JobId, Members))
+	: default::winner(_, assemble(_, JobId, _))
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
-	for ( .member(Agent,Members) ) {
-		.send(Agent,achieve,strategies::job_failed_assist);
-	}
 	!job_failed_assemble;
+	.
++default::job_done(JobId, _, _, _, _, Fine, _, _, _)
+	: default::winner(_, assist(_, _, JobId))
+<-
+	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
+	!job_failed_assist;
 	.

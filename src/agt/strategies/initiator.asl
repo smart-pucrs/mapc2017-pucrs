@@ -240,7 +240,7 @@ task_id(0).
 			}
 			?job_members(JobId,Aux);
 			-+job_members(JobId,[Agent|Aux]);
-	    	.send(Agent,tell,winner(List,assist(Storage,AgentA)));
+	    	.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 			-awarded(Agent,Shop,List,JobId);	
 		}
 		?job_members(JobId,JobMembers);

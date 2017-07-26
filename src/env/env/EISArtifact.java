@@ -47,17 +47,14 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private boolean receiving;
 	private int lastStep = -1;
 	private int round = 0;
-	private String job = "";
 	private String maps[] = new String[] { "paris", "london", "hannover" };
 	public EISArtifact() {
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
-//		MapHelper.init("paris", 200, 5);
 		MapHelper.getInstance().init("paris", 200, 5);
 	}
 
 	protected void init() throws IOException, InterruptedException {
-//			ei = EILoader.fromClassName("massim.eismassim.EnvironmentInterface");
 			ei = new EnvironmentInterface("conf/eismassimconfig.json");
 	        try {
 	            ei.start();
@@ -128,7 +125,6 @@ public class EISArtifact extends Artifact implements AgentListener {
 			for (String agent: agentIds.keySet()) {
 				try {
 					Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
-//					populateTeamArtifact(percepts);
 //					logger.info("***"+percepts);
 					if (percepts.isEmpty())
 						break;
@@ -171,10 +167,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 				if (!percepts.contains(old)) {
 //					logger.info("Job/mission failed or completed");
 					Literal literal = Translator.perceptToLiteral(old);
-					if (literal.getTerm(0).toString().equals(job))
-					{
-						jobDone.add(literal);
-					}
+					jobDone.add(literal);
 				}
 			}
 		}
@@ -240,7 +233,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 			if (!jobDone.isEmpty()) {
 				for (Literal lit: jobDone) {
 					await_time(100);
-					signal(agentIds.get(agent),"job_done",(Object[]) lit.getTermsArray());
+					signal("job_done",(Object[]) lit.getTermsArray());
 				}
 				jobDone.clear();
 			}
@@ -353,24 +346,17 @@ public class EISArtifact extends Artifact implements AgentListener {
 				boolean isEntity = perception.getName().equals("entity"); // Second parameter of entity is the team. :(
 				LinkedList<Parameter> parameters = perception.getParameters();
 				String facility = parameters.get(0).toString();
-//				if (!MapHelper.hasLocation(facility)) {
 				if (!MapHelper.getInstance().hasLocation(facility)) {
 					String local = parameters.get(0).toString();
 					double lat = Double.parseDouble(parameters.get(isEntity ? 2 : 1).toString());
 					double lon = Double.parseDouble(parameters.get(isEntity ? 3 : 2).toString());
-//					MapHelper.addLocation(local, new Location(lon, lat));
 					MapHelper.getInstance().addLocation(local, new Location(lon, lat));
 				}
 			}
 		}
 		if(!Double.isNaN(agLat) && !Double.isNaN(agLon)){
-//			MapHelper.addLocation(agent, new Location(agLon, agLat));
 			MapHelper.getInstance().addLocation(agent, new Location(agLon, agLat));
 		}
-	}
-	
-	@OPERATION void addJob(String jobA){
-		job = jobA;
 	}
 
     @Override

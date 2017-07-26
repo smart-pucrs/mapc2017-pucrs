@@ -72,7 +72,7 @@
 	.
 +!create_bid_task(Task, Bid, Shop) <- .wait(500); !create_bid_task(Task, Bid, Shop).
 	
-+default::winner(TaskList, assist(Storage, Assembler))
++default::winner(TaskList, assist(Storage, Assembler, JobId))
 <-
 	!strategies::not_free;
 	.print("I won the tasks ",TaskList);
@@ -81,7 +81,6 @@
 +default::winner(TaskList, assemble(Storage, JobId, Members))
 <-
 	!strategies::not_free;
-	addJob(JobId);
 	?default::get_assemble(TaskList, [], AssembleList);
 	.sort(AssembleList,AssembleListSorted);
 	.print("I won the tasks to assemble ",AssembleListSorted," and deliver to ",Storage," for ",JobId);

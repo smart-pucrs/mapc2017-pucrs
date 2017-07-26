@@ -57,7 +57,7 @@
 <-
 	-+storageList([StorageId|List]);
 	.
-//+default::storage(CenterStorage, _, _, TotCap, UsedCap, Items)
+//+default::storage(StorageId, _, _, TotCap, UsedCap, Items)
 //	: .my_name(vehicle1)
 //<-
 //	.print("ZZZZZZZZZZZZZZZ Items in storage: ",Items).

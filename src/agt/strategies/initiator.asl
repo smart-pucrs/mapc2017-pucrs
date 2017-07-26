@@ -33,7 +33,7 @@ countCenter(0).
 	!strategies::not_free;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
-	!!separate_tasks(Id, Storage, Items, End, End - Start, Reward);
+	!!separate_tasks(Id, Storage, Items, End, End - Start, Reward, type(priced));
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
@@ -45,7 +45,7 @@ countCenter(0).
 	!strategies::not_free;
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
-	!!separate_tasks(Id, Storage, Items, End, End - Start, Reward);
+	!!separate_tasks(Id, Storage, Items, End, End - Start, Reward, type(mission));
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Fine, End); .print("Ignoring mission ",Id).
 	
@@ -93,7 +93,7 @@ countCenter(0).
 
 @addCNP[atomic]
 +!add_cnp(Id) <- +cnp(Id).
-+!separate_tasks(Id, Storage, Items, End, Duration, Reward)
++!separate_tasks(Id, Storage, Items, End, Duration, Reward, type(Job))
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
 <-
 	!add_cnp(Id);
@@ -112,7 +112,8 @@ countCenter(0).
 	}
 	else { ListToolsNew = []; ListItems = B; }
 	.length(Items,NumberOfAssemble);
-	!evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, Reward, BadJob);
+	if (Job == priced) { !evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, Reward, BadJob); }
+	else { BadJob = "false" }
 	if (BadJob == "false") {
 		+job(Id, Storage, End, Items);
 		+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
@@ -139,10 +140,10 @@ countCenter(0).
 		}
 	}
 	.
-+!separate_tasks(Id, Storage, Items, End, Duration, Reward)
++!separate_tasks(Id, Storage, Items, End, Duration, Reward, type(Job))
 <-
 	.wait(500);
-	!separate_tasks(Id, Storage, Items, End, Duration, Reward);
+	!separate_tasks(Id, Storage, Items, End, Duration, Reward, type(Job));
 	.
 
 @eval[atomic]

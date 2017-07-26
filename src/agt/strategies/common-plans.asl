@@ -184,13 +184,8 @@
 	.abolish(strategies::retrieveList(_,_));
 	 -buy_list_id(_);
 	if ( default::hasItem(_,_) ) {
-		for ( default::hasItem(ItemId,Qty) ) {
-			if (.substring("item",ItemId) & not go_dump_no_tools) {
-				+go_dump_no_tools;
-				!go_dump_no_tools;
-			}
-		}
-		-go_dump_no_tools;
+		.findall(Item,default::hasItem(Item,Qty) & .substring("item",Item), List);
+		if (not .empty(List)) { !go_dump_no_tools; }
 	}
 	if ( default::hasItem(_,_) ) { 
 		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);

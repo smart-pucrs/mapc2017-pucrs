@@ -68,6 +68,7 @@ countCenter(0).
 	: true
 <- 
 	.concat("cnp_board_",TaskId,CNPBoardName);
+//	.print("Creating task ",CNPBoardName);
 	makeArtifact(CNPBoardName, "cnp.ContractNetBoard", [Task, Deadline, NumberOfAgents]);
 	if (.substring("assemble",Task)) { !send_to_free_trucks(FreeTrucks,Task,CNPBoardName,TaskId); }
 	else { !send_to_free_agents(FreeAgents,Task,CNPBoardName,TaskId); }
@@ -78,7 +79,8 @@ countCenter(0).
 		+bids(Task,Bids,JobId);
 	}
 	else {
-		.print("No bids.");
+		.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> No bids ",JobId);
+		+bids(Task,[99999,99999,99999,Task,TaskId],JobId);
 	}
 	remove[artifact_name(CNPBoardName)];
 	.
@@ -148,9 +150,9 @@ countCenter(0).
 
 @eval[atomic]
 +!evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, Reward, BadJob)
-	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & .length(ListToolsNew,NumberOfBuyTool) & .length(ListItems,NumberOfBuyItem) & default::steps(TotalSteps) & default::step(Step)
+	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & .length(ListToolsNew,NumberOfBuyTool) & .length(ListItems,NumberOfBuyItem) & default::steps(TotalSteps) & default::step(Step) & mapCenter(CLat,CLon)
 <-
-	if ( default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,FarthestShop,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps+30+10 & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
+	if ( default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps+30+10 & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
 		BadJob = "false";
 	}
 	else { BadJob = "true"; }

@@ -109,6 +109,8 @@ public class TeamArtifact extends Artifact {
 		shopItemsQty.clear();
 		agentNames.clear();
 		loads.clear();
+		availableTools.clear();
+		this.init();
 	}
 	
 }

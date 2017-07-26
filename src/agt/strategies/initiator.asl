@@ -1,6 +1,4 @@
 task_id(0).
-completed_jobs(0). // debugging
-countCenter(0).
 
 @minLon[atomic]
 +default::minLon(Lon) : X = Lon + 0.001 & countCenter(I) <- -minLon(Lon); +minLonReal(X); -+countCenter(I+1).

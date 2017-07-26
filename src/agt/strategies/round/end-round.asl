@@ -28,6 +28,7 @@
 <-
 	!end_round;
 	setMap;
+	.wait(500);
 	clearMaps;
 	!new::new_round;
 	.
@@ -37,7 +38,6 @@
 <-
 	!end_round;
 	addJob("");
-	.wait(500);
 	!new::new_round;
 	.	
 

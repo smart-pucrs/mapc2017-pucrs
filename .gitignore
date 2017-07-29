@@ -2,7 +2,7 @@
 /bin/
 backup/
 cache/
-scheme/
+scheme/sch.xml
 graphs/
 graphsMapHelper/
 /perceptlog/

@@ -83,9 +83,8 @@
 	org::focus(SchArtId)[wid(OrgId)];
 	.print("I won the tasks ",TaskList);
 	org::commitMission(massist);
-//	!strategies::go_work(TaskList, Storage, Assembler);
 	.
-+default::winner(TaskList, assemble(Storage, JobId, Members))
++default::winner(TaskList, assemble(Storage, JobId))
 	: default::joined(org,OrgId)
 <-
 	!strategies::not_free;
@@ -93,5 +92,4 @@
 	org::focus(SchArtId)[wid(OrgId)];
 	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
 	org::commitMission(massemble);
-//	!strategies::go_assemble(AssembleListSorted, Storage, JobId, Members);
 	.

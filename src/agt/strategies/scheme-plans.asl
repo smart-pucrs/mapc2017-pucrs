@@ -1,5 +1,5 @@
 +goalState(JobId,job_delivered,_,_,satisfied)
-	: default::winner(_, assemble(_, JobId, _))
+	: default::winner(_, assemble(_, JobId))
 <-
 //   .print("*** all done! ***");
    removeScheme(JobId);
@@ -7,14 +7,14 @@
    .
 
 +!go_to_workshop
-	: default::winner(_, assemble(Storage, _, _))
+	: default::winner(_, assemble(Storage, _))
 <-
 	!strategies::go_to_workshop(Storage);
 	!!strategies::free;
 	.
 
 +!do_assemble
-	: default::winner(TaskList, assemble(_, _, _)) & default::get_assemble(TaskList, [], AssembleListNotSorted)
+	: default::winner(TaskList, assemble(_, _)) & default::get_assemble(TaskList, [], AssembleListNotSorted)
 <-
 	!strategies::not_free;
 	.sort(AssembleListNotSorted,AssembleList);

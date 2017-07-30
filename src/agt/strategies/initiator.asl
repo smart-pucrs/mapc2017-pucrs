@@ -232,7 +232,6 @@ task_id(0).
 		.delete(AgentA,FreeAgentsA,FreeAgentsNewA);
 		-+initiator::free_agents(FreeAgentsNewA);
 //		.print("Removing ",AgentA," from free lists.");
-		+job_members(JobId,[]);
 		for (awarded(Agent,Shop,List,JobId)) {
 //			.print("Removing ",Agent," from free lists.");
 			?initiator::free_agents(FreeAgents);
@@ -243,21 +242,16 @@ task_id(0).
 				.delete(Agent,FreeTrucks,FreeTrucksNew);
 				-+initiator::free_trucks(FreeTrucksNew);
 			}
-			?job_members(JobId,Aux);
-			-+job_members(JobId,[Agent|Aux]);
 	    	.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 			-awarded(Agent,Shop,List,JobId);	
 		}
-		?job_members(JobId,JobMembers);
-//		.print("Job members ",JobMembers);
-		.send(AgentA,tell,winner(Items,assemble(Storage,JobId,JobMembers)));
+		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
 		-cnp(JobId);
 	}
 	else { 
 		-impossible_task(JobId);
 		-cnp(JobId);
 		-job(JobId, _, _, _);
-		-job_members(JobId,_,_);
 		-awarded_assemble(_,_,_,JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_,JobId));
@@ -292,7 +286,6 @@ task_id(0).
 @jobFinished[atomic]	
 +!job_finished(JobId) 
 <- 
-	-initiator::job_members(JobId,_); 
 	-initiator::job(JobId, _, _, _);
 		
 	?completed_jobs(Jobs);	// debugging

@@ -26,14 +26,14 @@
 	.
 	
 +!go_to_storage
-	: default::winner(_, assemble(Storage, _, _))
+	: default::winner(_, assemble(Storage, _))
 <-
 	.print("Finished assembling all items, going to deliver.");
 	!action::goto(Storage);
 	.
 	
 +!deliver
-	: default::winner(_, assemble(_, JobId, _))
+	: default::winner(_, assemble(_, JobId))
 <-
 	!action::deliver_job(JobId);
 	?default::lastActionResult(Result);
@@ -159,7 +159,7 @@
 +!job_failed_assemble
 	: true
 <-
-	-default::winner(_, assemble(_, JobId, _))[source(_)];
+	-default::winner(_, assemble(_, JobId))[source(_)];
 	removeScheme(JobId);
 	.drop_desire(org::_);
 	.abolish(org::_);
@@ -194,7 +194,7 @@
 	.print("$$$$$$$$$$$$ Job ",JobId," completed, got reward ",Reward);
 	.
 +default::job_done(JobId, _, _, _, _, _)
-	: default::winner(_, assemble(_, JobId, _))
+	: default::winner(_, assemble(_, JobId))
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
 	!job_failed_assemble;
@@ -213,7 +213,7 @@
 	
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)
-	: default::winner(_, assemble(_, JobId, _))
+	: default::winner(_, assemble(_, JobId))
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
 	!job_failed_assemble;

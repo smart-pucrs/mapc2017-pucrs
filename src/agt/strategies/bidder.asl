@@ -14,14 +14,14 @@
 	bid(Me, Bid, Shop, tool(ItemId), TaskId)[artifact_name(CNPBoard)];
 	.
 -default::task(tool(ItemId), CNPBoard, TaskId)[source(X)].
-+default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)]
++default::task(assemble(StorageId, Items), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
-	-default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)];
-	!create_bid_task(assemble(StorageId), Bid, Shop);
+	-default::task(assemble(StorageId, Items), CNPBoard, TaskId)[source(X)];
+	!create_bid_task(assemble(StorageId, Items), Bid, Shop);
 	bid(Me, Bid, Shop, assemble(StorageId), TaskId)[artifact_name(CNPBoard)];
 	.
--default::task(assemble(StorageId), CNPBoard, TaskId)[source(X)].
+-default::task(assemble(StorageId, Items), CNPBoard, TaskId)[source(X)].
 
 +!create_bid_task(item(ItemId, Qty), Bid, Shop)
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
@@ -61,28 +61,37 @@
 	}
 	else { Bid = -1; Shop = null; }
 	.
-+!create_bid_task(assemble(StorageId), Bid, Shop)
-	: default::role(Role, Speed, _, _, _) & new::workshopList(WList)
++!create_bid_task(assemble(StorageId, Items), Bid, Shop)
+	: default::role(Role, Speed, LoadCap, _, _) & new::workshopList(WList) & default::load(MyLoad) & default::total_load(Items,0,Vol)
 <-
-	actions.closest(Role,WList,StorageId,ClosestWorkshop);
-	actions.route(Role,Speed,ClosestWorkshop,RouteWorkshop);
-//	.print("####### Route: ",RouteWorkshop," role ",Role);
-	Bid = RouteWorkshop;
-	Shop = StorageId;
+	if (LoadCap - MyLoad >= Vol) {
+		actions.closest(Role,WList,StorageId,ClosestWorkshop);
+		actions.route(Role,Speed,ClosestWorkshop,RouteWorkshop);
+//		.print("####### Route: ",RouteWorkshop," role ",Role);
+		Bid = RouteWorkshop;
+		Shop = StorageId;
+	}
+	else { Bid = -1; Shop = null; }
 	.
 +!create_bid_task(Task, Bid, Shop) <- .wait(500); !create_bid_task(Task, Bid, Shop).
 	
 +default::winner(TaskList, assist(Storage, Assembler, JobId))
+	: default::joined(org,OrgId)
 <-
 	!strategies::not_free;
+	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
+	org::focus(SchArtId)[wid(OrgId)];
 	.print("I won the tasks ",TaskList);
-	!strategies::go_work(TaskList, Storage, Assembler);
+	org::commitMission(massist);
+//	!strategies::go_work(TaskList, Storage, Assembler);
 	.
 +default::winner(TaskList, assemble(Storage, JobId, Members))
+	: default::joined(org,OrgId)
 <-
 	!strategies::not_free;
-	?default::get_assemble(TaskList, [], AssembleList);
-	.sort(AssembleList,AssembleListSorted);
-	.print("I won the tasks to assemble ",AssembleListSorted," and deliver to ",Storage," for ",JobId);
-	!strategies::go_assemble(AssembleListSorted, Storage, JobId, Members);
+	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
+	org::focus(SchArtId)[wid(OrgId)];
+	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
+	org::commitMission(massemble);
+//	!strategies::go_assemble(AssembleListSorted, Storage, JobId, Members);
 	.

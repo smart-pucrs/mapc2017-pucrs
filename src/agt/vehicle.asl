@@ -1,16 +1,24 @@
 { include("$jacamoJar/templates/common-cartago.asl") }
+{ include("$jacamoJar/templates/common-moise.asl") }
+{ include("$jacamoJar/templates/org-obedient.asl", org) }
 { include("common-rules.asl") }
-//{ include("strategies/round/new-round.asl", new) }
 { include("strategies/round/new-round.asl") }
 { include("strategies/common-plans.asl", strategies) }
+{ include("strategies/scheme-plans.asl", org) }
 { include("strategies/bidder.asl", bidder) }
 { include("strategies/round/end-round.asl") }
 
 +!add_initiator
 <- 
-	.include("strategies/initiator.asl", initiator); 
+	.include("strategies/initiator.asl", initiator);
 	.
-
++!add_org_board
+	: joined(org,OrgId)
+<-
+	create("sch.xml");
+    makeArtifact(myorg, "ora4mas.nopl.OrgBoard", ["scheme/sch.xml"], OrgArtId)[wid(OrgId)];
+	.	
+	
 +!register(E)
 	: .my_name(Me)
 <- 

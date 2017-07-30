@@ -29,10 +29,6 @@ select_bid_assemble([],bid(AuxBidAgent,AuxBid),bid(BidAgentWinner,BidWinner)) :-
 select_bid_assemble([bid(BidAgent,Bid,ShopId,assemble(Storage),TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- Bid \== -1 & Bid < AuxBid & select_bid_assemble(Bids,bid(BidAgent,Bid),BidWinner).
 select_bid_assemble([bid(BidAgent,Bid,ShopId,Task,TaskId)|Bids],bid(AuxBidAgent,AuxBid),BidWinner) :- select_bid_assemble(Bids,bid(AuxBidAgent,AuxBid),BidWinner).
 
-select_bid_mission([],bid(AuxAgent,AuxDistance),bid(AgentWinner,DistanceWinner)) :- AgentWinner = AuxAgent & DistanceWinner = AuxDistance.
-select_bid_mission([bid(Agent,Distance)|Bids],bid(AuxAgent,AuxDistance),BidWinner) :- Distance \== -1 & Distance < AuxDistance & select_bid_mission(Bids,bid(Agent,Distance),BidWinner).
-select_bid_mission([bid(Agent,Distance)|Bids],bid(AuxAgent,AuxDistance),BidWinner) :- select_bid_mission(Bids,bid(AuxAgent,AuxDistance),BidWinner).
-
 find_shops_id([],Temp,Result) :- Result = Temp.
 find_shops_id([shop(ShopId,_)|List],Temp,Result) :- find_shops_id(List,[ShopId|Temp],Result).
 
@@ -40,15 +36,6 @@ getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- shop(FacilityId, LatAux, LonAu
 getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- storage(FacilityId, LatAux, LonAux,_,_,_) & Flat=LatAux & Flon=LonAux.
 getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- dump(FacilityId,LatAux,LonAux) & Flat=LatAux & Flon=LonAux.
 getFacility(FacilityId,Flat,Flon,LatAux,LonAux):- workshop(FacilityId,LatAux,LonAux) & Flat=LatAux & Flon=LonAux.
-
-checkQuadrant(quad1,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < MaxLat & Lat > CenterLat & Lon < CenterLon & Lon > MinLon).
-checkQuadrant(quad2,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < MaxLat & Lat > CenterLat & Lon < MaxLon & Lon > CenterLon).
-checkQuadrant(quad3,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < CenterLat & Lat > MinLat & Lon < CenterLon & Lon > MinLon).
-checkQuadrant(quad4,Lat,Lon) :- coalition::minLonReal(MinLon) & coalition::maxLonReal(MaxLon) & coalition::minLatReal(MinLat) & coalition::maxLatReal(MaxLat) & coalition::mapCenter(CenterLat,CenterLon) & (Lat < CenterLat & Lat > MinLat & Lon < MaxLon & Lon > CenterLon).
-
-getQuadShops(Quad, [], []).
-getQuadShops(Quad, [Shop|List], [Shop|Shops]) :- getFacility(Shop,Flat,Flon,LatAux,LonAux) & checkQuadrant(Quad, Flat, Flon) & getQuadShops(Quad, List, Shops).
-getQuadShops(Quad, [Shop|List], Shops) :- getQuadShops(Quad, List, Shops).
 
 convertListString2Term([],Temp,Result) :- Result = Temp.
 convertListString2Term([String | ListString],Temp,Result) :- .term2string(Term,String) & convertListString2Term(ListString,[Term|Temp],Result).
@@ -100,3 +87,6 @@ check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(Item
 check_price([],[],Aux,Result) :- Result = Aux.
 check_price([],[item(ItemId,Qty)|Items],Aux,Result) :- actions.getItemPrice(ItemId,Price) & check_price([],Items,Aux+Price*Qty,Result).
 check_price([item(Tool,_)|Tools],Items,Aux,Result) :- actions.getItemPrice(Tool,Price) & check_price(Tools,Items,Aux+Price,Result).
+
+total_load([],Aux,Vol) :- Vol = Aux.
+total_load([required(ItemId,Qty)|Items],Aux,Vol) :- default::item(ItemId,Vol2,_,_) & Aux2 = Aux + (Vol2 * Qty) & total_load(Items,Aux2,Vol).

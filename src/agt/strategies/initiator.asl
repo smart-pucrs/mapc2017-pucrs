@@ -119,7 +119,7 @@ task_id(0).
 		+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
 		!update_taskid(TaskIdA);
 	//	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
-		!!announce(assemble(Storage),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
+		!!announce(assemble(Storage, Items),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
 		for ( .member(item(ItemId,Qty),ListToolsNew) ) {
 			!update_taskid(TaskId);
 	//		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
@@ -135,7 +135,7 @@ task_id(0).
 		.print("Job ",Id," failed evaluation, ignoring it.");
 		-cnp(Id);
 		.my_name(Me);
-		if ( .member(Me,FreeAgents) ) { 
+		if  ( not default::winner(_, _) | strategies::waiting ) {
 			!strategies::free; 
 		}
 	}
@@ -161,9 +161,9 @@ task_id(0).
 	: .count(initiator::bids(_,_,JobId),NumberOfBids) & number_of_tasks(NumberOfTasks,JobId) & NumberOfBids == NumberOfTasks & .my_name(Me)
 <-
 	-number_of_tasks(NumberOfTasks,JobId);
-	for ( bids(assemble(StorageId),Bids,JobId) ) {
+	for ( bids(assemble(StorageId,_),Bids,JobId) ) {
 		if ( not initiator::impossible_task(JobId) ) {
-			-bids(assemble(StorageId),Bids,JobId);
+			-bids(assemble(StorageId,_),Bids,JobId);
 			?default::select_bid_assemble(Bids,bid(99999,99999),bid(Agent,Distance));
 			if (Distance \== 99999) {
 				?initiator::job(JobId, _, _, Items);
@@ -173,51 +173,56 @@ task_id(0).
 			else { +initiator::impossible_task(JobId); .print("Unable to allocate assemble to deliver at ",StorageId); }
 		}
 	}
-	for ( bids(tool(ItemId),Bids,JobId) ) {
-		if ( not initiator::impossible_task(JobId) ) {
-			-bids(tool(ItemId),Bids,JobId);
-			?default::select_bid_tool(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
-			if (Distance \== 99999) {
-				getLoad(Agent,Load);
-				?default::item(ItemId,Volume,_,_);
-		    	addLoad(Agent,Load-Volume);
-	//	    	.print("Awarding ",ItemId," to ",Agent," at",Shop);
-				if (not awarded(Agent,_,_,_)) {
-					+awarded(Agent,Shop,[tool(ItemId)],JobId);
+	if ( not initiator::impossible_task(JobId) ) {
+		for ( bids(tool(ItemId),Bids,JobId) ) {
+			if ( not initiator::impossible_task(JobId) ) {
+				-bids(tool(ItemId),Bids,JobId);
+				?default::select_bid_tool(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
+				if (Distance \== 99999) {
+					getLoad(Agent,Load);
+					?default::item(ItemId,Volume,_,_);
+			    	addLoad(Agent,Load-Volume);
+		//	    	.print("Awarding ",ItemId," to ",Agent," at",Shop);
+					if (not awarded(Agent,_,_,_)) {
+						+awarded(Agent,Shop,[tool(ItemId)],JobId);
+					}
+					else {
+						?awarded(Agent,_,List,JobId);
+			    		-awarded(Agent,_,List,JobId);
+			    		.concat(List,[tool(ItemId)],NewList);
+			    		+awarded(Agent,Shop,NewList,JobId);
+					}
 				}
-				else {
-					?awarded(Agent,_,List,JobId);
-		    		-awarded(Agent,_,List,JobId);
-		    		.concat(List,[tool(ItemId)],NewList);
-		    		+awarded(Agent,Shop,NewList,JobId);
-				}
+				else { +initiator::impossible_task(JobId); .print("Unable to allocate tool ",ItemId); }
 			}
-			else { +initiator::impossible_task(JobId); .print("Unable to allocate tool ",ItemId); }
 		}
-	}
-	for ( bids(item(ItemId,Qty),Bids,JobId) ) {
-		if ( not initiator::impossible_task(JobId) ) {
-			-bids(item(ItemId,Qty),Bids,JobId);
-			?default::select_bid(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
-			if (Distance \== 99999) {
-				getLoad(Agent,Load);
-				?default::item(ItemId,Volume,_,_);
-		    	addLoad(Agent,Load-Volume*Qty);
-	//	    	.print("Awarding #",Qty," of ",ItemId," to ",Agent," at",Shop);
-				if (not initiator::awarded(Agent,_,_,_)) {
-					+awarded(Agent,Shop,[item(ItemId,Qty)],JobId);
+		for ( bids(item(ItemId,Qty),Bids,JobId) ) {
+			if ( not initiator::impossible_task(JobId) ) {
+				-bids(item(ItemId,Qty),Bids,JobId);
+				?default::select_bid(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
+				if (Distance \== 99999) {
+					getLoad(Agent,Load);
+					?default::item(ItemId,Volume,_,_);
+			    	addLoad(Agent,Load-Volume*Qty);
+		//	    	.print("Awarding #",Qty," of ",ItemId," to ",Agent," at",Shop);
+					if (not initiator::awarded(Agent,_,_,_)) {
+						+awarded(Agent,Shop,[item(ItemId,Qty)],JobId);
+					}
+					else {
+						?awarded(Agent,_,List,JobId);
+			    		-awarded(Agent,_,List,JobId);
+			    		.concat(List,[item(ItemId,Qty)],NewList);
+			    		+awarded(Agent,Shop,NewList,JobId);
+					}
 				}
-				else {
-					?awarded(Agent,_,List,JobId);
-		    		-awarded(Agent,_,List,JobId);
-		    		.concat(List,[item(ItemId,Qty)],NewList);
-		    		+awarded(Agent,Shop,NewList,JobId);
-				}
+				else { +initiator::impossible_task(JobId); .print("Unable to allocate #",Qty," of ",ItemId); }
 			}
-			else { +initiator::impossible_task(JobId); .print("Unable to allocate #",Qty," of ",ItemId); }
 		}
 	}
 	if (not initiator::impossible_task(JobId)) {
+		?default::joined(org,OrgId);
+		org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
+//		debug(inspector_gui(on))[artifact_id(SchArtId)];
 		?awarded_assemble(AgentA,Items,Storage,JobId);
 		-awarded_assemble(AgentA,Items,Storage,JobId);
 		?initiator::free_agents(FreeAgentsA);
@@ -258,10 +263,10 @@ task_id(0).
 		.abolish(initiator::awarded(_,_,_,JobId));
 		.print("Impossible job ",JobId,", aborting it.");
 	}
-	?initiator::free_agents(FreeAgentsB);
-	if ( .member(Me,FreeAgentsB) ) {
+	if ( not default::winner(_, _) | strategies::waiting ) {
 		!strategies::free;
 	}
+	else { !!action::skip; }
 	.
 
 @addAgentFree[atomic]

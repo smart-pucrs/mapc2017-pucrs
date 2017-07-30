@@ -3,7 +3,7 @@ mas scenario {
 	agent vehicle1: vehicle.asl {
 		join: vehicleart, org
 		focus: vehicleart.eis_art_vehicle1, vehicleart.team_artifact
-		goals: register("connectionA1"), add_initiator, add_org_board
+		goals: register("connectionA1"), add_initiator
 	}
 	agent vehicle2: vehicle.asl {
 		join: vehicleart, org
@@ -174,7 +174,7 @@ mas scenario {
 	}
 	
 	workspace org {
-		artifact osboard: org.CreateOS()
+		artifact myorg: ora4mas.nopl.OrgBoard("src/org/sch.xml")
 	}
 
     asl-path: src/agt

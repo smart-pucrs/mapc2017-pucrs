@@ -82,7 +82,7 @@ check_buy_list([item(ItemId,Qty)|Items],Result) :- actions.getItemQty(ItemId,Qty
 
 check_multiple_buy([],AddSteps) :- AddSteps = 0.
 check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty <= Qty2 & check_multiple_buy(Items,AddSteps).
-check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty > Qty2 & AddSteps = 20.
+check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty > Qty2 & AddSteps = Qty2.
 
 check_price([],[],Aux,Result) :- Result = Aux.
 check_price([],[item(ItemId,Qty)|Items],Aux,Result) :- actions.getItemPrice(ItemId,Price) & check_price([],Items,Aux+Price*Qty,Result).

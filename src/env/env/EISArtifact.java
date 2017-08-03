@@ -54,13 +54,14 @@ public class EISArtifact extends Artifact implements AgentListener {
 		MapHelper.getInstance().init("paris", 200, 5);
 	}
 
-	protected void init() throws IOException, InterruptedException {
-			ei = new EnvironmentInterface("conf/eismassimconfig.json");
-	        try {
-	            ei.start();
-	        } catch (ManagementException e) {
-	            e.printStackTrace();
-	        }
+	protected void init(int id) throws IOException, InterruptedException {
+		
+		ei = new EnvironmentInterface("conf/eisconfig/eismassimconfig"+id+".json");
+        try {
+            ei.start();
+        } catch (ManagementException e) {
+            e.printStackTrace();
+        }
         ei.attachEnvironmentListener(new EnvironmentListener() {
             public void handleNewEntity(String entity) {}
             public void handleStateChange(EnvironmentState s) {
@@ -68,7 +69,7 @@ public class EISArtifact extends Artifact implements AgentListener {
             }
             public void handleDeletedEntity(String arg0, Collection<String> arg1) {}
             public void handleFreeEntity(String arg0, Collection<String> arg1) {}
-    });
+        });
         
         receiving = true;
 		execInternalOp("receiving");

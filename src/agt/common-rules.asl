@@ -64,12 +64,12 @@ separateItemTool([item(ItemId,Qty)|B],ListTools,[item(ItemId,Qty)|ListItems]) :-
 removeDuplicateTool([item(ItemId,Qty)|B],ListTools) :- .member(item(ItemId,Qty),B) & removeDuplicateTool(B,ListTools).
 removeDuplicateTool([item(ItemId,Qty)|B],[item(ItemId,Qty)|ListTools]) :- removeDuplicateTool(B,ListTools).
 
-get_assemble([],Aux,AssembleList) :- AssembleList = Aux.
-get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts(Parts,[],Assemble,Qty) & .concat([item(2,ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList).
-get_assemble([required(ItemId,Qty)|TaskList],[item(2,ItemId,Qty)|Aux],AssembleList) :- get_assemble(TaskList,Aux,AssembleList).
-get_parts([],Aux,AssembleList,Qty) :- AssembleList = Aux.
-get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts(Parts2,[],Assemble,Qty) & .concat([item(1,Item,Qty*Qty2)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_parts(Parts,NewAux,AssembleList,Qty2).
-get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2) :- get_parts(Parts,Aux,AssembleList,Qty2).
+get_assemble([],Aux,AssembleList,Count) :- AssembleList = Aux.
+get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList,Count) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts(Parts,[],Assemble,Qty,Count,NewCount) & .concat([item(NewCount+1,ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList,NewCount+1).
+get_assemble([required(ItemId,Qty)|TaskList],[item(Count+1,ItemId,Qty)|Aux],AssembleList,Count) :- get_assemble(TaskList,Aux,AssembleList,Count+1).
+get_parts([],Aux,AssembleList,Qty,Count,NewCount) :- AssembleList = Aux & Count = NewCount.
+get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2,Count,NewCount) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts(Parts2,[],Assemble,Qty2,Count,NewCount2) & .concat([item(NewCount2+1,Item,Qty*Qty2)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_parts(Parts,NewAux,AssembleList,Qty2,NewCount2+1,NewCount).
+get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2,Count,NewCount) :- get_parts(Parts,Aux,AssembleList,Qty2,Count,NewCount).
 
 getQuadLatLon(quad1,QLat,QLon) :- coalition::quad1(QLat,QLon).
 getQuadLatLon(quad2,QLat,QLon) :- coalition::quad2(QLat,QLon).

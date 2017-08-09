@@ -14,7 +14,7 @@
 	.
 
 +!do_assemble
-	: default::winner(TaskList, assemble(_, _)) & default::get_assemble(TaskList, [], AssembleListNotSorted)
+	: default::winner(TaskList, assemble(_, _)) & default::get_assemble(TaskList, [], AssembleListNotSorted, 0)
 <-
 	!strategies::not_free;
 	.sort(AssembleListNotSorted,AssembleList);

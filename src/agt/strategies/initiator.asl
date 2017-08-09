@@ -78,7 +78,7 @@ task_id(0).
 	}
 	else {
 		.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> No bids ",JobId);
-		+bids(Task,[99999,99999,99999,Task,TaskId],JobId);
+		+bids(Task,[bid(99999,99999,99999,Task,TaskId)],JobId);
 	}
 	remove[artifact_name(CNPBoardName)];
 	.

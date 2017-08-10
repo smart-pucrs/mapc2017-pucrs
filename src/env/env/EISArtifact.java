@@ -54,9 +54,9 @@ public class EISArtifact extends Artifact implements AgentListener {
 		MapHelper.getInstance().init("paris", 200, 5);
 	}
 
-	protected void init(int id) throws IOException, InterruptedException {
+	protected void init(String config) throws IOException, InterruptedException {
 		
-		ei = new EnvironmentInterface("conf/eisconfig/eismassimconfig"+id+".json");
+		ei = new EnvironmentInterface(config);
         try {
             ei.start();
         } catch (ManagementException e) {

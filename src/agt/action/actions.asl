@@ -7,7 +7,7 @@
 //	.print("Doing action ",Action, " at step ",S);
 	.wait({ +default::lastActionResult(Result) });
 	-default::action(S);
-	if (Result == failed) {
+	if (Action \== skip & Result == failed) {
 //		.print("Failed to execute action ",Action," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}

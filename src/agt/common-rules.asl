@@ -90,3 +90,15 @@ check_price([item(Tool,_)|Tools],Items,Aux,Result) :- actions.getItemPrice(Tool,
 
 total_load([],Aux,Vol) :- Vol = Aux.
 total_load([required(ItemId,Qty)|Items],Aux,Vol) :- default::item(ItemId,Vol2,_,_) & Aux2 = Aux + (Vol2 * Qty) & total_load(Items,Aux2,Vol).
+
+get_roles([],Aux,Roles) :- Roles = Aux.
+get_roles([Agent|FreeAgents],Aux,Roles) :- actions.getAgentRole(Agent,Role) & not .member(Role,Aux) & get_roles(FreeAgents,[Role|Aux],Roles).
+get_roles([Agent|FreeAgents],Aux,Roles) :- get_roles(FreeAgents,Aux,Roles).
+
+get_tools([],Aux,T) :- T = Aux.
+get_tools([Role|Roles],Aux,T) :- (default::role(Role,_,_,_,Tools) | default::tools(Role,Tools)) & .union(Tools,Aux,AuxNew) & get_tools(Roles,AuxNew,T).
+get_tools([Role|Roles],Aux,T) :- get_tools(Roles,Aux,T).
+
+check_tools([],AvailableTools,Result) :- Result = "true".
+check_tools([item(Tool,_)|ListToolsNew],AvailableTools,Result) :- .member(Tool,AvailableTools) & check_tools(ListToolsNew,AvailableTools,Result).
+check_tools([item(Tool,_)|ListToolsNew],AvailableTools,Result) :- not .member(Tool,AvailableTools) & Result = "false".

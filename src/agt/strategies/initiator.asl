@@ -80,13 +80,13 @@ task_id(0).
 	.
 
 +!evaluate_job(Items, Duration, Storage, Id, Reward)
-	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & default::steps(TotalSteps) & default::step(Step) & mapCenter(CLat,CLon)
+	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & default::steps(TotalSteps) & default::step(Step) & mapCenter(CLat,CLon) & initiator::free_agents(FreeAgents) & default::get_roles(FreeAgents,[],Roles) & default::get_tools(Roles,[],AvailableTools)
 <-
 	!decompose(Items,ListItems,ListToolsNew);
 	.length(ListToolsNew,NumberOfBuyTool);
 	.length(ListItems,NumberOfBuyItem);
 	.length(Items,NumberOfAssemble);
-	if ( default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
+	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
 //		+estimate(JobId,Step,Estimate);
 		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
 	}

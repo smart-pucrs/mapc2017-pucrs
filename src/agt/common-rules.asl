@@ -68,7 +68,7 @@ get_assemble([],Aux,AssembleList,Count) :- AssembleList = Aux.
 get_assemble([required(ItemId,Qty)|TaskList],Aux,AssembleList,Count) :- item(ItemId,_,_,parts(Parts)) & Parts \== [] & get_parts(Parts,[],Assemble,Qty,Count,NewCount) & .concat([item(NewCount+1,ItemId,Qty)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_assemble(TaskList,NewAux,AssembleList,NewCount+1).
 get_assemble([required(ItemId,Qty)|TaskList],[item(Count+1,ItemId,Qty)|Aux],AssembleList,Count) :- get_assemble(TaskList,Aux,AssembleList,Count+1).
 get_parts([],Aux,AssembleList,Qty,Count,NewCount) :- AssembleList = Aux & Count = NewCount.
-get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2,Count,NewCount) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts(Parts2,[],Assemble,Qty*Qty2,Count,NewCount2) & .concat([item(NewCount2+1,Item,Qty*Qty2)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_parts(Parts,NewAux,AssembleList,Qty*Qty2,NewCount2+1,NewCount).
+get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2,Count,NewCount) :- item(Item,_,_,parts(Parts2)) & Parts2 \== [] & get_parts(Parts2,[],Assemble,Qty*Qty2,Count,NewCount2) & .concat([item(NewCount2+1,Item,Qty*Qty2)],Assemble,AssembleNew) & .concat(AssembleNew,Aux,NewAux) & get_parts(Parts,NewAux,AssembleList,Qty2,NewCount2+1,NewCount).
 get_parts([[Item,Qty]|Parts],Aux,AssembleList,Qty2,Count,NewCount) :- get_parts(Parts,Aux,AssembleList,Qty2,Count,NewCount).
 
 getQuadLatLon(quad1,QLat,QLon) :- coalition::quad1(QLat,QLon).

@@ -31,7 +31,7 @@ task_id(0).
 	!strategies::not_free;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
-	!!separate_tasks(Id, Storage, Items, End, End - Start, Reward, type(priced));
+	!!evaluate_job(Items, End - Start, Storage, Id, Reward);
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
@@ -44,23 +44,94 @@ task_id(0).
 	+mission(Id, Storage, Items, End, End - Start, Reward);
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
-	!!separate_tasks(Id, Storage, Items, End, End - Start, Reward, type(mission));
+	?default::steps(TotalSteps);
+	?default::step(Step);
+	if ( Step + 50 < TotalSteps & Step + 50 < End ) { 
+		
+		!decompose(Items,ListItems,ListToolsNew);
+		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
+	}
+	else { 
+		.print("Mission ",Id," failed evaluation, ignoring it.");
+		-mission(Id, Storage, Items, End, End - Start, Reward);
+		if  ( not default::winner(_, _) | strategies::waiting ) {
+			!!strategies::free; 
+		}
+	}
 	.
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, End - Start, Reward); .print("Ignoring mission ",Id).
++default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, End - Start, Reward); .print("Ignoring mission ",Id," for now.").
 	
-@sendfreetrucks[atomic]
-+!send_to_free_trucks(FreeTrucks,Task,CNPBoardName,TaskId)
++!decompose(Items,ListItems,ListToolsNew)
 <-
-	for ( .member(Agent,FreeTrucks) ) {
-		.send(Agent,tell,task(Task,CNPBoardName,TaskId));
+	?default::decomposeRequirements(Items,[],Bases);
+	+bases([],Id);
+	for ( .member(Item,Bases) ) {
+		?bases(L,Id);
+		.concat(L,Item,New);
+		-+bases(New,Id);
+	}
+	?bases(B,Id);
+	-bases(B,Id);
+	if (.substring("tool",B)) {
+		?default::separateItemTool(B,ListTools,ListItems); 
+		?default::removeDuplicateTool(ListTools,ListToolsNew);
+	}
+	else { ListToolsNew = []; ListItems = B; }
+	.
+
++!evaluate_job(Items, Duration, Storage, Id, Reward)
+	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & default::steps(TotalSteps) & default::step(Step) & mapCenter(CLat,CLon)
+<-
+	!decompose(Items,ListItems,ListToolsNew);
+	.length(ListToolsNew,NumberOfBuyTool);
+	.length(ListItems,NumberOfBuyItem);
+	.length(Items,NumberOfAssemble);
+	if ( default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
+//		+estimate(JobId,Step,Estimate);
+		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
+	}
+	else { 
+		.print("Job ",Id," failed evaluation, ignoring it.");
+		if  ( not default::winner(_, _) | strategies::waiting ) {
+			!!strategies::free; 
+		}
 	}
 	.
-@sendfreeagents[atomic]
-+!send_to_free_agents(FreeAgents,Task,CNPBoardName,TaskId)
+
+@addCNP[atomic]
++!add_cnp(Id) <- +cnp(Id).
++!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End)
+	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
 <-
-	for ( .member(Agent,FreeAgents) ) {
-		.send(Agent,tell,task(Task,CNPBoardName,TaskId));
+	!add_cnp(Id);
+	+job(Id, Storage, End, Items);
+	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
+	!update_taskid(TaskIdA);
+//	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
+	!!announce(assemble(Storage, Items),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
+	for ( .member(item(ItemId,Qty),ListToolsNew) ) {
+		!update_taskid(TaskId);
+//		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
+		!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
+	for ( .member(item(ItemId,Qty),ListItems) ) {
+		!update_taskid(TaskId);
+//		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
+		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
+	}
+	.
++!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End)
+<-
+	.wait(500);
+	!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
+	.
+
+@upTaskId[atomic]
++!update_taskid(TaskId)
+	: task_id(TaskIdAux)
+<-
+	-+task_id(TaskIdAux+1);
+	TaskId = TaskIdAux;
 	.
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)
@@ -83,85 +154,20 @@ task_id(0).
 	}
 	remove[artifact_name(CNPBoardName)];
 	.
-
-@upTaskId[atomic]
-+!update_taskid(TaskId)
-	: task_id(TaskIdAux)
+	
+@sendfreetrucks[atomic]
++!send_to_free_trucks(FreeTrucks,Task,CNPBoardName,TaskId)
 <-
-	-+task_id(TaskIdAux+1);
-	TaskId = TaskIdAux;
-	.
-
-@addCNP[atomic]
-+!add_cnp(Id) <- +cnp(Id).
-+!separate_tasks(Id, Storage, Items, End, Duration, Reward, type(Job))
-	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
-<-
-	!add_cnp(Id);
-	?default::decomposeRequirements(Items,[],Bases);
-	+bases([],Id);
-	for ( .member(Item,Bases) ) {
-		?bases(L,Id);
-		.concat(L,Item,New);
-		-+bases(New,Id);
-	}
-	?bases(B,Id);
-	-bases(B,Id);
-	if (.substring("tool",B)) {
-		?default::separateItemTool(B,ListTools,ListItems); 
-		?default::removeDuplicateTool(ListTools,ListToolsNew);
-	}
-	else { ListToolsNew = []; ListItems = B; }
-	.length(Items,NumberOfAssemble);
-	if (Job == priced) { !evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, Reward, BadJob); }
-	else {
-		?default::steps(TotalSteps);
-		?default::step(Step);
-		if ( Step + 50 < TotalSteps & Step + 50 < End ) { BadJob = "false" }
-		else { BadJob = "true" }
-	}
-	if (BadJob == "false") {
-		+job(Id, Storage, End, Items);
-		+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
-		!update_taskid(TaskIdA);
-	//	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
-		!!announce(assemble(Storage, Items),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
-		for ( .member(item(ItemId,Qty),ListToolsNew) ) {
-			!update_taskid(TaskId);
-	//		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
-			!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
-		}
-		for ( .member(item(ItemId,Qty),ListItems) ) {
-			!update_taskid(TaskId);
-	//		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
-			!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
-		}
-	}
-	else { 
-		.print("Job ",Id," failed evaluation, ignoring it.");
-		-cnp(Id);
-		.my_name(Me);
-		if (initiator::mission(Id, _, _, _, _, _)) { -initiator::mission(Id, _, _, _, _, _) }
-		if  ( not default::winner(_, _) | strategies::waiting ) {
-			!strategies::free; 
-		}
+	for ( .member(Agent,FreeTrucks) ) {
+		.send(Agent,tell,task(Task,CNPBoardName,TaskId));
 	}
 	.
-+!separate_tasks(Id, Storage, Items, End, Duration, Reward, type(Job))
+@sendfreeagents[atomic]
++!send_to_free_agents(FreeAgents,Task,CNPBoardName,TaskId)
 <-
-	.wait(500);
-	!separate_tasks(Id, Storage, Items, End, Duration, Reward, type(Job));
-	.
-
-@eval[atomic]
-+!evaluate_job(ListToolsNew, ListItems, Duration, Storage, NumberOfAssemble, Id, Reward, BadJob)
-	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & .length(ListToolsNew,NumberOfBuyTool) & .length(ListItems,NumberOfBuyItem) & default::steps(TotalSteps) & default::step(Step) & mapCenter(CLat,CLon)
-<-
-	if ( default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
-//		+estimate(JobId,Step,Estimate);
-		BadJob = "false";
+	for ( .member(Agent,FreeAgents) ) {
+		.send(Agent,tell,task(Task,CNPBoardName,TaskId));
 	}
-	else { BadJob = "true"; }
 	.
 	
 @selectBids[atomic]
@@ -295,7 +301,21 @@ task_id(0).
 <-
 	-+initiator::free_agents([Agent|FreeAgents]);
 	-+initiator::free_trucks([Agent|FreeTrucks]);
-	for (initiator::mission(Id, Storage, Items, End, Duration, Reward)) { !!separate_tasks(Id, Storage, Items, End, Duration, Reward, type(mission)); }
+	for (initiator::mission(Id, Storage, Items, End, Duration, Reward)) { 
+		?default::steps(TotalSteps);
+		?default::step(Step);
+		if ( Step + 50 < TotalSteps & Step + 50 < End ) { 
+			!decompose(Items,ListItems,ListToolsNew);
+			!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
+		}
+		else { 
+			.print("Mission ",Id," failed evaluation, ignoring it.");
+			-mission(Id, Storage, Items, End, End - Start, Reward);
+			if  ( not default::winner(_, _) | strategies::waiting ) {
+				!!strategies::free; 
+			}
+		}
+	}
 	.
 @addMeFree[atomic]
 +!add_myself_to_free

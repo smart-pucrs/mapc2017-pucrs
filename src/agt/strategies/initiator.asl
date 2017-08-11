@@ -310,7 +310,7 @@ task_id(0).
 		}
 		else { 
 			.print("Mission ",Id," failed evaluation, ignoring it.");
-			-mission(Id, Storage, Items, End, End - Start, Reward);
+			-mission(Id, Storage, Items, End, Duration, Reward);
 			if  ( not default::winner(_, _) | strategies::waiting ) {
 				!!strategies::free; 
 			}

@@ -91,5 +91,5 @@
 	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
 	org::focus(SchArtId)[wid(OrgId)];
 	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
-	org::commitMission(massemble);
+	org::commitMission(massemble)[artifact_id(SchArtId)];
 	.

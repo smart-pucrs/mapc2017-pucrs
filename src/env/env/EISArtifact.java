@@ -71,8 +71,10 @@ public class EISArtifact extends Artifact implements AgentListener {
             public void handleFreeEntity(String arg0, Collection<String> arg1) {}
         });
         
-        receiving = true;
-		execInternalOp("receiving");
+        if (ei != null) {
+	        receiving = true;
+			execInternalOp("receiving");
+        }
 	}
 	
 	public static Set<String> getRegisteredAgents(){
@@ -81,19 +83,23 @@ public class EISArtifact extends Artifact implements AgentListener {
 	
 	@OPERATION
 	void register(String entity)  {
+		String agent = getCurrentOpAgentId().getAgentName();
+		logger = Logger.getLogger(EISArtifact.class.getName()+"_"+agent);
+		logger.info("Registering " + agent + " to entity " + entity);
+		agents.add(agent);
 		try {
-			String agent = getCurrentOpAgentId().getAgentName();
-			agents.add(agent);
 			ei.registerAgent(agent);
-			ei.associateEntity(agent, entity);
-			ei.attachAgentListener(agent, this);
-			agentToEntity.put(agent, entity);
-			agentIds.put(agent, getCurrentOpAgentId());
-			logger = Logger.getLogger(EISArtifact.class.getName()+"_"+agent);
-			logger.info("Registering " + agent + " to entity " + entity);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		ei.attachAgentListener(agent, this);
+		try {
+			ei.associateEntity(agent, entity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		agentToEntity.put(agent, entity);
+		agentIds.put(agent, getCurrentOpAgentId());
 	}	
 
 	@OPERATION

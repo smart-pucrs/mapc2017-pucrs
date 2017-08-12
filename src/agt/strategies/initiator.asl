@@ -14,16 +14,22 @@ task_id(0).
 <- 
 	-countCenter(4);
 	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
+	!!wait_next_step;
 	.
 	
-+default::step(1)
-	: mapCenter(CLat,CLon) & new::storageList(SList) & actions.closest(truck,SList,CLat,CLon,ClosestStorage)
++!wait_next_step
 <-
+	.wait( {+default::step(S)} );
+	.wait( {+default::step(S+1)} );
+	?mapCenter(CLat,CLon);
+	?new::storageList(SList);
+	actions.closest(truck,SList,CLat,CLon,ClosestStorage);
 	+default::center_storage(ClosestStorage);
 	.broadcast(tell,center_storage(ClosestStorage));
+	+accept_jobs;
 	.
 
-+default::job(_, _, _, _, _, _) : default::step(0).
++default::job(_, _, _, _, _, _) : not accept_jobs.
 @job[atomic]
 +default::job(Id, Storage, Reward, Start, End, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
@@ -35,7 +41,7 @@ task_id(0).
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
-+default::mission(_, _, _, _, _, _, _, _, _) : default::step(0).
++default::mission(_, _, _, _, _, _, _, _, _) : not accept_jobs.
 @mission[atomic]
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2

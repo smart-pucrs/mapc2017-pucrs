@@ -1,6 +1,7 @@
 { include("$jacamoJar/templates/common-cartago.asl") }
 { include("$jacamoJar/templates/common-moise.asl") }
 { include("$jacamoJar/templates/org-obedient.asl", org) }
+{ include("action/actions.asl",action) }
 { include("common-rules.asl") }
 { include("strategies/round/new-round.asl") }
 { include("strategies/common-plans.asl", strategies) }
@@ -37,6 +38,14 @@
 	addRole(Me,Role);
 	.wait(1000);
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
+	!!action::skip;
+	.wait( {+default::step(S)} );
+	if ( default::hasItem(_,_) ) { !strategies::go_dump }
+	if ( Me == vehicle1 ) { !initiator::add_myself_to_free; }
+	else {
+		if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
+		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
+	}
 	!strategies::free;
     .
     

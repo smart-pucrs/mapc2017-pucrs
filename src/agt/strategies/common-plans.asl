@@ -1,16 +1,9 @@
-{ include("action/actions.asl",action) }
-
 +default::actionID(0).
 +default::actionID(X) 
 	: free
 <-
 	!action::skip;
 	.
-//+default::actionID(X) 
-//	: not free & not default::winner(_,_) & not initiator::cnp(_)
-//<-
-//	!free;
-//	.
 
 +!go_to_workshop(Storage)
 	: new::workshopList(WList)
@@ -68,7 +61,7 @@
 	if ( default::hasItem(_,_) ) {
 		?default::center_storage(CenterStorage);
 		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);
-		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_store; }
+		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_store_tools; }
 		else { !go_dump; }
 	}
 	!strategies::check_charge;
@@ -114,7 +107,7 @@
 	}
 	.
 	
-+!go_store
++!go_store_tools
 	: default::center_storage(Storage)
 <-
 	!action::goto(Storage);
@@ -144,7 +137,7 @@
 	}
 	if ( default::hasItem(_,_) ) { 
 		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);
-		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_store; }
+		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_store_tools; }
 		else { !go_dump; }
 	}
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
@@ -168,6 +161,7 @@
 	.drop_desire(strategies::deliver);
 	.drop_desire(strategies::go_to_storage);
 	!action::abort;
+//	if ( default::hasItem(_,_) ) { !go_store; }
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!free;

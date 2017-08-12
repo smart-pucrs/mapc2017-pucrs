@@ -130,7 +130,7 @@
 	.drop_desire(strategies::go_buy);
 	.drop_desire(strategies::go_to_workshop(_));
 	.abolish(org::_);
-	!action::abort;
+	if ( not default::routeLength(0) ) { !action::abort; }
 	if ( default::hasItem(_,_) ) {
 		.findall(Item,default::hasItem(Item,Qty) & .substring("item",Item), List);
 		if (not .empty(List)) { !go_dump_no_tools; }
@@ -153,14 +153,14 @@
 	: true
 <-
 	-default::winner(_, assemble(_, JobId))[source(_)];
-	removeScheme(JobId);
+	if ( org::goalState(JobId,job_delivered,_,_,waiting) ) { org::removeScheme(JobId); }
 	.drop_desire(org::_);
 	.abolish(org::_);
 	.drop_desire(strategies::go_deliver);
 	.drop_desire(strategies::go_to_workshop(_));
 	.drop_desire(strategies::deliver);
 	.drop_desire(strategies::go_to_storage);
-	!action::abort;
+	if ( not default::routeLength(0) ) { !action::abort; }
 //	if ( default::hasItem(_,_) ) { !go_store; }
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	.send(vehicle1,achieve,initiator::add_truck_to_free);

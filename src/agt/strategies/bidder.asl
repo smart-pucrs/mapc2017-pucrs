@@ -81,8 +81,8 @@
 	!strategies::not_free;
 	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
 	org::focus(SchArtId)[wid(OrgId)];
-	.print("I won the tasks ",TaskList);
-	org::commitMission(massist);
+	.print("I won the tasks(",JobId,") ",TaskList);
+	org::commitMission(massist)[artifact_id(SchArtId)];
 	.
 +default::winner(TaskList, assemble(Storage, JobId))
 	: default::joined(org,OrgId)

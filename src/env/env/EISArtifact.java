@@ -166,8 +166,15 @@ public class EISArtifact extends Artifact implements AgentListener {
 			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(old.getName()) && !old.getName().equals("job") && !old.getName().equals("mission") ) || step_obs_prop.contains(old.getName())) {
 				if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore
 					Literal literal = Translator.perceptToLiteral(old);
-					removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
-//						logger.info("removing old perception "+literal);
+					try{
+						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
+					}
+					catch (Exception e) {
+						logger.info("error removing old perception "+literal);
+						logger.info("P*** "+percepts);
+						logger.info("O*** "+previousPercepts);
+					}
+					//						logger.info("removing old perception "+literal);
 				}
 			}
 			else if (old.getName().equals("job") || old.getName().equals("mission")) {
@@ -180,15 +187,18 @@ public class EISArtifact extends Artifact implements AgentListener {
 		}
 		
 		// compute new perception
-		Literal step = null;
-		Literal lastActionResult = null;
-		Literal actionID = null;
+		Literal step 				= null;
+		Literal auction 			= null;
+		Literal lastActionResult 	= null;
+		Literal actionID 			= null;
 		for (Percept percept: percepts) {
 			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(percept.getName())) || step_obs_prop.contains(percept.getName()) ) {
 				if (!previousPercepts.contains(percept) || percept.getName().equals("lastAction") || percept.getName().equals("lastActionResult")) { // really new perception 
 					Literal literal = Translator.perceptToLiteral(percept);
 					if (percept.getName().equals("step")) {
 						step = literal;
+					} else if(percept.getName().equals("auction")){
+						auction = literal;
 					} else if (percept.getName().equals("simEnd")) {
 						defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
 						cleanObsProps(match_obs_prop);
@@ -223,6 +233,10 @@ public class EISArtifact extends Artifact implements AgentListener {
 			
 		if (step != null) {
 //			logger.info("adding "+step);
+			
+			if (auction != null) 
+				defineObsProperty(auction.getFunctor(), (Object[]) auction.getTermsArray());
+
 			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
 			for (Literal lit: percs) {
 				defineObsProperty(lit.getFunctor(), (Object[]) lit.getTermsArray());
@@ -290,6 +304,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"storage",
 		"workshop",
 //		"resourceNode",		
+		"auction",
 		"dump",
 		"lat",
 		"lon",

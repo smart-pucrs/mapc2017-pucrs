@@ -27,6 +27,19 @@
 	+vehicle_job(truck,2);
 	+noActionCount(0);
 	
+	+metrics::noAction(0);
+	+metrics::jobHaveWorked(0);
+	+metrics::jobCompletedMyPart(0);
+	
+	+metrics::money(0);
+	+metrics::completedJobs(0);
+	+metrics::failedJobs(0);
+	+metrics::completedAuctions(0);
+	+metrics::failedAuctions(0);
+	+metrics::completedMissions(0);
+	+metrics::failedMissions(0);
+	+metrics::finePaid(0);
+	
 	+default::separateItemTool([],[],[]);
 	+default::removeDuplicateTool([],[]);
 	

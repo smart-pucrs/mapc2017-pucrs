@@ -1,3 +1,5 @@
+{include("strategies/job/auction/evaluate-auction.asl",evaluation_auction)}
+
 task_id(0).
 
 @minLon[atomic]
@@ -34,35 +36,78 @@ task_id(0).
 +default::job(Id, Storage, Reward, Start, End, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
-	!strategies::not_free;
+	!strategies::reasoning;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
 	!!evaluate_job(Items, End - Start, Storage, Id, Reward);
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
+
++!wait_for_step(Step)
+	: default::step(CurrentStep) & (Step <= CurrentStep).
++!wait_for_step(Step)
+<-
+	.wait({+default::step(Step)});
+	.
+//@oldAuction[atomic]
+//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
+//	: evaluation_auction::bidding(Id,LastBid,_)
+//<-	
+//	if (Bid == LastBid){
+//		.print("I'm winning ",Id);
+////		!strategies::free;
+//	}
+//	else{
+//		.print("I'm losing ",Id);
+////		.wait({+step(Step)});	
+////		.wait({+default::step(Step)});	
+////		!strategies::not_free;
+//		!strategies::reasoning;
+//		!evaluation_auction::analyse_auction_job(Id);
+//	}
+//	.
+//@newAuction[atomic]
+//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
+////	: not evaluation_auction::bidding(_,_,_)
+//	: true
+//<-
+//	!wait_for_step(Start);
+//	.print("############################################################");
+////	!strategies::not_free;
+//	!strategies::reasoning;
+//	.print("New auction job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," has current bid of ",Bid," time for bids ",Time);
+//	.print("Items required: ",Items);
+//
+////	!lAuctionJob::analyse_auction_job(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items);
+////	!!separate_tasks(Id, Storage, Items, End, End - Start, Reward, type(auction));
+//	!!evaluate_job(Items, End - Start, Storage, Id, Reward);
+//	.
+//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id).
+
+
 +default::mission(_, _, _, _, _, _, _, _, _) : not accept_jobs.
 @mission[atomic]
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
-	!strategies::not_free;
+	!strategies::reasoning;
 	+mission(Id, Storage, Items, End, End - Start, Reward);
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
 	?default::steps(TotalSteps);
 	?default::step(Step);
-	if ( Step + 50 < TotalSteps & Step + 50 < End ) { 
-		
+	if ( Step + 50 < TotalSteps & Step + 50 < End ) {		
 		!decompose(Items,ListItems,ListToolsNew);
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
 	}
 	else { 
 		.print("Mission ",Id," failed evaluation, ignoring it.");
 		-mission(Id, Storage, Items, End, End - Start, Reward);
-		if  ( not default::winner(_, _) | strategies::waiting ) {
-			!!strategies::free; 
-		}
+//		if  ( not default::winner(_, _) | strategies::waiting ) {
+//			!!strategies::free; 
+//		}
+		!strategies::not_reasoning;
 	}
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, End - Start, Reward); .print("Ignoring mission ",Id," for now.").
@@ -98,9 +143,10 @@ task_id(0).
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
-		if  ( not default::winner(_, _) | strategies::waiting ) {
-			!!strategies::free; 
-		}
+//		if  ( not default::winner(_, _) | strategies::waiting ) {
+//			!!strategies::free; 
+//		}
+		!strategies::not_reasoning;
 	}
 	.
 
@@ -180,6 +226,7 @@ task_id(0).
 +bids(_,_,JobId)
 	: .count(initiator::bids(_,_,JobId),NumberOfBids) & number_of_tasks(NumberOfTasks,JobId) & NumberOfBids == NumberOfTasks & .my_name(Me)
 <-
+	.print("Received all bids ",JobId);
 	-number_of_tasks(NumberOfTasks,JobId);
 	for ( bids(assemble(StorageId,_),Bids,JobId) ) {
 		if ( not initiator::impossible_task(JobId) ) {
@@ -268,6 +315,9 @@ task_id(0).
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
 		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _) }
 		-cnp(JobId);
+		
+		.wait(50);
+		!evaluation_auction::analyse_auction_job(JobId);
 	}
 	else { 
 		-impossible_task(JobId);
@@ -278,10 +328,13 @@ task_id(0).
 		.abolish(initiator::awarded(_,_,_,JobId));
 		.print("Impossible job ",JobId,", aborting it.");
 	}
-	if ( not default::winner(_, _) | strategies::waiting ) {
-		!strategies::free;
-	}
-	else { !!action::skip; }
+//	if ( not default::winner(_, _) | strategies::waiting ) {
+//		!strategies::free;
+//	}
+//	else { !!action::skip; }
+
+	!strategies::not_reasoning;
+	.print("Task allocation is done ",JobId);
 	.
 +!create_scheme(JobId, st, SchArtId,OrgId) <- org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
 -!create_scheme(JobId, st, SchArtId,OrgId) 
@@ -293,6 +346,7 @@ task_id(0).
 	.abolish(initiator::bids(_,_,JobId));
 	.abolish(initiator::awarded(_,_,_,JobId));
 	.print("Bug with create scheme for ",JobId,", detected, aborting it.");
+	!strategies::not_reasoning;
 	.
 
 @addAgentFree[atomic]
@@ -317,9 +371,10 @@ task_id(0).
 		else { 
 			.print("Mission ",Id," failed evaluation, ignoring it.");
 			-mission(Id, Storage, Items, End, Duration, Reward);
-			if  ( not default::winner(_, _) | strategies::waiting ) {
-				!!strategies::free; 
-			}
+//			if  ( not default::winner(_, _) | strategies::waiting ) {
+//				!!strategies::free; 
+//			}
+			!strategies::not_reasoning;
 		}
 	}
 	.
@@ -352,5 +407,7 @@ task_id(0).
 // debugging
 +default::step(998)
 	: default::money(Money) & completed_jobs(Jobs)
-<-	.print("$$$$$$$$$$$$$$$$$$$$ Money $",Money);
+<-	
+	-+metrics::money(Money);
+	.print("$$$$$$$$$$$$$$$$$$$$ Money $",Money);
 	.print("$$$$$$$$$$$$$$$$$$$$ Completed ",Jobs," jobs!").

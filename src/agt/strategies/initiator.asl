@@ -87,8 +87,8 @@ task_id(0).
 	?default::steps(TotalSteps);
 	?default::step(Step);
 	if ( Step + 50 < TotalSteps & Step + 50 < End ) {		
-		!decompose(Items,ListItems,ListToolsNew);
-		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
+		!decompose(Items,ListItems,ListToolsNew,Id);
+		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
 		.print("Mission ",Id," failed evaluation, ignoring it.");
@@ -102,7 +102,7 @@ task_id(0).
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, End - Start, Reward); .print("Ignoring mission ",Id," for now.").
 	
-+!decompose(Items,ListItems,ListToolsNew)
++!decompose(Items,ListItems,ListToolsNew,Id)
 <-
 	?default::decomposeRequirements(Items,[],Bases);
 	+bases([],Id);
@@ -123,13 +123,12 @@ task_id(0).
 +!evaluate_job(Items, Duration, Storage, Id, Reward)
 	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & default::steps(TotalSteps) & default::step(Step) & mapCenter(CLat,CLon) & initiator::free_agents(FreeAgents) & default::get_roles(FreeAgents,[],Roles) & default::get_tools(Roles,[],AvailableTools)
 <-
-	!decompose(Items,ListItems,ListToolsNew);
+	!decompose(Items,ListItems,ListToolsNew,Id);
 	.length(ListToolsNew,NumberOfBuyTool);
 	.length(ListItems,NumberOfBuyItem);
 	.length(Items,NumberOfAssemble);
 	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
-		+estimate(JobId,Step,Estimate);
-		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
+		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
@@ -143,11 +142,11 @@ task_id(0).
 
 @addCNP[atomic]
 +!add_cnp(Id) <- +cnp(Id).
-+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End)
++!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
 <-
 	!add_cnp(Id);
-	+job(Id, Storage, End, Items);
+	+job(Id, Items);
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
 	!update_taskid(TaskIdA);
 //	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
@@ -163,10 +162,10 @@ task_id(0).
 		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	.
-+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End)
++!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
 <-
 	.wait(500);
-	!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
+	!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	.
 
 @upTaskId[atomic]
@@ -224,7 +223,7 @@ task_id(0).
 			-bids(assemble(StorageId,_),Bids,JobId);
 			?default::select_bid_assemble(Bids,bid(99999,99999),bid(Agent,Distance));
 			if (Distance \== 99999) {
-				?initiator::job(JobId, _, _, Items);
+				?initiator::job(JobId, Items);
 				+awarded_assemble(Agent,Items,StorageId,JobId);
 	//			.print("Awarding assemble to ",Agent);
 			}
@@ -313,7 +312,7 @@ task_id(0).
 	else { 
 		-impossible_task(JobId);
 		-cnp(JobId);
-		-job(JobId, _, _, _);
+		-job(JobId, _);
 		-awarded_assemble(_,_,_,JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_,JobId));
@@ -332,7 +331,7 @@ task_id(0).
 <-
 	-impossible_task(JobId);
 	-cnp(JobId);
-	-job(JobId, _, _, _);
+	-job(JobId, _);
 	-awarded_assemble(_,_,_,JobId);
 	.abolish(initiator::bids(_,_,JobId));
 	.abolish(initiator::awarded(_,_,_,JobId));
@@ -361,8 +360,8 @@ task_id(0).
 		?default::steps(TotalSteps);
 		?default::step(Step);
 		if ( Step + 50 < TotalSteps & Step + 50 < End ) { 
-			!decompose(Items,ListItems,ListToolsNew);
-			!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
+			!decompose(Items,ListItems,ListToolsNew,Id);
+			!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 		}
 		else { 
 			.print("Mission ",Id," failed evaluation, ignoring it.");
@@ -384,7 +383,7 @@ task_id(0).
 @jobFinished[atomic]	
 +!job_finished(JobId) 
 <- 
-	-initiator::job(JobId, _, _, _);
+	-initiator::job(JobId, _);
 		
 	?completed_jobs(Jobs);	// debugging
 	-+completed_jobs(Jobs+1);

@@ -140,24 +140,26 @@ task_id(0).
 	}
 	.
 
-@addCNP[atomic]
-+!add_cnp(Id) <- +cnp(Id).
+@sep_task[atomic]
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
 <-
-	!add_cnp(Id);
+	+cnp(Id);
 	+job(Id, Items);
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
-	!update_taskid(TaskIdA);
+	?task_id(TaskIdA);
+	-+task_id(TaskIdA+1);
 //	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
 	!!announce(assemble(Storage, Items),Deadline,NumberOfTrucks,Id,TaskIdA,FreeAgents,FreeTrucks);
 	for ( .member(item(ItemId,Qty),ListToolsNew) ) {
-		!update_taskid(TaskId);
+		?task_id(TaskId);
+		-+task_id(TaskId+1);
 //		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
 		!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	for ( .member(item(ItemId,Qty),ListItems) ) {
-		!update_taskid(TaskId);
+		?task_id(TaskId);
+		-+task_id(TaskId+1);
 //		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
 		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
@@ -166,14 +168,6 @@ task_id(0).
 <-
 	.wait(500);
 	!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
-	.
-
-@upTaskId[atomic]
-+!update_taskid(TaskId)
-	: task_id(TaskIdAux)
-<-
-	-+task_id(TaskIdAux+1);
-	TaskId = TaskIdAux;
 	.
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)

@@ -188,7 +188,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		
 		// compute new perception
 		Literal step 				= null;
-		Literal auction 			= null;
+//		Literal auction 			= null;
 		Literal lastActionResult 	= null;
 		Literal actionID 			= null;
 		for (Percept percept: percepts) {
@@ -197,8 +197,8 @@ public class EISArtifact extends Artifact implements AgentListener {
 					Literal literal = Translator.perceptToLiteral(percept);
 					if (percept.getName().equals("step")) {
 						step = literal;
-					} else if(percept.getName().equals("auction")){
-						auction = literal;
+//					} else if(percept.getName().equals("auction")){
+//						auction = literal;
 					} else if (percept.getName().equals("simEnd")) {
 						defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
 						cleanObsProps(match_obs_prop);
@@ -234,8 +234,8 @@ public class EISArtifact extends Artifact implements AgentListener {
 		if (step != null) {
 //			logger.info("adding "+step);
 			
-			if (auction != null) 
-				defineObsProperty(auction.getFunctor(), (Object[]) auction.getTermsArray());
+//			if (auction != null) 
+//				defineObsProperty(auction.getFunctor(), (Object[]) auction.getTermsArray());
 
 			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
 			for (Literal lit: percs) {
@@ -304,7 +304,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"storage",
 		"workshop",
 //		"resourceNode",		
-		"auction",
+//		"auction",
 		"dump",
 		"lat",
 		"lon",

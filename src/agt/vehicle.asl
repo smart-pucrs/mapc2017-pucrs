@@ -8,7 +8,7 @@
 { include("strategies/scheme-plans.asl", org) }
 { include("strategies/bidder.asl", bidder) }
 { include("strategies/round/end-round.asl") }
-{ include("strategies/job/auction/execute-auction.asl", execution_auction) }
+//{ include("strategies/job/auction/execute-auction.asl", execution_auction) }
 
 +!add_initiator
 <- 

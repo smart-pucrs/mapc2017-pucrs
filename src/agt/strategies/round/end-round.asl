@@ -4,6 +4,7 @@
 	: .my_name(Me)
 <-
 	.print("---------------- END OF THE ROUND ----------------");
+	!print_metrics;	
 	?default::focused(vehicleart,team_artifact,Id1);
 	.concat("eis_art_",Me,ArtMeS);
 	.term2string(ArtMe,ArtMeS);
@@ -39,6 +40,47 @@
 	!end_round;
 	!new::new_round;
 	.	
+
+@metrics[atomic]
++!print_metrics
+	: .my_name(vehicle1) 
+<-
+	.print("--- Some Metrics ---");
+	?metrics::money(Money);
+	.print("Total amount of money: ",Money); 
+	?metrics::completedJobs(JobsCompleted);
+	.print("Number of completed jobs: ",JobsCompleted); 
+	?metrics::failedJobs(JobsFailed);
+	.print("Number of failed jobs: ",JobsFailed); 	
+	?metrics::completedAuctions(AuctionsCompleted);
+	.print("Number of completed auctions: ",AuctionsCompleted); 
+	?metrics::failedAuctions(AuctionsFailed);
+	.print("Number of failed auctions: ",AuctionsFailed); 	
+	?metrics::completedMissions(MissionsCompleted);
+	.print("Number of completed missions: ",MissionsCompleted); 
+	?metrics::failedMissions(MissionsFailed);
+	.print("Number of failed missions: ",MissionsFailed); 
+	?metrics::finePaid(Fine);
+	.print("Fine paid: ",Fine); 
+	!print_common_metrics;
+	.print("--------------------");
+	.	
++!print_metrics
+<-
+	.print("--- Some Metrics ---");
+	!print_common_metrics;
+	.print("--------------------");
+	.
++!print_common_metrics
+<-
+	?metrics::noAction(NoActions); // Ok
+	.print("Number of no actions: ",NoActions);
+	?metrics::jobHaveWorked(Jobs);
+	.print("Jobs I have worked: ",Jobs);
+	?metrics::jobCompletedMyPart(JobsMyPart);
+	.print("Jobs I have completed my part: ",JobsMyPart);
+	.
+
 
 {end}
 

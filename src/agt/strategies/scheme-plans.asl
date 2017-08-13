@@ -103,5 +103,7 @@
 <-
 	-strategies::assembling;
 	-default::winner(_,_)[source(_)];
-	!!strategies::empty_load;
+//	!!strategies::empty_load;
+	!strategies::empty_load;
+	!strategies::free;
 	.

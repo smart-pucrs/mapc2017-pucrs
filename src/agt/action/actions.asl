@@ -1,10 +1,31 @@
 {begin namespace(localActions, local)}
+
+-strategies::reasoning
+<- 
+	!commitWattingAction;
+	.
+	
++!commitWattingAction
+	: ::actionWantToDo(Action) & (Action \== none)
+<-
+	.print("****** I want to perform action ",Action);
+	!commitAction(Action);
+	-+::actionWantToDo(none);
+	.
++!commitWattingAction.
+
++!commitAction(Action)
+	: strategies::reasoning
+<-
+//	.print("****** Storing action ",Action);
+	-+::actionWantToDo(Action);
+	.
 +!commitAction(Action)
 	: default::step(S) & not default::action(S)
 <-
 	+default::action(S);
 	action(Action);
-//	.print("Doing action ",Action, " at step ",S);
+	.print("Doing action ",Action, " at step ",S);
 	.wait({ +default::lastActionResult(Result) });
 	-default::action(S);
 	if (Action \== skip & Result == failed) {
@@ -247,12 +268,7 @@
 +!bid_for_job(JobId, Price)
 	: true
 <-
-	!localActions::commitAction(
-		bid_for_job(
-			job(JobId),
-			price(Price)
-		)
-	);
+	!localActions::commitAction(bid_for_job(JobId,Price));
 	.
 
 // Post job (option 1)

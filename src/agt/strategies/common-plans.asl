@@ -73,7 +73,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-	!!strategies::free;
+//	!!strategies::free;
 	.
 
 +!check_charge
@@ -171,17 +171,27 @@
 	.
 	
 @free[atomic]
-+!free : not free <- +free; !!action::skip; .
+//+!free : not free <- +free; !!action::skip; .
++!free : not free <- .print("free added");+free; !!action::skip;.
 +!free <- !!action::skip.
-
 @notFree[atomic]
-+!not_free <- -free.
+//+!not_free <- -free.
++!not_free <- .print("free removed");-free.
+
+@reasoning[atomic]
+//+!reasoning : not ::reasoning <- +::reasoning;.
++!reasoning : not ::reasoning <- .print("reasoning added");+::reasoning;.
++!reasoning.
+@notReasoning[atomic]
+//+!not_reasoning <- -::reasoning.
++!not_reasoning <- .print("reasoning removed");-::reasoning.
 
 +default::lastAction(Action)
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)
 <-
 	-+new::noActionCount(Count+1);
 	.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> I have done ",Count+1," noActions.");
+	-+metrics::noAction(Count+1);
 	.
 	
 +default::job_done(JobId, _, Reward, _, _, _)

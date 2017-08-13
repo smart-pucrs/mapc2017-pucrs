@@ -1,31 +1,38 @@
 {begin namespace(localActions, local)}
 
--strategies::reasoning
-<- 
-	!commitWattingAction;
-	.
-	
-+!commitWattingAction
-	: ::actionWantToDo(Action) & (Action \== none)
-<-
-	.print("****** I want to perform action ",Action);
-	!commitAction(Action);
-	-+::actionWantToDo(none);
-	.
-+!commitWattingAction.
-
-+!commitAction(Action)
-	: strategies::reasoning
-<-
-//	.print("****** Storing action ",Action);
-	-+::actionWantToDo(Action);
-	.
+//-strategies::reasoning
+//<- 
+//	!commitWaitingAction;
+//	.
+//	
+//+!commitWaitingAction
+//	: ::actionWantToDo(Action) & strategies::assembling & (Action \== skip) & (Action \== none)
+//<-
+////	.print("****** I want to perform action ",Action);
+//	!commitAction(Action);
+//	-+::actionWantToDo(none);
+//	.
+//+!commitWaitingAction
+//	: ::actionWantToDo(Action) & (Action \== none)
+//<-
+////	.print("****** I want to perform action ",Action);
+//	!commitAction(Action);
+//	-+::actionWantToDo(none);
+//	.	
+//+!commitWaitingAction.
+//
+//+!commitAction(Action)
+//	: strategies::reasoning
+//<-
+////	.print("****** Storing action ",Action);
+//	-+::actionWantToDo(Action);
+//	.
 +!commitAction(Action)
 	: default::step(S) & not default::action(S)
 <-
 	+default::action(S);
 	action(Action);
-	.print("Doing action ",Action, " at step ",S);
+//	.print("Doing action ",Action, " at step ",S);
 	.wait({ +default::lastActionResult(Result) });
 	-default::action(S);
 	if (Action \== skip & Result == failed) {

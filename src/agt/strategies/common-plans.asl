@@ -37,7 +37,7 @@
 	.send(vehicle1,achieve,initiator::job_finished(JobId)); 
 	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
-	!strategies::free;
+	!!strategies::free;
 	.
 	
 +!go_buy
@@ -73,7 +73,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-//	!!strategies::free;
+	!!strategies::free;
 	.
 
 +!check_charge
@@ -125,7 +125,7 @@
 	.
 	
 +!job_failed_assist
-	: default::role(Role, _, _, _, _) & .my_name(Me)
+	: default::role(Role, _, _, _, _) & .my_name(Me)  & new::storageList(SList)
 <-
 	-default::winner(_,_)[source(_)];
 	.abolish(strategies::_);
@@ -139,8 +139,9 @@
 		if (not .empty(List)) { !go_dump_no_tools; }
 	}
 	if ( default::hasItem(_,_) ) { 
-		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);
-		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_store_tools; }
+		actions.closest(Role,SList,Facility);
+		?default::storage(Facility, _, _, TotCap, UsedCap, _);
+		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_store_tools(Facility); }
 		else { !go_dump; }
 	}
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
@@ -150,7 +151,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-	!!free;
+	!!strategies::free;
 	.
 +!job_failed_assemble
 	: true
@@ -167,24 +168,24 @@
 //	if ( default::hasItem(_,_) ) { !go_store; }
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
-	!!free;
+	!!strategies::free;
 	.
 	
 @free[atomic]
-//+!free : not free <- +free; !!action::skip; .
-+!free : not free <- .print("free added");+free; !!action::skip;.
++!free : not free <- +free; !!action::skip; .
+//+!free : not free <- .print("free added");+free; !!action::skip;.
 +!free <- !!action::skip.
 @notFree[atomic]
-//+!not_free <- -free.
-+!not_free <- .print("free removed");-free.
++!not_free <- -free.
+//+!not_free <- .print("free removed");-free.
 
 @reasoning[atomic]
-//+!reasoning : not ::reasoning <- +::reasoning;.
-+!reasoning : not ::reasoning <- .print("reasoning added");+::reasoning;.
++!reasoning : not ::reasoning <- +::reasoning;.
+//+!reasoning : not ::reasoning <- .print("reasoning added");+::reasoning;.
 +!reasoning.
 @notReasoning[atomic]
-//+!not_reasoning <- -::reasoning.
-+!not_reasoning <- .print("reasoning removed");-::reasoning.
++!not_reasoning <- -::reasoning.
+//+!not_reasoning <- .print("reasoning removed");-::reasoning.
 
 +default::lastAction(Action)
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)

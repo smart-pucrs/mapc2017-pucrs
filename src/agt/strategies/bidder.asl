@@ -40,10 +40,9 @@
 	: default::role(Role, Speed, _, _, Tools) & new::shopList(SList)
 <-
 	if (.member(ItemId,Tools) ) {
-		?default::available_tools(AvailableT);
-		.term2string(ItemId,ToolS);
-		if (.member(ToolS,AvailableT)) {
-			?default::center_storage(Facility);
+		.findall(Storage,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .member(ToolS,AvailableT) & .term2string(Storage,StorageS),StorageList);
+		if ( StorageList \== [] ) {
+			actions.closest(Role,StorageList,Facility);
 			actions.route(Role,Speed,Facility,Route);
 		}
 		else {
@@ -55,7 +54,7 @@
 		for ( default::tools(_,T) ) {
 			if (Role == drone & .member(ItemId,T) & not multiple_roles) { +multiple_roles }
 		}
-		if (multiple_roles) { -multiple_roles; Bid = Route*10; }
+		if (multiple_roles) { -multiple_roles; Bid = Route*100; }
 		else { Bid = Route; }
 		Shop = Facility;
 	}

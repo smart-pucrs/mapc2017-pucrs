@@ -53,6 +53,13 @@
 	-+shopList([ShopId|List]);
 	.
 
+@storageListInit[atomic]
++default::storage(StorageId, Lat, Lon, TotCap, UsedCap, Items)
+	: .my_name(vehicle1) & storageList(List) & not .member(StorageId,List)
+<-
+	createAvailableList(StorageId);
+	-+storageList([StorageId|List]);
+	.
 @storageList[atomic]
 +default::storage(StorageId, Lat, Lon, TotCap, UsedCap, Items)
 	: storageList(List) & not .member(StorageId,List)

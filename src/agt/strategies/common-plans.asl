@@ -55,13 +55,13 @@
 +!go_buy.
 
 +!empty_load
-	: default::role(Role, _, _, _, _)
+	: default::role(Role, _, _, _, _) & new::storageList(SList)
 <- 
 	.abolish(org::_);
 	if ( default::hasItem(_,_) ) {
-		?default::center_storage(CenterStorage);
-		?default::storage(CenterStorage, _, _, TotCap, UsedCap, _);
-		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_store_tools; }
+		actions.closest(Role,SList,Facility);
+		?default::storage(Facility, _, _, TotCap, UsedCap, _);
+		if ( default::load(Load) & UsedCap + Load < TotCap ) { !go_store_tools(Facility); }
 		else { !go_dump; }
 	}
 	!strategies::check_charge;
@@ -107,15 +107,18 @@
 	}
 	.
 	
-+!go_store_tools
-	: default::center_storage(Storage)
++!go_store_tools(Storage)
+	: true
 <-
 	!action::goto(Storage);
 	?default::storage(Storage, _, _, TotCap, UsedCap, _);
 	if ( default::load(Load) & UsedCap + Load < TotCap ) {
 		for ( default::hasItem(ItemId,Qty) ) {
-			addAvailableTool(ItemId);
-			!action::store(ItemId,Qty);
+			?default::storage(StorageL, _, _, TotCapL, UsedCapL, _);
+			if ( default::load(LoadL) & UsedCapL + LoadL < TotCapL ) {
+				addAvailableItem(Storage,ItemId);
+				!action::store(ItemId,Qty);
+			}
 		}
 	}
 	else { !go_dump; }

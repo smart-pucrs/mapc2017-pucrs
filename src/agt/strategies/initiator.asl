@@ -14,19 +14,6 @@ task_id(0).
 <- 
 	-countCenter(4);
 	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
-	!!wait_next_step;
-	.
-	
-+!wait_next_step
-<-
-	.wait( {+default::step(S)} );
-	.wait( {+default::step(S+1)} );
-	?mapCenter(CLat,CLon);
-	?new::storageList(SList);
-	actions.closest(truck,SList,CLat,CLon,ClosestStorage);
-	+default::center_storage(ClosestStorage);
-	.broadcast(tell,center_storage(ClosestStorage));
-	+accept_jobs;
 	.
 
 +default::job(_, _, _, _, _, _) : not accept_jobs.
@@ -93,7 +80,7 @@ task_id(0).
 	.length(ListItems,NumberOfBuyItem);
 	.length(Items,NumberOfAssemble);
 	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
-//		+estimate(JobId,Step,Estimate);
+		+estimate(JobId,Step,Estimate);
 		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items, End);
 	}
 	else { 

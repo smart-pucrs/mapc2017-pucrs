@@ -32,11 +32,11 @@
 	: default::role(Role, _, _, _, _) & new::shopList(SList) & default::winner(TaskList, assist(Storage, _, _)) & .my_name(Me)
 <-
 	for ( .member(tool(ItemId),TaskList) ) {
-		?default::available_tools(AvailableT);
-		.term2string(ItemId,ToolS);
-		if (.member(ToolS,AvailableT)) {
-			removeAvailableTool(ItemId);
-			+strategies::retrieveList(ItemId,1);
+		.findall(StorageAdd,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .member(ToolS,AvailableT) & .term2string(StorageAdd,StorageS), StorageList);
+		if ( StorageList \== [] ) {
+			actions.closest(Role,StorageList,Facility);
+			removeAvailableItem(Facility,ItemId);
+			+strategies::retrieveList(ItemId,1,Facility);
 		}
 		else {
 			?default::find_shops(ItemId,SList,Shops);
@@ -77,11 +77,10 @@
 	}
 	-strategies::buy_list_id(_);
 	!strategies::go_buy;
-	if (strategies::retrieveList(_,_)) {
-		?default::center_storage(CenterStorage);
-		!action::goto(CenterStorage);
-		for ( strategies::retrieveList(ItemId,Qty) ) {
-			-strategies::retrieveList(ItemId,Qty);
+	if (strategies::retrieveList(_,_,Fac)) {
+		for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
+			!action::goto(Fac);
+			-strategies::retrieveList(ItemId,Qty,Fac);
 			!action::retrieve(ItemId,Qty);
 		}
 	}

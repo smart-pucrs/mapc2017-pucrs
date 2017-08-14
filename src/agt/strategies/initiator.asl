@@ -24,7 +24,8 @@ task_id(0).
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
 //	!strategies::reasoning;
-	!strategies::not_free;
+//	!strategies::not_free;
+	+strategies::hold_action;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
 	!!evaluate_job(Items, End - Start, Storage, Id, Reward);
@@ -80,23 +81,24 @@ task_id(0).
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
 //	!strategies::reasoning;
-	!strategies::not_free;
+//	!strategies::not_free;
 	+mission(Id, Storage, Items, End, End - Start, Reward);
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
 	?default::steps(TotalSteps);
 	?default::step(Step);
-	if ( Step + 50 < TotalSteps & Step + 50 < End ) {		
+	if ( Step + 50 < TotalSteps & Step + 50 < End ) {
+		+strategies::hold_action;	
 		!decompose(Items,ListItems,ListToolsNew,Id);
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
 		.print("Mission ",Id," failed evaluation, ignoring it.");
 		-mission(Id, Storage, Items, End, End - Start, Reward);
-		if  ( not default::winner(_, _) | strategies::waiting ) {
-			!!strategies::free; 
-		}
-
+//		if  ( not default::winner(_, _) | strategies::waiting ) {
+//			!!strategies::free; 
+//		}
+		-strategies::hold_action;
 //		!strategies::not_reasoning;
 	}
 	.
@@ -132,10 +134,10 @@ task_id(0).
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
-		if  ( not default::winner(_, _) | strategies::waiting ) {
-			!!strategies::free; 
-		}
-		
+//		if  ( not default::winner(_, _) | strategies::waiting ) {
+//			!!strategies::free; 
+//		}
+		-strategies::hold_action;
 //		!strategies::not_reasoning;
 	}
 	.
@@ -312,11 +314,11 @@ task_id(0).
 		.abolish(initiator::awarded(_,_,_,JobId));
 		.print("Impossible job ",JobId,", aborting it.");
 	}
-	if ( not default::winner(_, _) | strategies::waiting ) {
-		!!strategies::free;
-	}
-	else { !!action::skip; }
-
+//	if ( not default::winner(_, _) | strategies::waiting ) {
+//		!!strategies::free;
+//	}
+//	else { !!action::skip; }
+	-strategies::hold_action;
 //	!strategies::not_reasoning;
 //	.print("Task allocation is done ",JobId);
 	.
@@ -330,11 +332,11 @@ task_id(0).
 	.abolish(initiator::bids(_,_,JobId));
 	.abolish(initiator::awarded(_,_,_,JobId));
 	.print("Bug with create scheme for ",JobId,", detected, aborting it.");
-	if ( not default::winner(_, _) | strategies::waiting ) {
-		!!strategies::free;
-	}
-	else { !!action::skip; }
-	
+//	if ( not default::winner(_, _) | strategies::waiting ) {
+//		!!strategies::free;
+//	}
+//	else { !!action::skip; }
+	-strategies::hold_action;
 //	!strategies::not_reasoning;
 	.
 
@@ -350,19 +352,21 @@ task_id(0).
 <-
 	-+initiator::free_agents([Agent|FreeAgents]);
 	-+initiator::free_trucks([Agent|FreeTrucks]);
-	for (initiator::mission(Id, Storage, Items, End, Duration, Reward)) { 
+	for (initiator::mission(Id, Storage, Items, End, Duration, Reward)) {
 		?default::steps(TotalSteps);
 		?default::step(Step);
-		if ( Step + 50 < TotalSteps & Step + 50 < End ) { 
+		if ( Step + 50 < TotalSteps & Step + 50 < End ) {
+			+strategies::hold_action;
 			!decompose(Items,ListItems,ListToolsNew,Id);
 			!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 		}
 		else { 
 			.print("Mission ",Id," failed evaluation, ignoring it.");
 			-mission(Id, Storage, Items, End, Duration, Reward);
-			if  ( not default::winner(_, _) | strategies::waiting ) {
-				!!strategies::free; 
-			}
+//			if  ( not default::winner(_, _) | strategies::waiting ) {
+//				!!strategies::free; 
+//			}
+			-strategies::hold_action;
 //			!strategies::not_reasoning;
 		}
 	}

@@ -6,13 +6,6 @@
 //	.
 //	
 //+!commitWaitingAction
-//	: ::actionWantToDo(Action) & strategies::assembling & (Action \== skip) & (Action \== none)
-//<-
-////	.print("****** I want to perform action ",Action);
-//	!commitAction(Action);
-//	-+::actionWantToDo(none);
-//	.
-//+!commitWaitingAction
 //	: ::actionWantToDo(Action) & (Action \== none)
 //<-
 ////	.print("****** I want to perform action ",Action);
@@ -28,7 +21,7 @@
 //	-+::actionWantToDo(Action);
 //	.
 +!commitAction(Action)
-	: default::step(S) & not default::action(S)
+	: default::step(S) & not default::action(S) & not strategies::hold_action
 <-
 	+default::action(S);
 	action(Action);
@@ -39,6 +32,14 @@
 //		.print("Failed to execute action ",Action," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
+	.
++!commitAction(Action) 
+	: strategies::hold_action 
+<- 
+//	.print("Holding action ",Action);
+	.wait(500);
+//	.print("Trying action ",Action," again now.");
+	!commitAction(Action);
 	.
 -!commitAction(Action) : Action == skip.
 -!commitAction(Action) <- !commitAction(Action).

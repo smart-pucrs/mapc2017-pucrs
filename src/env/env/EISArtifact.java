@@ -129,7 +129,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		Collection<Percept> previousPercepts = new ArrayList<Percept>();
 		
 		//		await_time(1000);
-		while(!ei.isEntityConnected(agent))
+		while(!ei.isEntityConnected(agentToEntity.get(agent)))
 			await_time(100);
 		
 		while (receiving) {

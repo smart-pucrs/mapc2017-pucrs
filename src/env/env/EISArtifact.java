@@ -43,17 +43,18 @@ public class EISArtifact extends Artifact implements AgentListener {
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
 
-	private EnvironmentInterfaceStandard ei;
+	private EnvironmentInterfaceStandard ei = null;
 	private boolean receiving;
 	private int lastStep = -1;
 	private int round = 0;
 	private String maps[] = new String[] { "paris", "london", "hannover" };
 	public EISArtifact() {
+		super();
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
 		MapHelper.getInstance().init("paris", 200, 5);
 	}
-
+	
 	protected void init(String config) throws IOException, InterruptedException {
 		
 		ei = new EnvironmentInterface(config);
@@ -71,10 +72,6 @@ public class EISArtifact extends Artifact implements AgentListener {
             public void handleFreeEntity(String arg0, Collection<String> arg1) {}
         });
         
-        if (ei != null) {
-	        receiving = true;
-			execInternalOp("receiving");
-        }
 	}
 	
 	public static Set<String> getRegisteredAgents(){
@@ -100,15 +97,19 @@ public class EISArtifact extends Artifact implements AgentListener {
 		}
 		agentToEntity.put(agent, entity);
 		agentIds.put(agent, getCurrentOpAgentId());
-	}	
-
+        if (ei != null) {
+	        receiving = true;
+			execInternalOp("receiving", agent);
+        }
+	}
+	
 	@OPERATION
 	void action(String action) throws NoValueException {
 		Literal literal = Literal.parseLiteral(action);
 		try {
 			String agent = getCurrentOpAgentId().getAgentName();
 			Action a = Translator.literalToAction(literal);
-			ei.performAction(agent, a, agentToEntity.get(agent));
+			ei.performAction(agent, a);
 		} catch (ActException e) {
 			e.printStackTrace();
 		}
@@ -123,27 +124,29 @@ public class EISArtifact extends Artifact implements AgentListener {
 	}
 	
 	@INTERNAL_OPERATION
-	void receiving() throws JasonException {
+	void receiving(String agent) throws JasonException {
 		lastStep = -1;
 		Collection<Percept> previousPercepts = new ArrayList<Percept>();
-		
+		await_time(1000);
 		while (receiving) {
 			await_time(100);
-			for (String agent: agentIds.keySet()) {
+			if (ei != null) {
 				try {
-					Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
-//					logger.info("***"+percepts);
-					if (percepts.isEmpty())
-						break;
-//					if (agent.equals("vehicle1")) { logger.info("***"+percepts); }
-					int currentStep = getCurrentStep(percepts);
-					if (lastStep != currentStep) { // only updates if it is a new step
-						lastStep = currentStep;
-						filterLocations(agent, percepts);
-						//logger.info("Agent "+agent);
-						updatePerception(agent, previousPercepts, percepts);
-						previousPercepts = percepts;
-					}
+//					if (ei.getAllPercepts(agent).get(agentToEntity.get(agent))) {
+						Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
+						if (!percepts.isEmpty()) {
+	//						logger.info("***"+percepts);
+		//					if (agent.equals("vehicle1")) { logger.info("***"+percepts); }
+							int currentStep = getCurrentStep(percepts);
+							if (lastStep != currentStep) { // only updates if it is a new step
+								lastStep = currentStep;
+								filterLocations(agent, percepts);
+								//logger.info("Agent "+agent);
+								updatePerception(agent, previousPercepts, percepts);
+								previousPercepts = percepts;
+							}
+						}
+//					}
 				} catch (PerceiveException | NoEnvironmentException e) {
 					e.printStackTrace();
 				}
@@ -253,7 +256,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 			defineObsProperty(actionID.getFunctor(), (Object[]) actionID.getTermsArray());
 			if (!jobDone.isEmpty()) {
 				for (Literal lit: jobDone) {
-					await_time(100);
+					await_time(500);
 					signal("job_done",(Object[]) lit.getTermsArray());
 				}
 				jobDone.clear();

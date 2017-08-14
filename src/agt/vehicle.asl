@@ -21,8 +21,9 @@
 	!new::new_round;
     .print("Registering...");
     register(E);
+    .send(vehicle1,tell,registered(Me));
 	.
-	
+
 +default::name(ServerMe)
 	: .my_name(Me)
 <-

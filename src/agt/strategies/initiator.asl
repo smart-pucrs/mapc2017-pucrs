@@ -320,7 +320,7 @@ task_id(0).
 //	!strategies::not_reasoning;
 //	.print("Task allocation is done ",JobId);
 	.
-+!create_scheme(JobId, st, SchArtId,OrgId) <- org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
++!create_scheme(JobId, st, SchArtId,OrgId) <- .print("Creating scheme for ",JobId); org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
 -!create_scheme(JobId, st, SchArtId,OrgId) 
 <-
 	-impossible_task(JobId);

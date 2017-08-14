@@ -2,11 +2,11 @@
   "scenario": "city2017",
   "host": "localhost",
   "port": 12300,
-  "scheduling": true,
+  "scheduling": false,
   "timeout": 40000,
   "times": false,
   "notifications": false,
-  "queued": true,
+  "queued": false,
   "entities": [
     {"name": "connectionA13", "username": "agentA13", "password": "1", "iilang": false, "xml": false}
   ]

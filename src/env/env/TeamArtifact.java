@@ -1,6 +1,7 @@
 package env;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -29,16 +30,19 @@ public class TeamArtifact extends Artifact {
 		this.defineObsProperty("available_items", storage, itemsAux);
 	}
 	
-	@OPERATION void addAvailableItem(String storage, String tool){
-		availableItems.get(storage).add(tool);
+	@OPERATION void addAvailableItem(String storage, String item){
+		availableItems.get(storage).add(item);
 		String[] itemsAux = availableItems.get(storage).toArray(new String[availableItems.get(storage).size()]);
-		this.updateObsProperty("available_items", storage, itemsAux);
+//		logger.info("@@@@@@@@@ Adding available item "+item+" to storage "+storage+". Result = "+Arrays.toString(itemsAux)+". Size = "+availableItems.get(storage).size());
+		this.removeObsPropertyByTemplate("available_items", storage, null);
+		this.defineObsProperty("available_items", storage, itemsAux);
 	}
 	
-	@OPERATION void removeAvailableItem(String storage, String tool){
-		availableItems.get(storage).remove(tool);
+	@OPERATION void removeAvailableItem(String storage, String item){
+		availableItems.get(storage).remove(item);
 		String[] itemsAux = availableItems.get(storage).toArray(new String[availableItems.get(storage).size()]);
-		this.updateObsProperty("available_items", storage, itemsAux);
+		this.removeObsPropertyByTemplate("available_items", storage, null);
+		this.defineObsProperty("available_items", storage, itemsAux);
 	}
 	
 	@OPERATION void addServerName(String agent, String agentServer){

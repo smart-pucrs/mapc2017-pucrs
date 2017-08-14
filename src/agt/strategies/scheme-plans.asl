@@ -106,3 +106,4 @@
 //	!!strategies::empty_load;
 	!!strategies::empty_load;
 	.
++!stop_assist_assemble <- .print("!!!!!!!!!!!!! Received stop assist from scheme but did not have the winner belief anymore.").

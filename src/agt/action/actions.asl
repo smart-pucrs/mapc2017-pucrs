@@ -41,8 +41,8 @@
 //	.print("Trying action ",Action," again now.");
 	!commitAction(Action);
 	.
--!commitAction(Action) : Action == skip.
--!commitAction(Action) <- !commitAction(Action).
++!commitAction(Action) : Action == skip.
++!commitAction(Action) <- !commitAction(Action).
 {end}
 
 // Goto (option 1)

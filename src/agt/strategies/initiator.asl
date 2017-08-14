@@ -32,7 +32,6 @@ task_id(0).
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
-
 //+!wait_for_step(Step)
 //	: default::step(CurrentStep) & (Step <= CurrentStep).
 //+!wait_for_step(Step)
@@ -98,7 +97,6 @@ task_id(0).
 //		if  ( not default::winner(_, _) | strategies::waiting ) {
 //			!!strategies::free; 
 //		}
-		-strategies::hold_action;
 //		!strategies::not_reasoning;
 	}
 	.
@@ -366,7 +364,6 @@ task_id(0).
 //			if  ( not default::winner(_, _) | strategies::waiting ) {
 //				!!strategies::free; 
 //			}
-			-strategies::hold_action;
 //			!strategies::not_reasoning;
 		}
 	}

@@ -86,8 +86,11 @@
 	}
 	!strategies::go_to_workshop(Storage);
 	if (Me == vehicle1) { +strategies::waiting; }
-	!!strategies::free;
+	!!check_state;
 	.
+	
++!check_state : not goalState(JobId,phase1,_,_,satisfied) <- !!strategies::free.
++!check_state.
 	
 +!assist_assemble
 	: default::winner(_, assist(_, Assembler, _)) & .my_name(Me)

@@ -165,11 +165,12 @@
 +!not_reasoning <- -::reasoning.
 //+!not_reasoning <- .print("reasoning removed");-::reasoning.
 
+@noAction[atomic]
 +default::lastAction(Action)
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)
 <-
 	-+new::noActionCount(Count+1);
-	.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> I have done ",Count+1," noActions.");
+	.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Step ",S," I have done ",Count+1," noActions.");
 	-+metrics::noAction(Count+1);
 	.
 	

@@ -40,6 +40,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private List<Literal> percs = new ArrayList<Literal>();
 	private List<Literal> signalList = new ArrayList<Literal>();
 	private List<Literal> jobDone = new ArrayList<Literal>();
+	private long startTime;
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
 
@@ -110,6 +111,9 @@ public class EISArtifact extends Artifact implements AgentListener {
 			String agent = getCurrentOpAgentId().getAgentName();
 			Action a = Translator.literalToAction(literal);
 			ei.performAction(agent, a);
+			long endTime = System.nanoTime();
+			long duration = (endTime - startTime) / 1000000;
+			logger.info("Executed action "+a+" step "+lastStep+". Time from percept: "+duration);
 		} catch (ActException e) {
 			e.printStackTrace();
 		}
@@ -139,6 +143,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //					if (ei.getAllPercepts(agent).get(agentToEntity.get(agent))) {
 						Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
 						if (!percepts.isEmpty()) {
+							startTime = System.nanoTime();
 	//						logger.info("***"+percepts);
 		//					if (agent.equals("vehicle1")) { logger.info("***"+percepts); }
 							int currentStep = getCurrentStep(percepts);

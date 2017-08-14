@@ -25,7 +25,7 @@
 <-
 	+default::action(S);
 	action(Action);
-//	.print("Doing action ",Action, " at step ",S);
+	.print("Doing action ",Action, " at step ",S);
 	.wait({ +default::lastActionResult(Result) });
 	-default::action(S);
 	if (Action \== skip & Result == failed) {

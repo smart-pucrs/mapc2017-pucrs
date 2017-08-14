@@ -43,7 +43,8 @@ public class EISArtifact extends Artifact implements AgentListener {
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
 
-	private EnvironmentInterfaceStandard ei = null;
+//	private EnvironmentInterfaceStandard ei = null;
+	private EnvironmentInterface ei = null;
 	private boolean receiving;
 	private int lastStep = -1;
 	private int round = 0;
@@ -126,7 +127,11 @@ public class EISArtifact extends Artifact implements AgentListener {
 	void receiving(String agent) throws JasonException {
 		lastStep = -1;
 		Collection<Percept> previousPercepts = new ArrayList<Percept>();
-		await_time(1000);
+		
+		//		await_time(1000);
+		while(!ei.isEntityConnected(agent))
+			await_time(100);
+		
 		while (receiving) {
 			await_time(100);
 			if (ei != null) {

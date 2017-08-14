@@ -49,7 +49,6 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private int round = 0;
 	private String maps[] = new String[] { "paris", "london", "hannover" };
 	public EISArtifact() {
-		super();
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
 		MapHelper.getInstance().init("paris", 200, 5);

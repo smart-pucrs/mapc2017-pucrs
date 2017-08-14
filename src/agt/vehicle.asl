@@ -43,7 +43,7 @@
 	.wait( {+default::step(S)} );
 	!!action::skip;
 	.wait( {+default::step(S+1)} );
-	if ( default::hasItem(_,_) ) { !strategies::go_store }
+	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
 	if ( Me == vehicle1 ) { !initiator::add_myself_to_free; +initiator::accept_jobs; }
 	else {

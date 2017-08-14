@@ -28,7 +28,7 @@ task_id(0).
 	+strategies::hold_action;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
-	!!evaluate_job(Items, End - Start, Storage, Id, Reward);
+	!!evaluate_job(Items, End, Storage, Id, Reward);
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
@@ -82,7 +82,7 @@ task_id(0).
 <- 
 //	!strategies::reasoning;
 //	!strategies::not_free;
-	+mission(Id, Storage, Items, End, End - Start, Reward);
+	+mission(Id, Storage, Items, End, Reward);
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
 	?default::steps(TotalSteps);
@@ -94,7 +94,7 @@ task_id(0).
 	}
 	else { 
 		.print("Mission ",Id," failed evaluation, ignoring it.");
-		-mission(Id, Storage, Items, End, End - Start, Reward);
+		-mission(Id, Storage, Items, End, Reward);
 //		if  ( not default::winner(_, _) | strategies::waiting ) {
 //			!!strategies::free; 
 //		}
@@ -102,7 +102,7 @@ task_id(0).
 //		!strategies::not_reasoning;
 	}
 	.
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, End - Start, Reward); .print("Ignoring mission ",Id," for now.").
++default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward); .print("Ignoring mission ",Id," for now.").
 	
 +!decompose(Items,ListItems,ListToolsNew,Id)
 <-
@@ -122,14 +122,14 @@ task_id(0).
 	else { ListToolsNew = []; ListItems = B; }
 	.
 
-+!evaluate_job(Items, Duration, Storage, Id, Reward)
++!evaluate_job(Items, End, Storage, Id, Reward)
 	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & default::steps(TotalSteps) & default::step(Step) & mapCenter(CLat,CLon) & initiator::free_agents(FreeAgents) & default::get_roles(FreeAgents,[],Roles) & default::get_tools(Roles,[],AvailableTools)
 <-
 	!decompose(Items,ListItems,ListToolsNew,Id);
 	.length(ListToolsNew,NumberOfBuyTool);
 	.length(ListItems,NumberOfBuyItem);
 	.length(Items,NumberOfAssemble);
-	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate," < ",Duration) & Estimate < Duration & Step + Estimate < TotalSteps ) {
+	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
 		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
@@ -299,7 +299,7 @@ task_id(0).
 			-awarded(Agent,Shop,List,JobId);	
 		}
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
-		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _) }
+		if (initiator::mission(JobId, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _) }
 		-cnp(JobId);
 		
 //		.wait(50);
@@ -352,7 +352,7 @@ task_id(0).
 <-
 	-+initiator::free_agents([Agent|FreeAgents]);
 	-+initiator::free_trucks([Agent|FreeTrucks]);
-	for (initiator::mission(Id, Storage, Items, End, Duration, Reward)) {
+	for (initiator::mission(Id, Storage, Items, End, Reward)) {
 		?default::steps(TotalSteps);
 		?default::step(Step);
 		if ( Step + 50 < TotalSteps & Step + 50 < End ) {
@@ -362,7 +362,7 @@ task_id(0).
 		}
 		else { 
 			.print("Mission ",Id," failed evaluation, ignoring it.");
-			-mission(Id, Storage, Items, End, Duration, Reward);
+			-mission(Id, Storage, Items, End, Reward);
 //			if  ( not default::winner(_, _) | strategies::waiting ) {
 //				!!strategies::free; 
 //			}
@@ -392,10 +392,10 @@ task_id(0).
 	.
 	
 +default::step(End)
-	: mission(Id, _, _, End, _, _)
+	: mission(Id, _, _, End, _)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline."); 
-	-initiator::mission(Id, _, _, End, _, _); 
+	-initiator::mission(Id, _, _, End, _); 
 	.
 // debugging
 +default::step(998)

@@ -1,6 +1,6 @@
 +default::actionID(0).
 +default::actionID(X) 
-	: free
+	: free & not strategies::hold_action(Action)
 <-
 	!action::skip;
 	.

@@ -47,7 +47,7 @@
 <-
 	.print("--- Some Metrics ---");
 	?metrics::money(Money);
-	.print("Total amount of money: ",Money); 
+	.print("Total amount of money: ",Money); // Ok
 	?metrics::completedJobs(JobsCompleted);
 	.print("Number of completed jobs: ",JobsCompleted); 
 	?metrics::failedJobs(JobsFailed);

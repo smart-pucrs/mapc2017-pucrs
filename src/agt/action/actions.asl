@@ -32,6 +32,12 @@
 //		.print("Failed to execute action ",Action," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
+	else {
+		if (strategies::hold_action(Action2)) {
+			-strategies::hold_action(Action2);
+			.print("Removing held action ",Action2);
+		}
+	}
 	.
 +!commitAction(Action) 
 	: strategies::hold_action 
@@ -42,7 +48,7 @@
 	!commitAction(Action);
 	.
 +!commitAction(Action) : Action == skip.
-+!commitAction(Action) <- !commitAction(Action).
++!commitAction(Action) : Action \== skip <- .print("Holding action ",Action); +strategies::hold_action(Action); .wait( {-strategies::hold_action(Action) }); !commitAction(Action);.
 {end}
 
 // Goto (option 1)
@@ -71,6 +77,7 @@
 +!goto(FacilityId)
 	: true
 <-	
+	.print("GOTO2");
 	!localActions::commitAction(goto(FacilityId));
 	!goto(FacilityId);
 	.

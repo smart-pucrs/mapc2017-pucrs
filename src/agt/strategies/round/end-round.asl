@@ -75,6 +75,8 @@
 <-
 	?metrics::noAction(NoActions); // Ok
 	.print("Number of no actions: ",NoActions);
+	?metrics::held_actions(HeldActions); // Ok
+	.print("Number of held actions: ",HeldActions);
 	?metrics::jobHaveWorked(Jobs);
 	.print("Jobs I have worked: ",Jobs);
 	?metrics::jobCompletedMyPart(JobsMyPart);

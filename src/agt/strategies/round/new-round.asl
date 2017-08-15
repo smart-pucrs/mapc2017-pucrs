@@ -7,6 +7,15 @@
 	+initiator::countCenter(0);
 	+initiator::free_agents([]);
 	+initiator::free_trucks([]);
+	
+	+metrics::money(0);
+	+metrics::completedJobs(0);
+	+metrics::failedJobs(0);
+	+metrics::completedAuctions(0);
+	+metrics::failedAuctions(0);
+	+metrics::completedMissions(0);
+	+metrics::failedMissions(0);
+	+metrics::finePaid(0);
 	. 
 +!add_initiator_beliefs.
 
@@ -30,15 +39,7 @@
 	+metrics::noAction(0);
 	+metrics::jobHaveWorked(0);
 	+metrics::jobCompletedMyPart(0);
-	
-	+metrics::money(0);
-	+metrics::completedJobs(0);
-	+metrics::failedJobs(0);
-	+metrics::completedAuctions(0);
-	+metrics::failedAuctions(0);
-	+metrics::completedMissions(0);
-	+metrics::failedMissions(0);
-	+metrics::finePaid(0);
+	+metrics::held_actions(0);
 	
 	+default::separateItemTool([],[],[]);
 	+default::removeDuplicateTool([],[]);

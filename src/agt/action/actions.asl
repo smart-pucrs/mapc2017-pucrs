@@ -48,7 +48,7 @@
 	!commitAction(Action);
 	.
 +!commitAction(Action) : Action == skip.
-+!commitAction(Action) : Action \== skip <- .print("Holding action ",Action); +strategies::hold_action(Action); .wait( {-strategies::hold_action(Action) }); !commitAction(Action);.
++!commitAction(Action) : Action \== skip & metrics::held_actions(C) <- +strategies::hold_action(Action); -+metrics::held_actions(C+1); .print("Holding action ",Action); .wait( {-strategies::hold_action(Action) }); !commitAction(Action);.
 {end}
 
 // Goto (option 1)
@@ -77,7 +77,6 @@
 +!goto(FacilityId)
 	: true
 <-	
-	.print("GOTO2");
 	!localActions::commitAction(goto(FacilityId));
 	!goto(FacilityId);
 	.

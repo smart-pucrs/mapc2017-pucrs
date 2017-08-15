@@ -2,6 +2,11 @@ find_shops(ItemId,[],[]).
 find_shops(ItemId,[ShopId|List],[ShopId|Result]) :- shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,_,_,_,_),ListItems) & find_shops(ItemId,List,Result).
 find_shops(ItemId,[ShopId|List],Result) :- shop(ShopId, _, _, _, ListItems) & not .member(item(ItemId,_,_,_,_,_),ListItems) & find_shops(ItemId,List,Result).
 
+find_shop_qty(item(ItemId, Qty),[],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop) :- Buy = Aux & Shop = AuxShop & RouteShop = AuxRoute.
+find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop) :- shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,Qty2,_,_,_),ListItems) & Qty / Qty2 < Aux & default::role(Role, Speed, _, _, _) & actions.route(Role,Speed,ShopId,Route) & find_shop_qty(item(ItemId, Qty),List,Buy,Qty/Qty2,RouteShop,Route,ShopId,Shop).
+find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop) :- shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,Qty2,_,_,_),ListItems) & Qty / Qty2 == Aux & default::role(Role, Speed, _, _, _)  & actions.route(Role,Speed,ShopId,Route) & Route < AuxRoute & find_shop_qty(item(ItemId, Qty),List,Buy,Qty/Qty2,RouteShop,Route,ShopId,Shop).
+find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop) :- find_shop_qty(item(ItemId, Qty),List,Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop).
+
 closest_facility(List, Facility) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility).
 closest_facility(List, Facility1, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility1, Facility2).
 closest_facility(List, Lat, Lon, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Lat, Lon, Facility2).
@@ -82,7 +87,7 @@ check_buy_list([item(ItemId,Qty)|Items],Result) :- actions.getItemQty(ItemId,Qty
 
 check_multiple_buy([],AddSteps) :- AddSteps = 0.
 check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty <= Qty2 & check_multiple_buy(Items,AddSteps).
-check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty > Qty2 & AddSteps = Qty2+50.
+check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty > Qty2 & AddSteps = Qty2.
 
 check_price([],[],Aux,Result) :- Result = Aux.
 check_price([],[item(ItemId,Qty)|Items],Aux,Result) :- actions.getItemPrice(ItemId,Price) & check_price([],Items,Aux+Price*Qty,Result).

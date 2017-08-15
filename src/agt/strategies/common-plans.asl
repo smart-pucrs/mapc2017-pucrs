@@ -1,9 +1,9 @@
-+default::actionID(0).
-+default::actionID(X) 
-	: free & not strategies::hold_action(Action)
-<-
-	!action::skip;
-	.
+//+default::actionID(0).
+//+default::actionID(X) 
+//	: free & not strategies::hold_action(Action)
+//<-
+//	!action::recharge_is_new_skip;
+//	.
 
 +!go_to_workshop(Storage)
 	: new::workshopList(WList)
@@ -28,14 +28,15 @@
 +!deliver
 	: default::winner(_, assemble(_, JobId))
 <-
+	
 	!action::deliver_job(JobId);
-	?default::lastActionResult(Result);
-	if ( not default::lastActionResult(failed_job_status) ) {
-		+strategies::jobDone(JobId);
-	}
+//	?default::lastActionResult(Result);
+//	if ( not default::lastActionResult(failed_job_status) ) {
+//		+strategies::jobDone(JobId);
+//	}
 	-default::winner(_,_)[source(_)];
 	.send(vehicle1,achieve,initiator::job_finished(JobId)); 
-	!strategies::check_charge;
+//	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!strategies::free;
 	.
@@ -60,7 +61,7 @@
 	.abolish(org::_);
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
-	!strategies::check_charge;
+//	!strategies::check_charge;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		.my_name(Me);
@@ -101,7 +102,7 @@
 		for ( default::hasItem(ItemId,Qty) ) {
 			?default::storage(Facility, _, _, TotCapL, UsedCapL, _);
 			if ( default::load(LoadL) & UsedCapL + LoadL < TotCapL ) {
-				addAvailableItem(Facility,ItemId);
+				addAvailableItem(Facility,ItemId,Qty);
 				!action::store(ItemId,Qty);
 			}
 		}
@@ -150,22 +151,21 @@
 	.
 	
 @free[atomic]
-+!free : not free <- +free; !!action::skip; .
-//+!free : not free <- .print("free added");+free; !!action::skip;.
-+!free <- !!action::skip.
++!free : not free <- +free; !!action::recharge_is_new_skip; .
+//+!free : not free <- .print("free added");+free; !!action::recharge_is_new_skip;.
++!free <- !!action::recharge_is_new_skip.
 @notFree[atomic]
 +!not_free <- -free.
 //+!not_free <- .print("free removed");-free.
 
-@reasoning[atomic]
-+!reasoning : not ::reasoning <- +::reasoning;.
-//+!reasoning : not ::reasoning <- .print("reasoning added");+::reasoning;.
-+!reasoning.
-@notReasoning[atomic]
-+!not_reasoning <- -::reasoning.
-//+!not_reasoning <- .print("reasoning removed");-::reasoning.
+//@reasoning[atomic]
+//+!reasoning : not ::reasoning <- +::reasoning;.
+////+!reasoning : not ::reasoning <- .print("reasoning added");+::reasoning;.
+//+!reasoning.
+//@notReasoning[atomic]
+//+!not_reasoning <- -::reasoning.
+////+!not_reasoning <- .print("reasoning removed");-::reasoning.
 
-@noAction[atomic]
 +default::lastAction(Action)
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)
 <-
@@ -184,6 +184,7 @@
 	: default::winner(_, assemble(_, JobId))
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
+	.send(vehicle1,achieve,initiator::update_job_failed);
 	!job_failed_assemble;
 	.
 +default::job_done(JobId, _, _, _, _, _)

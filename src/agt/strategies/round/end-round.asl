@@ -46,11 +46,11 @@
 	: .my_name(vehicle1) 
 <-
 	.print("--- Some Metrics ---");
-	?metrics::money(Money);
+	?metrics::money(Money); // Ok
 	.print("Total amount of money: ",Money); // Ok
-	?metrics::completedJobs(JobsCompleted);
+	?metrics::completedJobs(JobsCompleted); // Ok
 	.print("Number of completed jobs: ",JobsCompleted); 
-	?metrics::failedJobs(JobsFailed);
+	?metrics::failedJobs(JobsFailed); // Ok
 	.print("Number of failed jobs: ",JobsFailed); 	
 	?metrics::completedAuctions(AuctionsCompleted);
 	.print("Number of completed auctions: ",AuctionsCompleted); 
@@ -75,14 +75,13 @@
 <-
 	?metrics::noAction(NoActions); // Ok
 	.print("Number of no actions: ",NoActions);
-	?metrics::held_actions(HeldActions); // Ok
-	.print("Number of held actions: ",HeldActions);
+	?metrics::next_actions(DoubleActions); // Ok
+	.print("Number of double actions: ",DoubleActions);
 	?metrics::jobHaveWorked(Jobs);
 	.print("Jobs I have worked: ",Jobs);
 	?metrics::jobCompletedMyPart(JobsMyPart);
 	.print("Jobs I have completed my part: ",JobsMyPart);
 	.
-
 
 {end}
 

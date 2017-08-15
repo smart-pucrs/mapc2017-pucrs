@@ -21,21 +21,27 @@
 //	-+::actionWantToDo(Action);
 //	.
 +!commitAction(Action)
-	: default::step(S) & not default::action(S) & not strategies::hold_action
+	: default::actionID(S) & not default::action(S) & not strategies::hold_action
 <-
 	+default::action(S);
+	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
 	action(Action);
-	.print("Doing action ",Action, " at step ",S);
-	.wait({ +default::lastActionResult(Result) });
+	.wait( { +default::actionID(S+1) } );
+	?default::lastActionResult(Result);
+//	.wait( default::lastActionResult(Result) );
 	-default::action(S);
-	if (Action \== skip & Result == failed) {
-//		.print("Failed to execute action ",Action," due to the 1% random error. Executing it again.");
+	if (Action \== recharge & Result == failed) {
+		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
 	else {
-		if (strategies::hold_action(Action2)) {
-			-strategies::hold_action(Action2);
+		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId))) { +strategies::jobDone(JobId); }
+		if (strategies::next_action(Action2)) {
+			-strategies::next_action(Action2);
 			.print("Removing held action ",Action2);
+		}
+		else { 
+			if (strategies::free) { !action::recharge_is_new_skip; }
 		}
 	}
 	.
@@ -47,8 +53,9 @@
 //	.print("Trying action ",Action," again now.");
 	!commitAction(Action);
 	.
-+!commitAction(Action) : Action == skip.
-+!commitAction(Action) : Action \== skip & metrics::held_actions(C) <- +strategies::hold_action(Action); -+metrics::held_actions(C+1); .print("Holding action ",Action); .wait( {-strategies::hold_action(Action) }); !commitAction(Action);.
++!commitAction(Action) : Action == recharge.
++!commitAction(Action) : Action \== recharge & metrics::next_actions(C) <- +strategies::next_action(Action); -+metrics::next_actions(C+1); .print("Holding next action ",Action); .wait( {-strategies::next_action(Action) }); !commitAction(Action);.
+//+!commitAction(Action) <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NO ",Action).
 {end}
 
 // Goto (option 1)
@@ -354,6 +361,14 @@
 	!recharge;
 	.
 -!recharge <- .print("Fully recharged.").
+
+// Recharge New Skip
+// No parameters
++!recharge_is_new_skip
+	: true
+<-
+	!localActions::commitAction(recharge);
+	.
 	
 // Gather
 // No parameters

@@ -248,8 +248,9 @@ public class EISArtifact extends Artifact implements AgentListener {
 			
 //			if (auction != null) 
 //				defineObsProperty(auction.getFunctor(), (Object[]) auction.getTermsArray());
-
 			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
+			defineObsProperty(lastActionResult.getFunctor(), (Object[]) lastActionResult.getTermsArray());
+			
 			for (Literal lit: percs) {
 				defineObsProperty(lit.getFunctor(), (Object[]) lit.getTermsArray());
 			}
@@ -260,12 +261,13 @@ public class EISArtifact extends Artifact implements AgentListener {
 				}
 				signalList.clear();
 			}
-			defineObsProperty(lastActionResult.getFunctor(), (Object[]) lastActionResult.getTermsArray());
+			
 //			await_time(100);
 			defineObsProperty(actionID.getFunctor(), (Object[]) actionID.getTermsArray());
+			
 			if (!jobDone.isEmpty()) {
+				await_time(500);
 				for (Literal lit: jobDone) {
-					await_time(500);
 					signal("job_done",(Object[]) lit.getTermsArray());
 				}
 				jobDone.clear();

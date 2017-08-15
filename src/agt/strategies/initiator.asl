@@ -379,25 +379,31 @@ task_id(0).
 +!job_finished(JobId) 
 <- 
 	-initiator::job(JobId, _);
-		
-	?completed_jobs(Jobs);	// debugging
-	-+completed_jobs(Jobs+1);
+	?metrics::completedJobs(C);
+	-+metrics::completedJobs(C+1);
 //	?estimate(JobId,Start,Estimate);
 //	?default::step(Step);
 //	.print("Finished job ",JobId," at step ",Step," estimated to end in ",Start+Estimate);
 //	-estimate(JobId,Start,Estimate);
 	.
-	
+
+@upateJobFail[atomic]
++!update_job_failed
+	: metrics::failedJobs(C)
+<-
+	-+metrics::failedJobs(C+1);
+.
+
 +default::step(End)
 	: mission(Id, _, _, End, _)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline."); 
 	-initiator::mission(Id, _, _, End, _); 
+	!update_job_failed;
 	.
 // debugging
 +default::step(998)
-	: default::money(Money) & completed_jobs(Jobs)
+	: default::money(Money)
 <-	
 	-+metrics::money(Money);
-	.print("$$$$$$$$$$$$$$$$$$$$ Money $",Money);
-	.print("$$$$$$$$$$$$$$$$$$$$ Completed ",Jobs," jobs!").
+.

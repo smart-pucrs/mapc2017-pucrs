@@ -30,16 +30,38 @@ public class TeamArtifact extends Artifact {
 		this.defineObsProperty("available_items", storage, itemsAux);
 	}
 	
-	@OPERATION void addAvailableItem(String storage, String item){
-		availableItems.get(storage).add(item);
+	@OPERATION void addAvailableItem(String storage, String item, int qty){
+		if (availableItems.get(storage).toString().contains(item)) {
+			for (String s: availableItems.get(storage)) {
+				if (s.contains(item)) {
+					int ind = availableItems.get(storage).indexOf(s);
+					int newqty = qty + Integer.parseInt(""+s.subSequence(s.indexOf(",")+1, s.length()-1));
+					availableItems.get(storage).set(ind,"item("+item+","+newqty+")");
+//					logger.info("@@@@@ List "+availableItems.get(storage)+" already contains "+item+" index "+availableItems.get(storage).indexOf(s));
+				}
+			}
+		}
+		else { availableItems.get(storage).add("item("+item+","+qty+")"); }
 		String[] itemsAux = availableItems.get(storage).toArray(new String[availableItems.get(storage).size()]);
 //		logger.info("@@@@@@@@@ Adding available item "+item+" to storage "+storage+". Result = "+Arrays.toString(itemsAux)+". Size = "+availableItems.get(storage).size());
 		this.removeObsPropertyByTemplate("available_items", storage, null);
 		this.defineObsProperty("available_items", storage, itemsAux);
 	}
 	
-	@OPERATION void removeAvailableItem(String storage, String item){
-		availableItems.get(storage).remove(item);
+	@OPERATION void removeAvailableItem(String storage, String item, int qty){
+		int remove = -1;
+		if (availableItems.get(storage).toString().contains(item)) {
+			for (String s: availableItems.get(storage)) {
+				if (s.contains(item)) {
+					int ind = availableItems.get(storage).indexOf(s);
+					int newqty = Integer.parseInt(""+s.subSequence(s.indexOf(",")+1, s.length()-1))  - qty;
+					if (newqty != 0) { availableItems.get(storage).set(ind,"item("+item+","+newqty+")"); }
+					else { remove = ind; }
+//					logger.info("@@@@@ List "+availableItems.get(storage)+" already contains "+item+" index "+availableItems.get(storage).indexOf(s));
+				}
+			}
+			if (remove != -1) {  availableItems.get(storage).remove(remove); }
+		}
 		String[] itemsAux = availableItems.get(storage).toArray(new String[availableItems.get(storage).size()]);
 		this.removeObsPropertyByTemplate("available_items", storage, null);
 		this.defineObsProperty("available_items", storage, itemsAux);

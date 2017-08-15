@@ -39,9 +39,9 @@
 	addRole(Me,Role);
 	.wait(1000);
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
-	!!action::skip;
+	!!action::recharge_is_new_skip;
 	.wait( {+default::step(S)} );
-	!!action::skip;
+	!!action::recharge_is_new_skip;
 	.wait( {+default::step(S+1)} );
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }

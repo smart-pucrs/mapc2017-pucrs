@@ -27,12 +27,12 @@
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
 <-
 	if (LoadCap - MyLoad >= Vol * Qty) {
-		?default::find_shops(ItemId,SList,Shops);
-		actions.closest(Role,Shops,ClosestShop);
-		actions.route(Role,Speed,ClosestShop,RouteShop);
+		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop);
+//		.print("The lowest amount of buy actions that I need to buy ",Qty,"# of",ItemId," is ",Buy," in ",Shop);
+		actions.route(Role,Speed,Shop,RouteShop);
 //		.print("####### Route: ",RouteShop," role ",Role);
-		Bid = RouteShop;
-		Shop = ClosestShop;
+		Bid = RouteShop * math.ceil(Buy);
+		Shop = Shop;
 	}
 	else { Bid = -1; Shop = null; }
 	.
@@ -40,7 +40,7 @@
 	: default::role(Role, Speed, _, _, Tools) & new::shopList(SList)
 <-
 	if (.member(ItemId,Tools) ) {
-		.findall(Storage,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .member(ToolS,AvailableT) & .term2string(Storage,StorageS),StorageList);
+		.findall(Storage,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .substring(ToolS,AvailableT) & .term2string(Storage,StorageS),StorageList);
 		if ( StorageList \== [] ) {
 			actions.closest(Role,StorageList,Facility);
 			actions.route(Role,Speed,Facility,Route);

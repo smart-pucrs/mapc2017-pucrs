@@ -29,9 +29,9 @@
 	if (LoadCap - MyLoad >= Vol * Qty) {
 		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop);
 //		.print("The lowest amount of buy actions that I need to buy ",Qty,"# of",ItemId," is ",Buy," in ",Shop);
-		actions.route(Role,Speed,Shop,RouteShop);
+//		actions.route(Role,Speed,Shop,RouteShop);
 //		.print("####### Route: ",RouteShop," role ",Role);
-		Bid = RouteShop * math.ceil(Buy);
+		Bid = RouteShop;
 		Shop = Shop;
 	}
 	else { Bid = -1; Shop = null; }

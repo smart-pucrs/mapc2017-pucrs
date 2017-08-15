@@ -21,12 +21,12 @@
 //	-+::actionWantToDo(Action);
 //	.
 +!commitAction(Action)
-	: default::actionID(S) & not default::action(S) & not strategies::hold_action
+	: default::step(S) & not default::action(S) & not strategies::hold_action
 <-
 	+default::action(S);
 	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
 	action(Action);
-	.wait( { +default::actionID(S+1) } );
+	.wait( default::actionID(S+1) );
 	?default::lastActionResult(Result);
 //	.wait( default::lastActionResult(Result) );
 	-default::action(S);
@@ -53,9 +53,9 @@
 //	.print("Trying action ",Action," again now.");
 	!commitAction(Action);
 	.
-+!commitAction(Action) : Action == recharge.
++!commitAction(Action) : Action == recharge & .print("################################################### RECHARGE ",Action).
 +!commitAction(Action) : Action \== recharge & metrics::next_actions(C) <- +strategies::next_action(Action); -+metrics::next_actions(C+1); .print("Holding next action ",Action); .wait( {-strategies::next_action(Action) }); !commitAction(Action);.
-//+!commitAction(Action) <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NO ",Action).
++!commitAction(Action) <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NO ",Action).
 {end}
 
 // Goto (option 1)

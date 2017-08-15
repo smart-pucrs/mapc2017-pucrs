@@ -31,7 +31,7 @@
 	
 //+default::hasItem(Item,Qty)
 //<- .print("Just got #",Qty," of ",Item).
-	
+
 +default::role(Role,_,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)
 <- 
@@ -40,9 +40,9 @@
 	.wait(1000);
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
 	!!action::recharge_is_new_skip;
-	.wait( {+default::step(S)} );
+	.wait({ +default::step(S) });
 	!!action::recharge_is_new_skip;
-	.wait( {+default::step(S+1)} );
+	.wait( default::step(S+1) );
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
 	if ( Me == vehicle1 ) { !initiator::add_myself_to_free; +initiator::accept_jobs; }

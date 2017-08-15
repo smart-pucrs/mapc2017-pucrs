@@ -153,7 +153,7 @@
 @free[atomic]
 +!free : not free <- +free; !!action::recharge_is_new_skip; .
 //+!free : not free <- .print("free added");+free; !!action::recharge_is_new_skip;.
-+!free <- !!action::recharge_is_new_skip.
++!free : free <- !!action::recharge_is_new_skip.
 @notFree[atomic]
 +!not_free <- -free.
 //+!not_free <- .print("free removed");-free.
@@ -170,7 +170,7 @@
 	: default::step(S) & S \== 0 & Action == noAction & new::noActionCount(Count)
 <-
 	-+new::noActionCount(Count+1);
-	.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Step ",S," I have done ",Count+1," noActions.");
+	.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Step ",S-1," I have done ",Count+1," noActions.");
 	-+metrics::noAction(Count+1);
 	.
 	

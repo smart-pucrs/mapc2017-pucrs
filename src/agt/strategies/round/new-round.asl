@@ -40,6 +40,7 @@
 	+metrics::jobHaveWorked(0);
 	+metrics::jobCompletedMyPart(0);
 	+metrics::next_actions(0);
+	+metrics::jobHaveFailed(0);
 	
 	+default::separateItemTool([],[],[]);
 	+default::removeDuplicateTool([],[]);

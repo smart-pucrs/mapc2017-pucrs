@@ -81,6 +81,8 @@
 	.print("Jobs I have worked: ",Jobs);
 	?metrics::jobCompletedMyPart(JobsMyPart);
 	.print("Jobs I have completed my part: ",JobsMyPart);
+	?metrics::jobHaveFailed(JobsFail);  // Ok
+	.print("Jobs I have failed: ",JobsFail);
 	.
 
 {end}

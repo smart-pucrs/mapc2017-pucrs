@@ -1,6 +1,6 @@
 {begin namespace(localActions, local)}
 
-//-strategies::reasoning
+//-::reasoning
 //<- 
 //	!commitWaitingAction;
 //	.
@@ -15,13 +15,13 @@
 //+!commitWaitingAction.
 //
 //+!commitAction(Action)
-//	: strategies::reasoning
+//	: ::reasoning
 //<-
 ////	.print("****** Storing action ",Action);
 //	-+::actionWantToDo(Action);
 //	.
 +!commitAction(Action)
-	: default::step(S) & not default::action(S) & not strategies::hold_action
+	: default::step(S) & not default::action(S) & not action::hold_action
 <-
 	+default::action(S);
 	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
@@ -37,8 +37,8 @@
 	}
 	else {
 		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId))) { +strategies::jobDone(JobId); }
-		if (strategies::next_action(Action2)) {
-			-strategies::next_action(Action2);
+		if (action::next_action(Action2)) {
+			-action::next_action(Action2);
 			.print("Removing held action ",Action2);
 		}
 		else { 
@@ -47,7 +47,7 @@
 	}
 	.
 +!commitAction(Action) 
-	: strategies::hold_action 
+	: action::hold_action 
 <- 
 //	.print("Holding action ",Action);
 	.wait(500);
@@ -55,7 +55,7 @@
 	!commitAction(Action);
 	.
 +!commitAction(Action) : Action == recharge & .print("################################################### RECHARGE ",Action).
-+!commitAction(Action) : Action \== recharge & metrics::next_actions(C) <- +strategies::next_action(Action); -+metrics::next_actions(C+1); .print("Holding next action ",Action); .wait( {-strategies::next_action(Action) }); !commitAction(Action);.
++!commitAction(Action) : Action \== recharge & metrics::next_actions(C) <- +action::next_action(Action); -+metrics::next_actions(C+1); .print("Holding next action ",Action); .wait( {-action::next_action(Action) }); !commitAction(Action);.
 +!commitAction(Action) <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NO ",Action).
 {end}
 
@@ -389,7 +389,7 @@
 	!localActions::commitAction(abort);
 	.
 
-// Strategies for verifying battery and going to charging stations
+//  for verifying battery and going to charging stations
 +!go_charge(Flat,Flon)
 	: new::chargingList(List) & default::lat(Lat) & default::lon(Lon) & default::role(_, Speed, _, BatteryCap, _)
 <-
@@ -453,7 +453,7 @@
 		}
 	}
 	-onMyWay(Aux2List);
-	if (not impossible) {
+	if (not action::impossible) {
 		.print("**** Going to charge my battery at ", FacilityAux2);
 		!localActions::commitAction(goto(FacilityAux2));
 		!goto(FacilityAux2);
@@ -544,7 +544,7 @@
 		}
 	}
 	-onMyWay(Aux2List);
-	if (not impossible) {
+	if (not action::impossible) {
 		.print("**** Going to charge my battery at ", FacilityAux2);
 		!localActions::commitAction(goto(FacilityAux2));
 		!goto(FacilityAux2);

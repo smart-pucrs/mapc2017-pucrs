@@ -119,6 +119,7 @@
 	.drop_desire(strategies::go_buy);
 	.drop_desire(strategies::go_to_workshop(_));
 	.abolish(org::_);
+	.wait(500);
 	if ( not default::routeLength(0) ) { !action::abort; }
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
@@ -142,6 +143,7 @@
 	.drop_desire(strategies::go_to_workshop(_));
 	.drop_desire(strategies::deliver);
 	.drop_desire(strategies::go_to_storage);
+	.wait(500);
 	if ( not default::routeLength(0) ) { !action::abort; }
 	
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
@@ -181,16 +183,18 @@
 	.print("$$$$$$$$$$$$ Job ",JobId," completed, got reward ",Reward);
 	.
 +default::job_done(JobId, _, _, _, _, _)
-	: default::winner(_, assemble(_, JobId))
+	: default::winner(_, assemble(_, JobId)) & metrics::jobHaveFailed(JobsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
+	-+metrics::jobHaveFailed(JobsFail+1);
 	.send(vehicle1,achieve,initiator::update_job_failed);
 	!job_failed_assemble;
 	.
 +default::job_done(JobId, _, _, _, _, _)
-	: default::winner(_, assist(_, _, JobId))
+	: default::winner(_, assist(_, _, JobId)) & metrics::jobHaveFailed(JobsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
+	-+metrics::jobHaveFailed(JobsFail+1);
 	!job_failed_assist;
 	.
 +default::job_done(JobId, _, Reward, _, _, Fine, _, _, _)
@@ -201,14 +205,16 @@
 	
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)
-	: default::winner(_, assemble(_, JobId))
+	: default::winner(_, assemble(_, JobId)) & metrics::jobHaveFailed(JobsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
+	-+metrics::jobHaveFailed(JobsFail+1);
 	!job_failed_assemble;
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)
-	: default::winner(_, assist(_, _, JobId))
+	: default::winner(_, assist(_, _, JobId)) & metrics::jobHaveFailed(JobsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
+	-+metrics::jobHaveFailed(JobsFail+1);
 	!job_failed_assist;
 	.

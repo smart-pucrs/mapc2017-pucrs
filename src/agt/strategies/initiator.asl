@@ -25,7 +25,7 @@ task_id(0).
 <- 
 //	!strategies::reasoning;
 //	!strategies::not_free;
-	+strategies::hold_action;
+	+action::hold_action;
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
 	!!evaluate_job(Items, End, Storage, Id, Reward);
@@ -87,7 +87,7 @@ task_id(0).
 	?default::steps(TotalSteps);
 	?default::step(Step);
 	if ( Step + 50 < TotalSteps & Step + 50 < End ) {
-		+strategies::hold_action;	
+		+action::hold_action;	
 		!decompose(Items,ListItems,ListToolsNew,Id);
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
@@ -135,7 +135,7 @@ task_id(0).
 //		if  ( not default::winner(_, _) | strategies::waiting ) {
 //			!!strategies::free; 
 //		}
-		-strategies::hold_action;
+		-action::hold_action;
 //		!strategies::not_reasoning;
 	}
 	.
@@ -316,7 +316,7 @@ task_id(0).
 //		!!strategies::free;
 //	}
 //	else { !!action::skip; }
-	-strategies::hold_action;
+	-action::hold_action;
 //	!strategies::not_reasoning;
 //	.print("Task allocation is done ",JobId);
 	.
@@ -334,7 +334,7 @@ task_id(0).
 //		!!strategies::free;
 //	}
 //	else { !!action::skip; }
-	-strategies::hold_action;
+	-action::hold_action;
 //	!strategies::not_reasoning;
 	.
 
@@ -354,7 +354,7 @@ task_id(0).
 		?default::steps(TotalSteps);
 		?default::step(Step);
 		if ( Step + 50 < TotalSteps & Step + 50 < End ) {
-			+strategies::hold_action;
+			+action::hold_action;
 			!decompose(Items,ListItems,ListToolsNew,Id);
 			!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 		}

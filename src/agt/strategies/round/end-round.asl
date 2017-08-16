@@ -77,11 +77,9 @@
 	.print("Number of no actions: ",NoActions);
 	?metrics::next_actions(DoubleActions); // Ok
 	.print("Number of double actions: ",DoubleActions);
-	?metrics::jobHaveWorked(Jobs);
-	.print("Jobs I have worked: ",Jobs);
-	?metrics::jobCompletedMyPart(JobsMyPart);
-	.print("Jobs I have completed my part: ",JobsMyPart);
-	?metrics::jobHaveFailed(JobsFail);  // Ok
+	?metrics::jobHaveWorked(Jobs); // Ok
+	.print("Jobs I have worked: ",Jobs); // Ok
+	?metrics::jobHaveFailed(JobsFail); // Ok
 	.print("Jobs I have failed: ",JobsFail);
 	?metrics::missionHaveFailed(MissionsFail);  // Ok
 	.print("Missions I have failed: ",MissionsFail);

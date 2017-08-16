@@ -39,10 +39,8 @@
 	addRole(Me,Role);
 	.wait(1000);
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
-	!!action::recharge_is_new_skip;
-	.wait({ +default::step(S) });
-	!!action::recharge_is_new_skip;
-	.wait( default::step(S+1) );
+	!action::recharge_is_new_skip;
+	!action::recharge_is_new_skip;
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
 	if ( Me == vehicle1 ) { !initiator::add_myself_to_free; +initiator::accept_jobs; }
@@ -50,7 +48,7 @@
 		if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-	!strategies::free;
+	!!strategies::free;
     .
     
 +tools(Role,Tools) : default::role(Role,_,_,_,_) <- -tools(Role,Tools)[source(_)].

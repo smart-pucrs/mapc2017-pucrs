@@ -210,22 +210,22 @@ task_id(0).
 +bids(_,_,JobId)
 	: .count(initiator::bids(_,_,JobId),NumberOfBids) & number_of_tasks(NumberOfTasks,JobId) & NumberOfBids == NumberOfTasks & .my_name(Me)
 <-
-//	.print("Received all bids ",JobId);
+	.print("Received all bids ",JobId);
 	-number_of_tasks(NumberOfTasks,JobId);
-	for ( bids(assemble(StorageId,_),Bids,JobId) ) {
+	for ( initiator::bids(assemble(StorageId,_),Bids,JobId) ) {
 		if ( not initiator::impossible_task(JobId) ) {
 			-bids(assemble(StorageId,_),Bids,JobId);
 			?default::select_bid_assemble(Bids,bid(99999,99999),bid(Agent,Distance));
 			if (Distance \== 99999) {
+//				.print("Awarding assemble of ",JobId," to ",Agent);
 				?initiator::job(JobId, Items);
 				+awarded_assemble(Agent,Items,StorageId,JobId);
-	//			.print("Awarding assemble to ",Agent);
 			}
 			else { +initiator::impossible_task(JobId); .print("Unable to allocate assemble to deliver at ",StorageId); }
 		}
 	}
 	if ( not initiator::impossible_task(JobId) ) {
-		for ( bids(tool(ItemId),Bids,JobId) ) {
+		for ( initiator::bids(tool(ItemId),Bids,JobId) ) {
 			if ( not initiator::impossible_task(JobId) ) {
 				-bids(tool(ItemId),Bids,JobId);
 				?default::select_bid_tool(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
@@ -234,7 +234,7 @@ task_id(0).
 					?default::item(ItemId,Volume,_,_);
 			    	addLoad(Agent,Load-Volume);
 		//	    	.print("Awarding ",ItemId," to ",Agent," at",Shop);
-					if (not awarded(Agent,_,_,_)) {
+					if (not initiator::awarded(Agent,_,_,_)) {
 						+awarded(Agent,Shop,[tool(ItemId)],JobId);
 					}
 					else {
@@ -247,7 +247,7 @@ task_id(0).
 				else { +initiator::impossible_task(JobId); .print("Unable to allocate tool ",ItemId); }
 			}
 		}
-		for ( bids(item(ItemId,Qty),Bids,JobId) ) {
+		for ( initiator::bids(item(ItemId,Qty),Bids,JobId) ) {
 			if ( not initiator::impossible_task(JobId) ) {
 				-bids(item(ItemId,Qty),Bids,JobId);
 				?default::select_bid(Bids,bid(99999,99999,99999),bid(Agent,Distance,Shop));
@@ -283,7 +283,7 @@ task_id(0).
 		.delete(AgentA,FreeAgentsA,FreeAgentsNewA);
 		-+initiator::free_agents(FreeAgentsNewA);
 //		.print("Removing ",AgentA," from free lists.");
-		for (awarded(Agent,Shop,List,JobId)) {
+		for ( initiator::awarded(Agent,Shop,List,JobId) ) {
 //			.print("Removing ",Agent," from free lists.");
 			?initiator::free_agents(FreeAgents);
 			.delete(Agent,FreeAgents,FreeAgentsNew);

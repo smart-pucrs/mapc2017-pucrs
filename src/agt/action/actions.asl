@@ -27,6 +27,7 @@
 	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
 	action(Action);
 	.wait( default::actionID(S+1) );
+	.print("Got out of wait from step ",S);
 	?default::lastActionResult(Result);
 //	.wait( default::lastActionResult(Result) );
 	-default::action(S);

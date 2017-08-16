@@ -86,7 +86,7 @@ task_id(0).
 	.print("Items required: ",Items);
 	?default::steps(TotalSteps);
 	?default::step(Step);
-	if ( Step + 50 < TotalSteps & Step + 50 < End ) {
+	if ( Step + 100 < TotalSteps & Step + 100 < End ) {
 		+action::hold_action;	
 		!decompose(Items,ListItems,ListToolsNew,Id);
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
@@ -353,7 +353,7 @@ task_id(0).
 	for (initiator::mission(Id, Storage, Items, End, Reward)) {
 		?default::steps(TotalSteps);
 		?default::step(Step);
-		if ( Step + 50 < TotalSteps & Step + 50 < End ) {
+		if ( Step + 100 < TotalSteps & Step + 100 < End ) {
 			+action::hold_action;
 			!decompose(Items,ListItems,ListToolsNew,Id);
 			!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);

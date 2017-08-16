@@ -39,6 +39,7 @@
 	addRole(Me,Role);
 	.wait(1000);
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
+	.wait( default::actionID(S) );
 	!action::recharge_is_new_skip;
 //	.wait( default::actionID(S) );
 	!action::recharge_is_new_skip;

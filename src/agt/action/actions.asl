@@ -20,11 +20,11 @@
 ////	.print("****** Storing action ",Action);
 //	-+::actionWantToDo(Action);
 //	.
-+default::actionID(X) 
-	: strategies::free
-<-
-	!action::recharge_is_new_skip;
-	.
+//+default::actionID(X) 
+//	: strategies::free
+//<-
+//	!action::recharge_is_new_skip;
+//	.
 
 +!commitAction(Action)
 	: default::step(S) & not default::action(S) & not action::hold_action
@@ -32,8 +32,8 @@
 	+default::action(S);
 	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
 	action(Action);
-	.wait( default::actionID(S+1) );
-	.print("Got out of wait from step ",S);
+	.wait( default::actionID(S2) & S2 \== S );
+//	.print("Got out of wait from step ",S);
 	?default::lastActionResult(Result);
 //	.wait( default::lastActionResult(Result) );
 	-default::action(S);
@@ -47,9 +47,9 @@
 			-action::next_action(Action2);
 			.print("Removing held action ",Action2);
 		}
-//		else { 
-//			if (strategies::free) { !!action::recharge_is_new_skip; }
-//		}
+		else { 
+			if (strategies::free) { !!action::recharge_is_new_skip; }
+		}
 	}
 	.
 +!commitAction(Action) 
@@ -61,7 +61,7 @@
 	!commitAction(Action);
 	.
 +!commitAction(Action) : Action == recharge & .print("################################################### RECHARGE ",Action).
-+!commitAction(Action) : Action \== recharge & metrics::next_actions(C) <- +action::next_action(Action); -+metrics::next_actions(C+1); .print("Holding next action ",Action); .wait( {-action::next_action(Action) }); !commitAction(Action);.
++!commitAction(Action) : Action \== recharge & metrics::next_actions(C) & not action::next_actions(_) <- +action::next_action(Action); -+metrics::next_actions(C+1); .print("Holding next action ",Action); .wait( {-action::next_action(Action) }); !commitAction(Action);.
 +!commitAction(Action) <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NO ",Action).
 {end}
 

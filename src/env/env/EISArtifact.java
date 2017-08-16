@@ -40,7 +40,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private List<Literal> percs = new ArrayList<Literal>();
 	private List<Literal> signalList = new ArrayList<Literal>();
 	private List<Literal> jobDone = new ArrayList<Literal>();
-	private long startTime;
+//	private long startTime;
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
 
@@ -49,6 +49,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private boolean receiving;
 	private int lastStep = -1;
 	private int round = 0;
+//	private int acceptJobs = -2;
 	private String maps[] = new String[] { "paris", "london", "hannover" };
 	public EISArtifact() {
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
@@ -111,9 +112,9 @@ public class EISArtifact extends Artifact implements AgentListener {
 			String agent = getCurrentOpAgentId().getAgentName();
 			Action a = Translator.literalToAction(literal);
 			ei.performAction(agent, a);
-			long endTime = System.nanoTime();
-			long duration = (endTime - startTime) / 1000000;
-			logger.info("Executed action "+a+" step "+lastStep+". Time from percept: "+duration);
+//			long endTime = System.nanoTime();
+//			long duration = (endTime - startTime) / 1000000;
+//			logger.info("Executed action "+a+" step "+lastStep+". Time from percept: "+duration);
 		} catch (ActException e) {
 			e.printStackTrace();
 		}
@@ -143,7 +144,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 //					if (ei.getAllPercepts(agent).get(agentToEntity.get(agent))) {
 						Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
 						if (!percepts.isEmpty()) {
-							startTime = System.nanoTime();
+//							startTime = System.nanoTime();
 	//						logger.info("***"+percepts);
 		//					if (agent.equals("vehicle1")) { logger.info("***"+percepts); }
 							int currentStep = getCurrentStep(percepts);
@@ -221,7 +222,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 						if (percept.getName().equals("lastActionResult")) {
 							lastActionResult = literal;
 						} 
-						else if (percept.getName().equals("job") || percept.getName().equals("mission")) { signalList.add(literal); }
+						else if (agent.equals("vehicle1") && (percept.getName().equals("job") || percept.getName().equals("mission"))) { signalList.add(literal); }
 						else if (percept.getName().equals("actionID")) { actionID = literal; }
 						else if (percept.getName().equals("shop") || percept.getName().equals("workshop") || percept.getName().equals("routeLength") || percept.getName().equals("facility")) { percs.add(0,literal); }
 						else { percs.add(literal); }
@@ -245,7 +246,10 @@ public class EISArtifact extends Artifact implements AgentListener {
 			
 		if (step != null) {
 //			logger.info("adding "+step);
-			
+//			if (agent.equals("vehicle1") && acceptJobs != 1)
+//				acceptJobs += 1;
+//			if (acceptJobs == 1)
+//				logger.info("Accepting jobs now!");
 //			if (auction != null) 
 //				defineObsProperty(auction.getFunctor(), (Object[]) auction.getTermsArray());
 			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
@@ -255,7 +259,8 @@ public class EISArtifact extends Artifact implements AgentListener {
 				defineObsProperty(lit.getFunctor(), (Object[]) lit.getTermsArray());
 			}
 			percs.clear();
-			if (agent.equals("vehicle1") && !signalList.isEmpty()) {
+//			if (!signalList.isEmpty() && acceptJobs == 1) {
+			if (!signalList.isEmpty()) {
 				for (Literal lit: signalList) {
 					signal(agentIds.get(agent),lit.getFunctor(),(Object[]) lit.getTermsArray());
 				}

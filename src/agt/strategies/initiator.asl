@@ -18,7 +18,7 @@ task_id(0).
 	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
 	.
 
-+default::job(_, _, _, _, _, _) : not accept_jobs.
++default::job(_, _, _, _, _, _) : not initiator::accept_jobs.
 @job[atomic]
 +default::job(Id, Storage, Reward, Start, End, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
@@ -74,7 +74,7 @@ task_id(0).
 //+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id).
 
 
-+default::mission(_, _, _, _, _, _, _, _, _) : not accept_jobs.
++default::mission(_, _, _, _, _, _, _, _, _) : not initiator::accept_jobs.
 @mission[atomic]
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
@@ -210,7 +210,7 @@ task_id(0).
 +bids(_,_,JobId)
 	: .count(initiator::bids(_,_,JobId),NumberOfBids) & number_of_tasks(NumberOfTasks,JobId) & NumberOfBids == NumberOfTasks & .my_name(Me)
 <-
-	.print("Received all bids ",JobId);
+//	.print("Received all bids ",JobId);
 	-number_of_tasks(NumberOfTasks,JobId);
 	for ( initiator::bids(assemble(StorageId,_),Bids,JobId) ) {
 		if ( not initiator::impossible_task(JobId) ) {

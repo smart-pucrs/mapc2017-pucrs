@@ -20,6 +20,12 @@
 ////	.print("****** Storing action ",Action);
 //	-+::actionWantToDo(Action);
 //	.
++default::actionID(X) 
+	: strategies::free
+<-
+	!action::recharge_is_new_skip;
+	.
+
 +!commitAction(Action)
 	: default::step(S) & not default::action(S) & not action::hold_action
 <-
@@ -41,9 +47,9 @@
 			-action::next_action(Action2);
 			.print("Removing held action ",Action2);
 		}
-		else { 
-			if (strategies::free) { !action::recharge_is_new_skip; }
-		}
+//		else { 
+//			if (strategies::free) { !!action::recharge_is_new_skip; }
+//		}
 	}
 	.
 +!commitAction(Action) 

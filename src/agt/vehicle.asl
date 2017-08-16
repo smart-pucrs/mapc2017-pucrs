@@ -40,7 +40,9 @@
 	.wait(1000);
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
 	!action::recharge_is_new_skip;
+//	.wait( default::actionID(S) );
 	!action::recharge_is_new_skip;
+//	.wait( default::actionID(S+1) );
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
 	if ( Me == vehicle1 ) { !initiator::add_myself_to_free; +initiator::accept_jobs; }

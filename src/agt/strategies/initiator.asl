@@ -394,12 +394,19 @@ task_id(0).
 	-+metrics::failedJobs(C+1);
 .
 
+@upateMissionFail[atomic]
++!update_mission_failed
+	: metrics::failedMissions(C)
+<-
+	-+metrics::failedMissions(C+1);
+.
+
 +default::step(End)
 	: mission(Id, _, _, End, _)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline."); 
 	-initiator::mission(Id, _, _, End, _); 
-	!update_job_failed;
+	!update_mission_failed;
 	.
 // debugging
 +default::step(998)

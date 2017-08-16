@@ -205,16 +205,17 @@
 	
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)
-	: default::winner(_, assemble(_, JobId)) & metrics::jobHaveFailed(JobsFail)
+	: default::winner(_, assemble(_, JobId)) & metrics::missionHaveFailed(MissionsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
-	-+metrics::jobHaveFailed(JobsFail+1);
+	-+metrics::missionHaveFailed(MissionsFail+1);
+	.send(vehicle1,achieve,initiator::update_mission_failed);
 	!job_failed_assemble;
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)
-	: default::winner(_, assist(_, _, JobId)) & metrics::jobHaveFailed(JobsFail)
+	: default::winner(_, assist(_, _, JobId)) & metrics::missionHaveFailed(MissionsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
-	-+metrics::jobHaveFailed(JobsFail+1);
+	-+metrics::missionHaveFailed(MissionsFail+1);
 	!job_failed_assist;
 	.

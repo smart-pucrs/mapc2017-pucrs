@@ -58,7 +58,7 @@
 	.print("Number of failed auctions: ",AuctionsFailed); 	
 	?metrics::completedMissions(MissionsCompleted);
 	.print("Number of completed missions: ",MissionsCompleted); 
-	?metrics::failedMissions(MissionsFailed);
+	?metrics::failedMissions(MissionsFailed);  // Ok
 	.print("Number of failed missions: ",MissionsFailed); 
 	?metrics::finePaid(Fine);
 	.print("Fine paid: ",Fine); 
@@ -83,6 +83,8 @@
 	.print("Jobs I have completed my part: ",JobsMyPart);
 	?metrics::jobHaveFailed(JobsFail);  // Ok
 	.print("Jobs I have failed: ",JobsFail);
+	?metrics::missionHaveFailed(MissionsFail);  // Ok
+	.print("Missions I have failed: ",MissionsFail);
 	.
 
 {end}

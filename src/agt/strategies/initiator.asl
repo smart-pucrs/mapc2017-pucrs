@@ -74,7 +74,7 @@ task_id(0).
 //+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id).
 
 
-+default::mission(_, _, _, _, _, _, _, _, _) : not initiator::accept_jobs.
++default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward); .print("Ignoring mission ",Id," for now."); .
 @mission[atomic]
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
@@ -402,7 +402,7 @@ task_id(0).
 .
 
 +default::step(End)
-	: mission(Id, _, _, End, _)
+	: initiator::mission(Id, _, _, End, _)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline."); 
 	-initiator::mission(Id, _, _, End, _); 

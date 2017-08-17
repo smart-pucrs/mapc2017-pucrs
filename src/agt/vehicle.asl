@@ -32,14 +32,23 @@
 //+default::hasItem(Item,Qty)
 //<- .print("Just got #",Qty," of ",Item).
 
+//+default::role(Role,_,LoadCap,_,Tools)
+//<-
+
+// only send recharge
+//+default::role(Role,_,LoadCap,_,Tools)
+//<-
+//	.wait( default::actionID(S) );
+//	!!strategies::free;
+//.
+
 +default::role(Role,_,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)
 <- 
 	addLoad(Me,LoadCap);
 	addRole(Me,Role);
-	.wait(1000);
-	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
 	.wait( default::actionID(S) );
+	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
 	!action::recharge_is_new_skip;
 //	.wait( default::actionID(S) );
 	!action::recharge_is_new_skip;

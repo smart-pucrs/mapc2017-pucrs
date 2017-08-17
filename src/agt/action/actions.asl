@@ -1,11 +1,11 @@
 {begin namespace(localActions, local)}
 
 +!commitAction(Action)
-	: default::step(S) & not default::action(S) & not action::hold_action
+	: default::step(S) & not action::action(S) & not action::hold_action
 <-
-	+default::action(S);
+	+action::action(S);
 //	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
-	if ( Action \== recharge) {
+	if ( Action \== recharge & Action \== continue) {
 		.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
 	}
 	action(Action);
@@ -13,7 +13,7 @@
 //	.print("Got out of wait from step ",S);
 	?default::lastActionResult(Result);
 //	.wait( default::lastActionResult(Result) );
-	-default::action(S);
+	-action::action(S);
 	if (Action \== recharge & Result == failed) {
 //		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
@@ -127,22 +127,35 @@
 +!buy(ItemId, Amount)
 	: default::hasItem(ItemId,OldAmount)
 <-	
-	!localActions::commitAction(buy(ItemId,Amount));
-	!buy_loop(ItemId, Amount, OldAmount);
+	!buy_loop(ItemId, Amount, Amount, OldAmount);
 	.
 +!buy(ItemId, Amount)
 	: true
 <-	
-	!localActions::commitAction(buy(ItemId,Amount));
-	!buy_loop(ItemId, Amount, 0);
+	!buy_loop(ItemId, Amount, Amount, 0);
 	.
-+!buy_loop(ItemId, Amount, OldAmount)
-	: not default::hasItem(ItemId, Amount+OldAmount)
++!buy_loop(ItemId, Total, Amount, OldAmount)
+	: not default::hasItem(ItemId, Total+OldAmount) & default::facility(ShopId) & default::shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,QtyAvailable,_,_,_),ListItems)
 <-
-	!localActions::commitAction(buy(ItemId,Amount));
-	!buy_loop(ItemId, Amount, OldAmount);
+	if (Amount <= QtyAvailable) {
+//		.print("Trying to buy all.");
+		!localActions::commitAction(buy(ItemId,Amount));
+		!buy_loop(ItemId, Total, Total - Amount, OldAmount);
+	}
+	else {
+		if (QtyAvailable == 0) {
+			!localActions::commitAction(recharge);
+			!buy_loop(ItemId, Total, Amount, OldAmount);
+			
+		}
+		else {
+//			.print("Trying to buy available ",QtyAvailable);
+			!localActions::commitAction(buy(ItemId,QtyAvailable));
+			!buy_loop(ItemId, Total, Amount - QtyAvailable, OldAmount);
+		}
+	}
 	.
--!buy_loop(ItemId, Amount, OldAmount).
+-!buy_loop(ItemId, Total, Amount, OldAmount). //: default::hasItem(ItemId, Qty) <- .print("Finished buy, I have: #",Qty," of ",ItemId).
 
 // Give
 // AgentId must be a string

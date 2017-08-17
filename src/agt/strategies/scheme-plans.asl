@@ -52,29 +52,6 @@
 		}
 		else { +strategies::buyList(ItemId,Qty,Shop); }
 	}
-	+strategies::buy_list_id(0);
-	for ( strategies::buyList(ItemId,Qty,Shop) ) {
-		getShopItem(item(Shop,ItemId),QtyCap);
-		-strategies::buyList(ItemId,Qty,Shop);
-		if (Qty > QtyCap) {
-//			.print("Need to buy #",Qty," of ",ItemId," from ",Shop," cap ",QtyCap);
-			for ( .range(I,1,math.floor(Qty/QtyCap)) ) {
-				?strategies::buy_list_id(Id);
-				-+strategies::buy_list_id(Id+1);
-				+strategies::buyList(ItemId,QtyCap,Shop,Id+1);
-//				.print("Adding buylist #",QtyCap," ",ItemId);
-			}
-			Mod = Qty mod QtyCap;
-			if ( Mod \== 0 ) {
-				?strategies::buy_list_id(Id);
-				-+strategies::buy_list_id(Id+1);
-				+strategies::buyList(ItemId,Mod,Shop,Id+1);
-//				.print("Adding buylist #",Mod," ",ItemId);
-			}
-		}
-		else { ?strategies::buy_list_id(Id); -+strategies::buy_list_id(Id+1); +strategies::buyList(ItemId,Qty,Shop,Id+1);  }
-	}
-	-strategies::buy_list_id(_);
 	!strategies::go_buy;
 	if (strategies::retrieveList(_,_,Fac)) {
 		for ( strategies::retrieveList(ItemId,Qty,Fac) ) {

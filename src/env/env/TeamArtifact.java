@@ -90,7 +90,7 @@ public class TeamArtifact extends Artifact {
 	@OPERATION void addShopItem(String item, int qty, String itemId, int price){
 		shopItemsQty.put(item,qty);
 		if (itemsQty.containsKey(itemId)) {
-			if (itemsQty.get(itemId) > qty) {
+			if (itemsQty.get(itemId) < qty) {
 				itemsQty.replace(itemId, qty);
 			}
 		}

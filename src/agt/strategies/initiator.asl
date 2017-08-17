@@ -110,31 +110,34 @@ task_id(0).
 	.length(ListToolsNew,NumberOfBuyTool);
 	.length(ListItems,NumberOfBuyItem);
 	.length(Items,NumberOfAssemble);
-	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItems,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItems,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
+	?default::concat_bases(ListItems,[],ListItemsConcat);
+	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
+		!update_eval;
 		-action::hold_action;
 	}
 	.
 	
 +!evaluate_mission(Items, End, Storage, Id, Reward, Fine)
-	: not initiator::eval(Id) & default::steps(TotalSteps) & default::step(Step)
+	: not initiator::eval(Id) & default::steps(TotalSteps) & default::step(Step) & initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <-
 	+eval(Id);
-//	if ( Step + 100 < TotalSteps & Step + 100 < End ) {
+	if ( Step + 70 < TotalSteps & Step + 70 < End ) {
 		!decompose(Items,ListItems,ListToolsNew,Id);
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
-//	}
-//	else { 
-//		.print("Mission ",Id," failed evaluation, ignoring it.");
-//		-mission(Id, Storage, Items, End, Reward, Fine);
-//		+failed_mission(Id, End, Fine);
-//	}
+	}
+	else { 
+		.print("Mission ",Id," failed evaluation, ignoring it.");
+		-action::hold_action;
+		-mission(Id, Storage, Items, End, Reward, Fine);
+		+failed_mission(Id, End, Fine);
+	}
 	-eval(Id);
 .
-+!evaluate_mission(Items, End, Storage, Id, Reward, Fine) : initiator::eval(Id). //<- .print("Mission is already being evaluated").
++!evaluate_mission(Items, End, Storage, Id, Reward, Fine). //<- .print("Mission is already being evaluated").
 
 @sep_task[atomic]
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
@@ -385,6 +388,13 @@ task_id(0).
 //	.print("Finished job ",JobId," at step ",Step," estimated to end in ",Start+Estimate);
 //	-estimate(JobId,Start,Estimate);
 	.
+	
+@upateJobEval[atomic]
++!update_eval
+	: metrics::failedEvalJobs(C)
+<-
+	-+metrics::failedEvalJobs(C+1);
+.
 
 @upateJobFail[atomic]
 +!update_job_failed

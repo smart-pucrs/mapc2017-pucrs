@@ -41,14 +41,14 @@
 	.
 	
 +!go_buy
-	: strategies::buyList(_,_,Shop,_)
+	: strategies::buyList(_,_,Shop)
 <-
 //	.print("Going to shop ",Shop);
 	!action::goto(Shop);
-	for ( strategies::buyList(ItemId,Qty,Shop,Id) ) {
+	for ( strategies::buyList(ItemId,Qty,Shop) ) {
 		!action::buy(ItemId,Qty);
 //		.print("Buying #",Qty," of ",ItemId);
-		-strategies::buyList(ItemId,Qty,Shop,Id);
+		-strategies::buyList(ItemId,Qty,Shop);
 	}
 	!go_buy
 	.
@@ -58,7 +58,7 @@
 	: default::role(Role, _, _, _, _) 
 <- 
 	.abolish(org::_);
-	if ( default::hasItem(_,_) ) { !go_store(Role); }
+	if ( default::hasItem(ItemId,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
 //	!strategies::check_charge;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
@@ -99,6 +99,7 @@
 	?default::storage(Facility, _, _, TotCap2, UsedCap2, _);
 	if ( UsedCap2 + Load < TotCap2 ) {
 		for ( default::hasItem(ItemId,Qty) ) {
+//			.print("Trying to store #",Qty," of ",ItemId);
 			?default::storage(Facility, _, _, TotCapL, UsedCapL, _);
 			if ( default::load(LoadL) & UsedCapL + LoadL < TotCapL ) {
 				addAvailableItem(Facility,ItemId,Qty);
@@ -118,7 +119,11 @@
 	.drop_desire(strategies::go_buy);
 	.drop_desire(strategies::go_to_workshop(_));
 	.abolish(org::_);
-	.wait(500);
+	?default::step(S);
+	if (action::action(S)) {
+		.abolish(action::_);
+		.wait( default::step(S2) & S2 \== S );
+	}
 	if ( not default::routeLength(0) ) { !action::abort; }
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
@@ -129,6 +134,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
+	.print("Failed job, why I am not doing recharge.");
 	!!strategies::free;
 	.
 +!job_failed_assemble
@@ -142,7 +148,11 @@
 	.drop_desire(strategies::go_to_workshop(_));
 	.drop_desire(strategies::deliver);
 	.drop_desire(strategies::go_to_storage);
-	.wait(500);
+	?default::step(S);
+	if (action::action(S)) {
+		.abolish(action::_);
+		.wait( default::step(S2) & S2 \== S );
+	}
 	if ( not default::routeLength(0) ) { !action::abort; }
 	
 	if ( default::hasItem(_,_) ) { !go_store(Role); }

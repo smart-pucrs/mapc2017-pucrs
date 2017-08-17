@@ -87,7 +87,7 @@ check_buy_list([item(ItemId,Qty)|Items],Result) :- actions.getItemQty(ItemId,Qty
 
 check_multiple_buy([],AddSteps) :- AddSteps = 0.
 check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty <= Qty2 & check_multiple_buy(Items,AddSteps).
-check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty > Qty2 & AddSteps = Qty2 + 50.
+check_multiple_buy([item(ItemId,Qty)|Items],AddSteps) :- actions.getItemQty(ItemId,Qty2) & Qty > Qty2 & AddSteps = Qty * 5. // 5 is the maximum restock 5 steps to add 1 item
 
 check_price([],[],Aux,Result) :- Result = Aux.
 check_price([],[item(ItemId,Qty)|Items],Aux,Result) :- actions.getItemPrice(ItemId,Price) & check_price([],Items,Aux+Price*Qty,Result).
@@ -107,3 +107,10 @@ get_tools([Role|Roles],Aux,T) :- get_tools(Roles,Aux,T).
 check_tools([],AvailableTools,Result) :- Result = "true".
 check_tools([item(Tool,_)|ListToolsNew],AvailableTools,Result) :- .member(Tool,AvailableTools) & check_tools(ListToolsNew,AvailableTools,Result).
 check_tools([item(Tool,_)|ListToolsNew],AvailableTools,Result) :- not .member(Tool,AvailableTools) & Result = "false".
+
+concat_bases([],Aux,ListItemsConcat) :- ListItemsConcat = Aux.
+concat_bases([item(ItemId,Qty)|ListItems],Aux,ListItemsConcat) :- .findall(Qty2,.member(item(ItemId,Qty2),ListItems),QtyList) & not .empty(QtyList) & deleteall(ItemId,ListItems,ListItemsNew) & concat_bases(ListItemsNew,[item(ItemId,math.sum(QtyList)+Qty)|Aux],ListItemsConcat).
+concat_bases([item(ItemId,Qty)|ListItems],Aux,ListItemsConcat) :- not .member(item(ItemId,Qty2),ListItems) & concat_bases(ListItems,[item(ItemId,Qty)|Aux],ListItemsConcat).
+
+deleteall(ItemId,ListItems,ListItemsNew) :- .member(item(ItemId,_),ListItems) & .delete(item(ItemId,_),ListItems,ListItemsNewAux) & deleteall(ItemId,ListItemsNewAux,ListItemsNew).
+deleteall(ItemId,ListItems,ListItemsNew) :- not .member(item(ItemId,_),ListItems) & ListItemsNew = ListItems.

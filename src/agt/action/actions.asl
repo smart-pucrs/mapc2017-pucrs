@@ -30,22 +30,22 @@
 	: default::step(S) & not default::action(S) & not action::hold_action
 <-
 	+default::action(S);
-	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+//	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
 	action(Action);
 	.wait( default::actionID(S2) & S2 \== S );
-	.print("Got out of wait from step ",S);
+//	.print("Got out of wait from step ",S);
 	?default::lastActionResult(Result);
 //	.wait( default::lastActionResult(Result) );
 	-default::action(S);
 	if (Action \== recharge & Result == failed) {
-		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
+//		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
 	else {
 		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId))) { +strategies::jobDone(JobId); }
 		if (action::next_action(Action2)) {
 			-action::next_action(Action2);
-			.print("Removing held action ",Action2);
+//			.print("Removing held action ",Action2);
 		}
 		else { 
 			if (strategies::free) { !!action::recharge_is_new_skip; }
@@ -60,9 +60,17 @@
 //	.print("Trying action ",Action," again now.");
 	!commitAction(Action);
 	.
-+!commitAction(Action) : Action == recharge & .print("################################################### RECHARGE ",Action).
-+!commitAction(Action) : Action \== recharge & metrics::next_actions(C) & not action::next_actions(_) <- +action::next_action(Action); -+metrics::next_actions(C+1); .print("Holding next action ",Action); .wait( {-action::next_action(Action) }); !commitAction(Action);.
-+!commitAction(Action) <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NO ",Action).
++!commitAction(Action) : Action == recharge.
++!commitAction(Action) 
+	: Action \== recharge & metrics::next_actions(C) & not action::next_actions(_) 
+<- 
+	+action::next_action(Action); 
+	-+metrics::next_actions(C+1); 
+//	.print("Holding next action ",Action); 
+	.wait( {-action::next_action(Action) }); 
+	!commitAction(Action);
+.
+//+!commitAction(Action) <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NO ",Action).
 {end}
 
 // Goto (option 1)

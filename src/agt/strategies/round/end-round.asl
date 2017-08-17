@@ -47,7 +47,7 @@
 <-
 	.print("--- Some Metrics ---");
 	?metrics::money(Money); // Ok
-	.print("Total amount of money: ",Money); // Ok
+	.print("Total amount of money: ",Money);
 	?metrics::completedJobs(JobsCompleted); // Ok
 	.print("Number of completed jobs: ",JobsCompleted); 
 	?metrics::failedJobs(JobsFailed); // Ok
@@ -56,12 +56,12 @@
 	.print("Number of completed auctions: ",AuctionsCompleted); 
 	?metrics::failedAuctions(AuctionsFailed);
 	.print("Number of failed auctions: ",AuctionsFailed); 	
-	?metrics::completedMissions(MissionsCompleted);
+	?metrics::completedMissions(MissionsCompleted); // Ok
 	.print("Number of completed missions: ",MissionsCompleted); 
-	?metrics::failedMissions(MissionsFailed);  // Ok
+	?metrics::failedMissions(MissionsFailed); // Ok
 	.print("Number of failed missions: ",MissionsFailed); 
 	?metrics::finePaid(Fine);
-	.print("Fine paid: ",Fine); 
+	.print("Fine paid: ",Fine); // Ok
 	!print_common_metrics;
 	.print("--------------------");
 	.	

@@ -1,36 +1,13 @@
 {begin namespace(localActions, local)}
 
-//-::reasoning
-//<- 
-//	!commitWaitingAction;
-//	.
-//	
-//+!commitWaitingAction
-//	: ::actionWantToDo(Action) & (Action \== none)
-//<-
-////	.print("****** I want to perform action ",Action);
-//	!commitAction(Action);
-//	-+::actionWantToDo(none);
-//	.	
-//+!commitWaitingAction.
-//
-//+!commitAction(Action)
-//	: ::reasoning
-//<-
-////	.print("****** Storing action ",Action);
-//	-+::actionWantToDo(Action);
-//	.
-//+default::actionID(X) 
-//	: strategies::free
-//<-
-//	!action::recharge_is_new_skip;
-//	.
-
 +!commitAction(Action)
 	: default::step(S) & not default::action(S) & not action::hold_action
 <-
 	+default::action(S);
 //	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+	if ( Action \== recharge) {
+		.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+	}
 	action(Action);
 	.wait( default::actionID(S2) & S2 \== S );
 //	.print("Got out of wait from step ",S);

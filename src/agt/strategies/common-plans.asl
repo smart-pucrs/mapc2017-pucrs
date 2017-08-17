@@ -35,7 +35,6 @@
 //		+strategies::jobDone(JobId);
 //	}
 	-default::winner(_,_)[source(_)];
-	.send(vehicle1,achieve,initiator::job_finished(JobId)); 
 //	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!strategies::free;
@@ -180,6 +179,7 @@
 	: jobDone(JobId)
 <-
 	-jobDone(JobId);
+	.send(vehicle1,achieve,initiator::job_finished(JobId)); 
 	.print("$$$$$$$$$$$$ Job ",JobId," completed, got reward ",Reward);
 	.
 +default::job_done(JobId, _, _, _, _, _)
@@ -201,6 +201,7 @@
 	: jobDone(JobId)
 <-
 	-jobDone(JobId);
+	.send(vehicle1,achieve,initiator::mission_finished(JobId)); 
 	.print("$$$$$$$$$$$$ Mission ",JobId," completed, got reward ",Reward);
 	
 	.
@@ -209,7 +210,7 @@
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
 	-+metrics::missionHaveFailed(MissionsFail+1);
-	.send(vehicle1,achieve,initiator::update_mission_failed);
+	.send(vehicle1,achieve,initiator::update_mission_failed(Fine));
 	!job_failed_assemble;
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)

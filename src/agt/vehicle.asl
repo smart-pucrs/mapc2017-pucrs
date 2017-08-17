@@ -49,10 +49,9 @@
 	addRole(Me,Role);
 	.wait( default::actionID(S) );
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
+	.wait(500);
 	!action::recharge_is_new_skip;
-//	.wait( default::actionID(S) );
 	!action::recharge_is_new_skip;
-//	.wait( default::actionID(S+1) );
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
 	if ( Me == vehicle1 ) { !initiator::add_myself_to_free; +initiator::accept_jobs; }
@@ -60,6 +59,9 @@
 		if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
+//	for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
+//		!!initiator::evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+//	}
 	!!strategies::free;
     .
     

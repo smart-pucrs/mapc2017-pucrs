@@ -72,18 +72,18 @@ task_id(0).
 //+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id).
 
 
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now."); .
-@mission[atomic]
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
-	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
-<- 
-	+action::hold_action;
-	+mission(Id, Storage, Items, End, Reward, Fine);
-	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
-	.print("Items required: ",Items);
-	!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
-	.
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
+//+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now."); .
+//@mission[atomic]
+//+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
+//	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
+//<- 
+//	+action::hold_action;
+//	+mission(Id, Storage, Items, End, Reward, Fine);
+//	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
+//	.print("Items required: ",Items);
+//	!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+//	.
+//+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
 	
 +!decompose(Items,ListItems,ListToolsNew,Id)
 <-
@@ -112,7 +112,12 @@ task_id(0).
 	.length(Items,NumberOfAssemble);
 	?default::concat_bases(ListItems,[],ListItemsConcat);
 	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
-		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+//		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+
+//		!gTaskAllocation::allocate_job(Id, Items);
+		?initiator::free_agents(FreeAgents);
+		.send(FreeAgents,achieve,gTaskAllocation::allocate_job(Id,Items,FreeAgents));
+//		!gTaskAllocation::allocate_job(Id, [required(item17,1)]);
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");

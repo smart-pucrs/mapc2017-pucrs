@@ -59,9 +59,9 @@
 		if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-//	for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
-//		!!initiator::evaluate_mission(Items, End, Storage, Id, Reward, Fine);
-//	}
+	for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
+		!!initiator::evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+	}
 	!!strategies::free;
     .
     

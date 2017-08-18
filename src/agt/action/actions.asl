@@ -39,7 +39,7 @@
 	.
 +!commitAction(Action) : Action == recharge.
 +!commitAction(Action) 
-	: Action \== recharge & metrics::next_actions(C) & not action::next_actions(_) 
+	: Action \== recharge & metrics::next_actions(C) & not action::next_action(_) 
 <- 
 	+action::next_action(Action); 
 	-+metrics::next_actions(C+1); 

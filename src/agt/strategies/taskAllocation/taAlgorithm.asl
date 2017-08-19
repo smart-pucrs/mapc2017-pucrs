@@ -632,6 +632,7 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 	}
 	
 	}
+	+taResults ::allocationProcess(ready);
 ?initime(INITIME);
 .time(HH,NN,SS);
 .concat(HH,":",NN,":",SS,ENDTIME);

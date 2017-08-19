@@ -111,6 +111,9 @@ converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoaliti
 
 {begin namespace(gTaskAllocation, global) }
 
+testVetor([]).
+testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
+
 +coalitionTask(JobId, Requirements)
 	: true
 <-
@@ -135,12 +138,45 @@ converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoaliti
 	.print("Itens Base: ",Bases);
 	?localTask::generateTaskList(JobId,Bases,[],Tasks);
 	.print("Tasks: ",Tasks);
-	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
+
+	for ( .member(subtask(_,TaskId,_,_,_,_),Tasks) ) {
+        +::taskBiding(JobId,TaskId);
+    }
+	
+//	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
+	!taProcess::run_distributed_TA_algorithm(communication(broadcast,[]),Tasks,RoleLoad-MyLoad);
 	.
 
 	
 {end}
 
+//+taResults:: allocatedTasks(Task,Parent)
+//	: ::taskBiding(JobId,Parent)
+//<-
+//	.print("I won task ",Task," for ",JobId);
+//	.abolish(::taskBiding(JobId,_));
+//	.
+	
+//+default::winner(TaskList, assist(Storage, Assembler, JobId))
+//	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
+//<-
+//	!strategies::not_free;
+//	-+metrics::jobHaveWorked(Jobs+1);
+//	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
+//	org::focus(SchArtId)[wid(OrgId)];
+//	.print("I won the tasks(",JobId,") ",TaskList);
+//	org::commitMission(massist)[artifact_id(SchArtId)];
+//	.
+//+default::winner(TaskList, assemble(Storage, JobId))
+//	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
+//<-
+//	!strategies::not_free;
+//	-+metrics::jobHaveWorked(Jobs+1);
+//	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
+//	org::focus(SchArtId)[wid(OrgId)];
+//	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
+//	org::commitMission(massemble)[artifact_id(SchArtId)];
+//	.
 
 
 +!task_allocation_coalition(JobId, Requirements)

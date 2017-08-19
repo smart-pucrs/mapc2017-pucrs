@@ -62,17 +62,16 @@ decomposeRequirements([required(Item,Qtd) | Requirements],Temp,Result):- default
 //generateTaskList([],Temp,Result) :- Result = Temp.
 //generateTaskList([compoundedItem(Item,ListItensJob)|List],Temp,Result) :- generateSubTaskList(Item,ListItensJob,[],Translated) & .concat(Translated,Temp,NewTemp) & generateTaskList(List,NewTemp,Result).
 
-evaluateUtilityItem(ItemId,Vol,Utility) :-default::load(MyLoad) 
-										& default::role(Role,Speed,LoadCap,_,_) 
+evaluateUtilityItem(ItemId,TotalVol,Utility) :-default::load(MyLoad) 
+										& default::role(Role,Speed,LoadCap,_,_) 										
+										& (LoadCap - MyLoad >= TotalVol) 
+										& default::item(ItemId,Vol,_,_)
+										& Qty = (TotalVol / Vol)
 										& new::shopList(SList)
-//										& (LoadCap - MyLoad >= Vol + 15) 
-										& (LoadCap - MyLoad >= Vol) 
-										& default::find_shops(ItemId,SList,Shops)
-										& actions.closest(Role,Shops,ClosestShop)
-										& actions.route(Role,Speed,ClosestShop,RouteShop)
+										& default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop)
 										& Utility = RouteShop.
 evaluateUtilityItem(ItemId,Vol,Utility) :- Utility = -1.
-evaluateUtilityTool(ItemId,Utility) :- default::role(_,_,_,_,Tools) & .sublist([ItemId],Tools) & Utility = -1.
+evaluateUtilityTool(ItemId,Utility) :- default::role(_,_,_,_,Tools) & .member(ItemId,Tools) & Utility = 1.
 evaluateUtilityTool(ItemId,Utility) :- Utility = -1.
 evaluateUtility(ItemId,Vol,Utility) :- .substring("item",ItemId) & evaluateUtilityItem(ItemId,Vol,Utility).
 evaluateUtility(ItemId,Vol,Utility) :- evaluateUtilityTool(ItemId,Utility).

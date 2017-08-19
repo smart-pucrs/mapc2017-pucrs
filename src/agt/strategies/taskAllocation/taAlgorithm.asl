@@ -30,7 +30,9 @@ readyMe(false).
 <- 
 if(taDefinitions::taUtilityGoal(UGOAL) & (UGOAL=="maximize")){
 	for (.member(subtask(SUBTASK,TASK,LOAD,UTILITY,TASKTYPE,ROLE),SUBTASKLIST)) {
-		+taProcess::subtaskReceived(SUBTASK,TASK,LOAD,UTILITY,TASKTYPE,ROLE);
+		if(UTILITY>-1){
+			+taProcess::subtaskReceived(SUBTASK,TASK,LOAD,UTILITY,TASKTYPE,ROLE);
+		}
 		+taProcess::subtaskReceivedOriginal(SUBTASK,TASK,LOAD,UTILITY,TASKTYPE,ROLE);
 		}
 }
@@ -41,10 +43,14 @@ else{
 		+taProcess::subtaskReceivedOriginal(SUBTASK,TASK,LOAD,UTILITY,TASKTYPE,ROLE);
 		
 		if((MaxUtility-UTILITY)>0){
-			+taProcess::subtaskReceived(SUBTASK,TASK,LOAD,(MaxUtility-UTILITY),TASKTYPE,ROLE);
+			if(UTILITY>-1){
+				+taProcess::subtaskReceived(SUBTASK,TASK,LOAD,(MaxUtility-UTILITY),TASKTYPE,ROLE);
+			}
 		}
 		else{
-			+taProcess::subtaskReceived(SUBTASK,TASK,LOAD,0,TASKTYPE,ROLE);
+			if(UTILITY>-1){
+				+taProcess::subtaskReceived(SUBTASK,TASK,LOAD,0,TASKTYPE,ROLE);
+			}
 		}
 	}
 }

@@ -309,7 +309,7 @@ for (.member(TASK,LTASKS)) {
 				}
 			}
 
-			if(candidate(VXXXX, SUBTKXXXX, TASK)){
+			if(taProcess::candidate(VXXXX, SUBTKXXXX, TASK)){
 				if (Nsubtasks>QtyToAlloc) {
 					.nth(QtyToAlloc,LNETVALUE3,netValue(NETVALUEm2,SUBTASKm2,TASKm2));
 					?taProcess::subtaskLoad(SUBTASKm2,TASKm2,LOAD3);

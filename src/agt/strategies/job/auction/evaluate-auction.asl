@@ -1,5 +1,10 @@
-evaluateBid(Reward,0,MyBid) 			:- MyBid = Reward-6.
-evaluateBid(Reward,CurrentBid,MyBid) 	:- MyBid = CurrentBid-6.
+evaluateBid(Reward,0,BaseBid,MyBid) 			:- MyBid = Reward-(BaseBid+6).
+evaluateBid(Reward,CurrentBid,BaseBid,MyBid) 	:- MyBid = CurrentBid-(BaseBid+6).
+
+checkPossibleBid(Reward,CurrentBid,BaseBid,Limit) 		:- ::evaluateBid(Reward,Bid,BaseBid,NewBid) & (Limit <= NewBid).
+checkLimit(Reward,0,Limit) 								:- (Limit < Reward).
+checkLimit(Reward,CurrentBid,Limit) 					:- (Limit < Reward) & (Limit < CurrentBid).
+checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,CurrentBid,Limit) & checkPossibleBid(Reward,CurrentBid,BaseBid,Limit).
 
 !triggerFuturePlan.
 
@@ -13,48 +18,53 @@ evaluateBid(Reward,CurrentBid,MyBid) 	:- MyBid = CurrentBid-6.
     !triggerFuturePlan;
 	.
 +!triggerFuturePlan
-//	: ::futurePlans(_,_)
 <-
-//	.wait({+step(Step)});
 	.wait({+default::step(Step)});
 	!triggerFuturePlan;
 	.
-//+!triggerFuturePlan.
 
-// USE O DECOMPOSE
-+!analyse_auction_job(Id)	
-	: default::auction(Id,_,Reward,Start,_,_,0,Time,Items)	
++!first_analysis(Id)	
+	: default::auction(Id,_,Reward,Start,_,_,0,Time,Items) & default::step(S)
 <-
-	.print("Analysing auction job");	
-	
-	?default::decomposeRequirements(Items,[],Bases);
-	+::bases([],Id);
-	for ( .member(Item,Bases) ) {
-		?::bases(L,Id);
-		.concat(L,Item,New);
-		-+::bases(New,Id);
-	}
-	?::bases(B,Id);
-	-::bases(B,Id);
-	if (.substring("tool",B)) {
-		?default::separateItemTool(B,ListTools,ListItems); 
-		?default::removeDuplicateTool(ListTools,ListToolsNew);
-	}
-	else { ListToolsNew = []; ListItems = B; }
+	.print("First analysing auction job at step ",S);	
+	!initiator::decompose(Items,ListItems,ListToolsNew,Id);
+
 	?default::check_price(ListToolsNew,ListItems,0,ResultP);
 	Limit = math.ceil(ResultP*1.8);
-	-+::bidding(Id,0,Limit);
+	+::bidding(Id,0,0,Limit);
 	.print("Limit is ",Limit);
 	.print("Reward is ",Reward);
 	
+	+::futurePlans(further_analysis(Id),Start+Time-1);
 	+::futurePlans(free_for_next_auction(Id),Start+Time);
-//	if (not .desire(triggerFuturePlan)){
-//		.print("Not counting future plans");
-//		!!triggerFuturePlan;
-//	}	
-	!send_a_bid(Id);
-//	!strategies::free;
 	.
+
++!further_analysis(Id)	
+	: default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)	& ::bidding(Id,_,BaseBid,Limit) & ::checkStillGoodAuction(Reward,Bid,BaseBid,Limit) & default::step(S)
+<-
+	+action::hold_action;
+	.print("Final analysis for ",Id," at step ",S);	
+	
+	!initiator::evaluate_job(Items, End - Start, Storage, Id, Reward);
+	.
++!further_analysis(Id)	
+<-
+	.print(Id," is not a good auctionJob anymore");	
+	.
+	
++!analyse_bid_posted(Id)
+	: ::bidding(Id,0,_,Limit) & default::auction(Id,_,Reward,_,_,_,Bid,_,_)
+<-
+	.print("Someone post a initial bid ",Bid,", it decreases in ",Reward-Bid);
+	-+::bidding(Id,Bid,Reward-Bid,Limit);
+	.
++!analyse_bid_posted(Id)
+	: ::bidding(Id,LastBestBid,IncreaseBid,Limit) & default::auction(Id,_,_,_,_,_,Bid,_,_)
+<-
+	.print("Someone post bid",Bid,", it decreases in ",LastBestBid-Bid);
+	-+::bidding(Id,Bid,LastBestBid-Bid,Limit);
+	.
+
 +!analyse_auction_job(Id)	
 	: default::auction(Id,_,_,_,_,_,_,_,_)	
 <-
@@ -62,46 +72,23 @@ evaluateBid(Reward,CurrentBid,MyBid) 	:- MyBid = CurrentBid-6.
 	!send_a_bid(Id);
 	.
 +!analyse_auction_job(Id)	
-	: true
 <-
 	.print("Job is not an auction");
 	.
 
 +!send_a_bid(Id)
-	: default::auction(Id,_,Reward,_,_,_,Bid,_,_) & ::bidding(Id,_,Limit) & (Limit >= Reward)
+	: default::auction(Id,_,Reward,_,_,_,Bid,_,_) & ::bidding(Id,_,BaseBid,Limit)	
 <-
-	.print("Limit ",Limit," is greater or equal to Reward ",Reward);
-//	!strategies::free;
-	!strategies::not_reasoning;
-	.
-+!send_a_bid(Id)
-	: default::auction(Id,_,_,_,_,_,Bid,_,_) & ::bidding(Id,CurrentBid,Limit) & (Bid \== 0) & (CurrentBid > 0) & (Bid < Limit)
-<-
-	.print("Bid ",Bid," is lower than the limit of ",Limit);
-//	!strategies::free;
-	!strategies::not_reasoning;
-	.
-+!send_a_bid(Id)
-	: default::auction(Id,_,Reward,_,_,_,Bid,_,_) & ::bidding(Id,_,Limit)	
-<-
-	?::evaluateBid(Reward,Bid,NewBid);
-//	NewBid = Limit+1;
+	?::evaluateBid(Reward,Bid,BaseBid,NewBid);
 	
-	if (NewBid >= Limit){
-		.print("Posting bid of ",NewBid);	
-		-+::bidding(Id,NewBid,Limit);
-		!action::bid_for_job(Id,NewBid);	
-	}
-	else{
-		.print("CounterBid ",NewBid," is lower than the limit of ",Limit);
-//		!strategies::free;
-		!strategies::not_reasoning;
-	}
+	.print("Posting bid of ",NewBid);
+	!action::bid_for_job(Id,NewBid);
+
+	-action::hold_action;	
 	.
 	
 +!free_for_next_auction(AuctionId) 
-	: ::bidding(AuctionId,_,_) 
+	: ::bidding(AuctionId,_,_,_) 
 <- 
-	-::bidding(AuctionId,_,_);
+	-::bidding(AuctionId,_,_,_);
 	. 
-	

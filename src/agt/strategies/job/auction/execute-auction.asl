@@ -1,5 +1,3 @@
-::teste.
-
 !triggerFuturePlan.
 
 +!triggerFuturePlan
@@ -18,17 +16,17 @@
 	.
 	
 +default::winner(TaskList, assist(Storage, Assembler, JobId))
-	: default::auction(AuctionId,_,_,Start,_,_,_,Time,_)
+	: default::auction(JobId,_,_,Start,_,_,_,Time,_)
 <-
 	.print("I won the auction tasks(",JobId,") ",TaskList);
-	+::futurePlans(figure_out_auction_winning(AuctionId),Start+Time);
+	+::futurePlans(figure_out_auction_winning(JobId),Start+Time);
 	!!start_auction_tasks(JobId,massist);
 	.
 +default::winner(TaskList, assemble(Storage, JobId))
-	: default::auction(AuctionId,_,_,Start,_,_,_,Time,_)
+	: default::auction(JobId,_,_,Start,_,_,_,Time,_)
 <-
 	.print("I won the auction tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
-	+::futurePlans(figure_out_auction_winning(AuctionId),Start+Time);
+	+::futurePlans(figure_out_auction_winning(JobId),Start+Time);
 	!!start_auction_tasks(JobId,massemble);
 	.
 	
@@ -46,17 +44,14 @@
 +!figure_out_auction_winning(AuctionId)
 	: default::auction(AuctionId, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
 <-	
-	-initiator::bidding(AuctionId,_);
 	.print("We win auction ",AuctionId);	
 	.resume(::start_auction_tasks(_,_));
 	.
 +!figure_out_auction_winning(AuctionId) 
 <- 
-	-initiator::bidding(AuctionId,_); 
 	.print("We lost auction ",AuctionId);
 	.drop_desire(::start_auction_tasks(_,_));
 	-default::winner(_,_)[source(_)];
 	!strategies::empty_load;
 	!strategies::free;
 	.
-

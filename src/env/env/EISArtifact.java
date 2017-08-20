@@ -177,16 +177,16 @@ public class EISArtifact extends Artifact implements AgentListener {
 	
 	private void updatePerception(String agent, Collection<Percept> previousPercepts, Collection<Percept> percepts) throws JasonException {
 		for (Percept old: previousPercepts) {
-//			if (old.getName().equals("auction") && !percepts.contains(old)) {
-//				Literal literal = Translator.perceptToLiteral(old);
-//				try {
-//					literal.addTerm(ASSyntax.parseTerm("auction"));
-////					logger.info("AUCTION "+literal);
-//					jobDone.add(literal);
-//				} catch (ParseException e) {
-//					logger.info("AUCTION failed to send signal");
-//				}
-//			}
+			if (old.getName().equals("auction") && !percepts.contains(old)) {
+				Literal literal = Translator.perceptToLiteral(old);
+				try {
+					literal.addTerm(ASSyntax.parseTerm("auction"));
+//					logger.info("AUCTION "+literal);
+					jobDone.add(literal);
+				} catch (ParseException e) {
+					logger.info("AUCTION failed to send signal");
+				}
+			}
 			
 			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(old.getName()) && !old.getName().equals("job") && !old.getName().equals("mission") ) || step_obs_prop.contains(old.getName())) {
 				if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore

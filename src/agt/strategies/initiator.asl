@@ -376,6 +376,13 @@ task_id(0).
 //	.print("Finished job ",JobId," at step ",Step," estimated to end in ",Start+Estimate);
 //	-estimate(JobId,Start,Estimate);
 	.
+@auctionFinished[atomic]	
++!auction_finished(JobId) 
+<- 
+	-initiator::job(JobId, _);
+	?metrics::completedAuctions(C);
+	-+metrics::completedAuctions(C+1);
+	.
 
 @missionFinished[atomic]	
 +!mission_finished(JobId) 
@@ -401,17 +408,37 @@ task_id(0).
 	: metrics::failedJobs(C)
 <-
 	-+metrics::failedJobs(C+1);
-.
-
+	.
 @upateMissionFail[atomic]
 +!update_mission_failed(FineNew)
 	: metrics::failedMissions(C) & metrics::finePaid(OldFine) 
 <-
 	-+metrics::failedMissions(C+1);
 	-+metrics::finePaid(OldFine+FineNew);
-.
+	.
+@upateAuctionFail[atomic]
++!update_auction_failed(FineNew)
+	: metrics::failedAuctions(C) & metrics::finePaid(OldFine) 
+<-
+	-+metrics::failedAuctions(C+1);
+	-+metrics::finePaid(OldFine+FineNew);
+	.
 
+//+default::step(End)
+//	: initiator::mission(Id, _, _, End, _, Fine) | initiator::failed_mission(Id, End, Fine)
+//<-
+//	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline.");
+//	-initiator::mission(Id, _, _, End, _, Fine);
+//	-initiator::failed_mission(Id, End, Fine);
+//	!update_mission_failed(Fine);
+//	.
 +default::step(End)
+	: initiator::mission(_,_,_,End,_,_) | initiator::failed_mission(_,End,_) | default::auction(_,_,_,_,End,_,_,_,_)
+<-
+	!check_failed_fined_job(End);
+	.
+	
++!check_failed_fined_job(End)
 	: initiator::mission(Id, _, _, End, _, Fine) | initiator::failed_mission(Id, End, Fine)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",Id," failed: deadline.");
@@ -419,6 +446,13 @@ task_id(0).
 	-initiator::failed_mission(Id, End, Fine);
 	!update_mission_failed(Fine);
 	.
++!check_failed_fined_job(End)
+	: default::auction(Id,_,_,_,End,Fine,_,_,_) 
+<-
+	.print("!!!!!!!!!!!!!!!!! Auction ",Id," failed: deadline.");
+	!update_auction_failed(Fine);
+	.
+	
 // debugging
 +default::step(998)
 	: default::money(Money)

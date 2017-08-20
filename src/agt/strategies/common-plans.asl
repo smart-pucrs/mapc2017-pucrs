@@ -230,3 +230,26 @@
 	-+metrics::missionHaveFailed(MissionsFail+1);
 	!job_failed_assist;
 	.
+	
++default::job_done(JobId,_,Reward,_,_,Fine,_,_,_,auction)
+	: jobDone(JobId)
+<-
+	-jobDone(JobId);
+	.send(vehicle1,achieve,initiator::auction_finished(JobId)); 
+	.print("$$$$$$$$$$$$ Auction ",JobId," completed, got reward ",Reward);	
+	.
++default::job_done(JobId, _, _, _, _, Fine, _, _, _,auction)
+	: default::winner(_, assemble(_, JobId)) & metrics::auctionHaveFailed(AuctionFail)
+<-
+	.print("!!!!!!!!!!!!!!!!! Auction ",JobId," failed, paying fine ",Fine);
+	-+metrics::auctionHaveFailed(AuctionFail+1);
+	.send(vehicle1,achieve,initiator::update_mission_failed(Fine));
+	!job_failed_assemble;
+	.
++default::job_done(JobId, _, _, _, _, Fine, _, _, _,auction)
+	: default::winner(_, assist(_, _, JobId)) & metrics::auctionHaveFailed(AuctionFail)
+<-
+	.print("!!!!!!!!!!!!!!!!! Auction ",JobId," failed, paying fine ",Fine);
+	-+metrics::auctionHaveFailed(AuctionFail+1);
+	!job_failed_assist;
+	.

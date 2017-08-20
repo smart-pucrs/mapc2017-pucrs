@@ -83,6 +83,8 @@
 	.print("Jobs I have worked: ",Jobs); // Ok
 	?metrics::jobHaveFailed(JobsFail); // Ok
 	.print("Jobs I have failed: ",JobsFail);
+	?metrics::auctionHaveFailed(AuctionFail);  // Ok
+	.print("Auctions I have failed: ",AuctionFail);
 	?metrics::missionHaveFailed(MissionsFail);  // Ok
 	.print("Missions I have failed: ",MissionsFail);
 	.

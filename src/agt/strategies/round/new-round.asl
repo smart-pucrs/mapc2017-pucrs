@@ -42,6 +42,7 @@
 	+metrics::next_actions(0);
 	+metrics::jobHaveFailed(0);
 	+metrics::missionHaveFailed(0);
+	+metrics::auctionHaveFailed(0);
 	
 	+default::separateItemTool([],[],[]);
 	+default::removeDuplicateTool([],[]);

@@ -2,10 +2,10 @@ find_shops(ItemId,[],[]).
 find_shops(ItemId,[ShopId|List],[ShopId|Result]) :- shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,_,_,_,_),ListItems) & find_shops(ItemId,List,Result).
 find_shops(ItemId,[ShopId|List],Result) :- shop(ShopId, _, _, _, ListItems) & not .member(item(ItemId,_,_,_,_,_),ListItems) & find_shops(ItemId,List,Result).
 
-find_shop_qty(item(ItemId, Qty),[],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop) :- Buy = Aux & Shop = AuxShop & RouteShop = AuxRoute.
-find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop) :- shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,Qty2,_,_,_),ListItems) & Qty / Qty2 < Aux & default::role(Role, Speed, _, _, _) & actions.route(Role,Speed,ShopId,Route) & find_shop_qty(item(ItemId, Qty),List,Buy,Qty/Qty2,RouteShop,Route,ShopId,Shop).
-find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop) :- shop(ShopId, _, _, _, ListItems) & .member(item(ItemId,_,Qty2,_,_,_),ListItems) & Qty / Qty2 == Aux & default::role(Role, Speed, _, _, _)  & actions.route(Role,Speed,ShopId,Route) & Route < AuxRoute & find_shop_qty(item(ItemId, Qty),List,Buy,Qty/Qty2,RouteShop,Route,ShopId,Shop).
-find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop) :- find_shop_qty(item(ItemId, Qty),List,Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop).
+find_shop_qty(item(ItemId, Qty),[],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop,Res) :- Buy = Aux & Shop = AuxShop & RouteShop = AuxRoute.
+find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop,Res) :- shop(ShopId, _, _, Restock, ListItems) & .member(item(ItemId,_,Qty2,_,_,_),ListItems) & Restock <= Res & Qty / Qty2 < Aux & default::role(Role, Speed, _, _, _) & actions.route(Role,Speed,ShopId,Route) & find_shop_qty(item(ItemId, Qty),List,Buy,Qty/Qty2,RouteShop,Route,ShopId,Shop,Restock).
+find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop,Res) :- shop(ShopId, _, _, Restock, ListItems) & .member(item(ItemId,_,Qty2,_,_,_),ListItems) & Restock <= Res & Qty / Qty2 == Aux & default::role(Role, Speed, _, _, _)  & actions.route(Role,Speed,ShopId,Route) & Route < AuxRoute & find_shop_qty(item(ItemId, Qty),List,Buy,Qty/Qty2,RouteShop,Route,ShopId,Shop,Restock).
+find_shop_qty(item(ItemId, Qty),[ShopId|List],Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop,Res) :- find_shop_qty(item(ItemId, Qty),List,Buy,Aux,RouteShop,AuxRoute,AuxShop,Shop,Res).
 
 closest_facility(List, Facility) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility).
 closest_facility(List, Facility1, Facility2) :- role(Role, _, _, _, _) & actions.closest(Role, List, Facility1, Facility2).

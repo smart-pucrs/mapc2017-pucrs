@@ -134,7 +134,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-	.print("Failed job, why I am not doing recharge.");
+//	.print("Failed job, why I am not doing recharge.");
 	!!strategies::free;
 	.
 +!job_failed_assemble

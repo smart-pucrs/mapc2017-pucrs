@@ -125,7 +125,7 @@ task_id(0).
 	: not initiator::eval(Id) & default::steps(TotalSteps) & default::step(Step) & initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <-
 	+eval(Id);
-	if ( Step + 70 < TotalSteps & Step + 70 < End ) {
+	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
 		!decompose(Items,ListItems,ListToolsNew,Id);
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
@@ -143,6 +143,7 @@ task_id(0).
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) 
 <-
+//	.print("Tools to be alocated: ",ListToolsNew);
 	+cnp(Id);
 	+job(Id, Items);
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
@@ -187,6 +188,8 @@ task_id(0).
 	}
 	else {
 		.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> No bids ",JobId);
+		?metrics::noBids(NoBids);
+		-+metrics::noBids(NoBids+1);
 		+bids(Task,[bid(99999,99999,99999,Task,TaskId)],JobId);
 	}
 	remove[artifact_name(CNPBoardName)];

@@ -24,15 +24,23 @@
 -default::task(assemble(StorageId, Items), CNPBoard, TaskId)[source(X)].
 
 +!create_bid_task(item(ItemId, Qty), Bid, Shop)
-	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
+	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList) 
 <-
 	if (LoadCap - MyLoad >= Vol * Qty) {
-		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop);
+		HaHa = []; // strange Jason parser bug 
+		.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
+//		.print(StorageList," for task #",Qty," of ",ItemId);
+		if ( not .empty(StorageList) ) {
+			actions.closest(Role,StorageList,Facility);
+			actions.route(Role,Speed,Facility,Route);
+		}
+		else {
+			?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,Route,99999,"",Facility,99999);
+		}
 //		.print("The lowest amount of buy actions that I need to buy ",Qty,"# of",ItemId," is ",Buy," in ",Shop);
-//		actions.route(Role,Speed,Shop,RouteShop);
-//		.print("####### Route: ",RouteShop," role ",Role);
-		Bid = RouteShop;
-		Shop = Shop;
+//		.print("####### Route: ",Route," role ",Role);
+		Bid = Route;
+		Shop = Facility;
 	}
 	else { Bid = -1; Shop = null; }
 	.

@@ -62,8 +62,10 @@
 	.print("Number of completed missions: ",MissionsCompleted); 
 	?metrics::failedMissions(MissionsFailed); // Ok
 	.print("Number of failed missions: ",MissionsFailed); 
-	?metrics::finePaid(Fine);
-	.print("Fine paid: ",Fine); // Ok
+	?metrics::finePaid(Fine); // Ok
+	.print("Fine paid: ",Fine);
+	?metrics::noBids(NoBids); // Ok
+	.print("Number of no bids: ",NoBids);
 	!print_common_metrics;
 	.print("--------------------");
 	.	

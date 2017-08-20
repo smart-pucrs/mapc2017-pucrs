@@ -45,7 +45,7 @@
 		}
 	}
 	for ( .member(item(ItemId,Qty),TaskList) ) {
-		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop);
+		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop,99999);
 		if (strategies::buyList(ItemId,Qty2,Shop)) {
 			-strategies::buyList(ItemId,Qty2,Shop)
 			+strategies::buyList(ItemId,Qty+Qty2,Shop);

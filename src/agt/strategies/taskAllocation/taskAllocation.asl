@@ -150,6 +150,24 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 {end}
 
++taResults::allocationProcess(ready):true
+	//: ::taskBiding(JobId,_)
+<-
+	.findall(allocatedTasks(Task,Parent),taResults:: allocatedTasks(Task,Parent),LTASKS);
+	.length(LTASKS, NTASKS);
+	if(NTASKS>0){
+		.print("I won ",NTASKS, " tasks!");
+		.print("Tasks I won:",LTASKS);
+		//.abolish(::taskBiding(JobId,_));
+	}
+	else {
+		.print("I won 0 tasks");
+	}
+	.
+
+
+
+
 //+taResults:: allocatedTasks(Task,Parent)
 //	: ::taskBiding(JobId,Parent)
 //<-

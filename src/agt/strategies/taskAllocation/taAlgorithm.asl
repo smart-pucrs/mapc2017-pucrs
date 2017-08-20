@@ -613,21 +613,21 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 +!totalAllocatedFinal:true
 <-
 .findall(preAllocatedTasks(NetValue, Subtask, Task),taProcess::preAllocatedTasks(NetValue, Subtask, Task),LAlloc);
-.print("preAllocatedTasks:",LAlloc);
+//.print("preAllocatedTasks:",LAlloc);
 	for (.member(preAllocatedTasks(NetValuea, Subtaska, Taska),LAlloc)) {
 	
 	if(not Subtaska==Taska){
 		+taResults::allocatedTasks(Subtaska, Taska);
-		.print("+taResults::allocatedTasks: Subtaska:",Subtaska," - Taska:",Taska)
+		//.print("+taResults::allocatedTasks: Subtaska:",Subtaska," - Taska:",Taska)
 	}
 	else{
 		//.print("Task SD por enquanto para nao dar erro");
 		.findall(subtask(Subtaska2,Taska,UTILITYORIG),taProcess::subtaskReceivedOriginal(Subtaska2,Taska,LOADORIG,UTILITYORIG,TASKTYPEORIG,ROLEORIG), LSUBTASK);
-		.print("Taska:",Taska);
-		.print("LSUBTASK:",LSUBTASK);
+		//.print("Taska:",Taska);
+		//.print("LSUBTASK:",LSUBTASK);
 		 for (.member(subtask(SubtaskSD,TaskSD,UTILITYORIGSD),LSUBTASK)) {
 			+taResults::allocatedTasks(SubtaskSD, TaskSD);
-			.print("+taResults::allocatedTasks: SubtaskSD:",SubtaskSD," - TaskSD:",TaskSD)
+			//.print("+taResults::allocatedTasks: SubtaskSD:",SubtaskSD," - TaskSD:",TaskSD)
 		}
 	}
 	
@@ -638,7 +638,7 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 .concat(HH,":",NN,":",SS,ENDTIME);
 .print("INITIME:",INITIME);
 .print("ENDTIME:",ENDTIME);
-!printAuxFinal;	
+//!printAuxFinal;	
 .
 
 
@@ -1099,11 +1099,11 @@ if (VBid == PriceGlobal) {
 
 }//end for BIDS
 
-if (bidIgnorado(A,true)){
+if (taProcess::bidIgnorado(A,true)){
 	!updateMissingBid(A,1);
 }
 else{
-	if (bidIgnorado(A,false)){
+	if (taProcess::bidIgnorado(A,false)){
 	!updateMissingBid(A,-1);
 	}
 	else{

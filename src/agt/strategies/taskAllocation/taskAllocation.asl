@@ -71,8 +71,20 @@ evaluateUtilityItem(ItemId,TotalVol,Utility) :-	  default::load(MyLoad)
 												& default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,Route,99999,"",Facility,99999)
 												& Utility = Route.
 evaluateUtilityItem(ItemId,Vol,Utility) :- Utility = -1.
+
 evaluateUtilityTool(ItemId,Utility) :- default::role(_,_,_,_,Tools) & .member(ItemId,Tools) & Utility = 1.
 evaluateUtilityTool(ItemId,Utility) :- Utility = -1.
+
+evaluateUtilityAssemble(StorageId,Items,Utility) :- default::load(MyLoad)
+												& 	default::total_load(Items,0,Vol)
+												&	default::role(Role, Speed, LoadCap, _, _)
+												&	(LoadCap - MyLoad >= Vol)
+												&	new::workshopList(WList)
+												&	actions.closest(Role,WList,StorageId,ClosestWorkshop)
+												&	actions.route(Role,Speed,ClosestWorkshop,RouteWorkshop)
+												&	Utility = RouteWorkshop.
+evaluateUtilityAssemble(StorageId,Items,Utility) :- Utility = -1.
+
 evaluateUtility(ItemId,Vol,Utility) :- .substring("item",ItemId) & evaluateUtilityItem(ItemId,Vol,Utility).
 evaluateUtility(ItemId,Vol,Utility) :- evaluateUtilityTool(ItemId,Utility).
 
@@ -84,7 +96,7 @@ generateSubTaskList(ParentId,[item(BaseItem,Qtd)|List],Temp,Result) :-	default::
 																	&	(	
 																			(Utility \== -1
 																		& 	.term2string(TermId,ParentId)
-																		& 	generateSubTaskList(ParentId,List,[subtask(BaseItem,TermId,NewVol,Utility,tcl,"")|Temp],Result))
+																		& 	generateSubTaskList(ParentId,List,[subtask(required(BaseItem,Qtd),TermId,NewVol,Utility,tcl,"")|Temp],Result))
 																	|		
 																			(generateSubTaskList(ParentId,List,Temp,Result))
 																		).
@@ -98,9 +110,16 @@ generateTaskList(ParentId,[compoundedItem(Item,ListItensJob)|List],Temp,Result) 
 																				&	generateSubTaskList(NewId,ListItensJob,[],Translated) 
 																				& 	.concat(Translated,Temp,NewTemp)
 																				& 	generateTaskList(NewId,List,NewTemp,Result).
+generateAssembleTask(JobId,StorageId,Items,[subtask(assemble,JobId,Vol,Utility,tcl,"")|Result]) :- evaluateUtilityAssemble(StorageId,Items,Utility) 
+												&	(Utility \== -1)
+												&	default::total_load(Items,0,Vol).
+generateAssembleTask(JobId,StorageId,Items,Result).
 
 converCoalitionMembers([],Temp,Result) :- Result = Temp.
 converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoalitionMembers(Coalition,[Member|Temp],Result).
+
+convertTaskId([],Temp,Result) :- Result = Temp.
+convertTaskId([subtask(required(BaseItem,Qtd),ParentId,NewVol,Utility,Type,Unkown)|List],Temp,Result) :- convertTaskId(List,[subtask(BaseItem,ParentId,NewVol,Utility,Type,Unkown)|Temp],Result).
 
 {end}
 
@@ -109,7 +128,7 @@ converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoaliti
 testVetor([]).
 testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
-+!allocate_job(JobId,Requirements,FreeAgents)
++!allocate_job(JobId,StorageId,Requirements,FreeAgents)
 	: not default::winner(_,_) & default::role(_,_,RoleLoad,_,_) & default::load(MyLoad)
 <-
 	.print("Initialising Task Allocation ",JobId);
@@ -118,21 +137,29 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	?localTask::generateTaskList(JobId,Bases,[],Tasks);
 	.print("Tasks: ",Tasks);
 
-	for ( .member(subtask(_,TaskId,_,_,_,_),Tasks) ) {
-        +::taskBiding(JobId,TaskId);
+	for ( .member(subtask(required(TaskId,Qtd),ParentId,_,_,_,_),Tasks) ) {
+        +::taskBiding(JobId,ParentId,required(TaskId,Qtd),TaskId);
     }
+    
+    ?localTask::convertTaskId(Tasks,[],ConvertedTasks);
+	
+	
+	?localTask::generateAssembleTask(JobId,StorageId,Requirements,ConvertedTasks);
+	.print("Tasks: ",ConvertedTasks);
 	
 //	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
-//	!taProcess::run_distributed_TA_algorithm(communication(broadcast,[]),Tasks,RoleLoad-MyLoad);
+	!taProcess::run_distributed_TA_algorithm(communication(broadcast,[]),ConvertedTasks,RoleLoad-MyLoad);
 	.
-
 	
 {end}
 
-+taResults::allocationProcess(ready):true
++taResults::allocationProcess(ready)
 	//: ::taskBiding(JobId,_)
 <-
-	.findall(allocatedTasks(Task,Parent),taResults:: allocatedTasks(Task,Parent),LTASKS);
+	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::taskBiding(_,TuParent,TaskId,TuTask)),LTASKS);
+//	.findall(Task,taResults::allocatedTasks(Task,ParentId),LTASKS);
+	
+	
 	.length(LTASKS, NTASKS);
 	if(NTASKS>0){
 		.print("I won ",NTASKS, " tasks!");

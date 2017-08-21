@@ -115,8 +115,8 @@ task_id(0).
 	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
 //		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 		
-		.broadcast(achieve,gTaskAllocation::allocate_job(Id,Items,[]));
-		!gTaskAllocation::allocate_job(Id,Items,[]);
+		.broadcast(achieve,gTaskAllocation::allocate_job(Id,Storage,Items,[]));
+		!gTaskAllocation::allocate_job(Id,Storage,Items,[]);
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");

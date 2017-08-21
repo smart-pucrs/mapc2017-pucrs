@@ -62,14 +62,14 @@ decomposeRequirements([required(Item,Qtd) | Requirements],Temp,Result):- default
 //generateTaskList([],Temp,Result) :- Result = Temp.
 //generateTaskList([compoundedItem(Item,ListItensJob)|List],Temp,Result) :- generateSubTaskList(Item,ListItensJob,[],Translated) & .concat(Translated,Temp,NewTemp) & generateTaskList(List,NewTemp,Result).
 
-evaluateUtilityItem(ItemId,TotalVol,Utility) :-default::load(MyLoad) 
-										& default::role(Role,Speed,LoadCap,_,_) 										
-										& (LoadCap - MyLoad >= TotalVol) 
-										& default::item(ItemId,Vol,_,_)
-										& Qty = (TotalVol / Vol)
-										& new::shopList(SList)
-										& default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop)
-										& Utility = RouteShop.
+evaluateUtilityItem(ItemId,TotalVol,Utility) :-	  default::load(MyLoad) 
+												& default::role(Role,Speed,LoadCap,_,_) 										
+												& (LoadCap - MyLoad >= TotalVol) 
+												& default::item(ItemId,Vol,_,_)
+												& Qty = (TotalVol / Vol)
+												& new::shopList(SList)
+												& default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,Route,99999,"",Facility,99999)
+												& Utility = Route.
 evaluateUtilityItem(ItemId,Vol,Utility) :- Utility = -1.
 evaluateUtilityTool(ItemId,Utility) :- default::role(_,_,_,_,Tools) & .member(ItemId,Tools) & Utility = 1.
 evaluateUtilityTool(ItemId,Utility) :- Utility = -1.
@@ -81,8 +81,13 @@ generateSubTaskList(ParentId,[],Temp,Result) :- Result = Temp.
 generateSubTaskList(ParentId,[item(BaseItem,Qtd)|List],Temp,Result) :-	default::item(BaseItem,Vol,_,_) 
 																	& 	NewVol = Qtd*Vol 
 																	& 	evaluateUtility(BaseItem,NewVol,Utility) 
-																	& 	.term2string(TermId,ParentId)
-																	& 	generateSubTaskList(ParentId,List,[subtask(BaseItem,TermId,NewVol,Utility,tcl,"")|Temp],Result).
+																	&	(	
+																			(Utility \== -1
+																		& 	.term2string(TermId,ParentId)
+																		& 	generateSubTaskList(ParentId,List,[subtask(BaseItem,TermId,NewVol,Utility,tcl,"")|Temp],Result))
+																	|		
+																			(generateSubTaskList(ParentId,List,Temp,Result))
+																		).
 generateSubTaskList(ParentId,[compoundedItem(Item,ListItensJob)|List],Temp,Result) :- 
 																					generateTaskList(ParentId,[compoundedItem(Item,ListItensJob)],[],Translated) 
 																				&	.concat(Translated,Temp,NewTemp) 

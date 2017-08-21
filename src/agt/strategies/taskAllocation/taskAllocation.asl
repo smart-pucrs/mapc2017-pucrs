@@ -99,16 +99,6 @@ generateTaskList(ParentId,[compoundedItem(Item,ListItensJob)|List],Temp,Result) 
 																				& 	.concat(Translated,Temp,NewTemp)
 																				& 	generateTaskList(NewId,List,NewTemp,Result).
 
-
-evaluateUtilityExploration(car,Task,Utility) 		:- (((Task == first)|(Task == second)) & Utility = 1) | (Utility = -1).
-evaluateUtilityExploration(drone,Task,Utility) 		:- ((Task == explore) & Utility = 1) | (Utility = -1).
-evaluateUtilityExploration(motorcycle,Task,Utility) :- ((Task == shop) & Utility = 1) | (Utility = -1).
-evaluateUtilityExploration(truck,Task,Utility) 		:- (((Task == workshop)|(Task == resource)) & Utility = 1) | (Utility = -1).
-generateSubTaskListExloration([],Temp,Result) 			:- Result = Temp.
-generateSubTaskListExloration([Task|Tasks],Temp,Result) :-default::role(Role,_,_,_,_)
-														& evaluateUtilityExploration(Role,Task,Utility) 
-														& generateSubTaskListExloration(Tasks,[subtask(Task,exploration,1,Utility,"tcn","")|Temp],Result).
-
 converCoalitionMembers([],Temp,Result) :- Result = Temp.
 converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoalitionMembers(Coalition,[Member|Temp],Result).
 
@@ -118,22 +108,6 @@ converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoaliti
 
 testVetor([]).
 testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
-
-+coalitionTask(JobId, Requirements)
-	: true
-<-
-	!task_allocation_job(JobId, Requirements);
-	.
-	
-+!task_allocation_exploration(Coalition)
-	: default::convertListString2Term(Coalition,[],TermCoalition) & localTask::converCoalitionMembers(TermCoalition,[],NewCoalition)
-<-
-	.print("Task Allocation Exploration");
-	Task = [first,second,explore,shop,shop,workshop,resource];
-	?localTask::generateSubTaskListExloration(Task,[],Tasks);
-	.print("Tasks: ",Tasks);
-	!taProcess::run_distributed_TA_algorithm(communication(coalition,NewCoalition),Tasks,1);
-	.
 	
 +!allocate_job(JobId,Requirements,FreeAgents)
 	: not default::winner(_,_) & default::role(_,_,RoleLoad,_,_) & default::load(MyLoad)

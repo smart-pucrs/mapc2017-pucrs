@@ -92,7 +92,8 @@ task_id(0).
 	for ( .member(Item,Bases) ) {
 		?bases(L,Id);
 		.concat(L,Item,New);
-		-+bases(New,Id);
+		-bases(L,Id);
+		+bases(New,Id);
 	}
 	?bases(B,Id);
 	-bases(B,Id);

@@ -119,10 +119,10 @@
 	.drop_desire(strategies::go_buy);
 	.drop_desire(strategies::go_to_workshop(_));
 	.abolish(org::_);
-	?default::step(S);
+	?default::actionID(S);
 	if (action::action(S)) {
 		.abolish(action::_);
-		.wait( default::step(S2) & S2 \== S );
+		.wait( default::actionID(S2) & S2 \== S );
 	}
 	if ( not default::routeLength(0) ) { !action::abort; }
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
@@ -134,7 +134,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-	.print("Failed job, why I am not doing recharge.");
+//	.print("Failed job, why I am not doing recharge.");
 	!!strategies::free;
 	.
 +!job_failed_assemble
@@ -148,10 +148,10 @@
 	.drop_desire(strategies::go_to_workshop(_));
 	.drop_desire(strategies::deliver);
 	.drop_desire(strategies::go_to_storage);
-	?default::step(S);
+	?default::actionID(S);
 	if (action::action(S)) {
 		.abolish(action::_);
-		.wait( default::step(S2) & S2 \== S );
+		.wait( default::actionID(S2) & S2 \== S );
 	}
 	if ( not default::routeLength(0) ) { !action::abort; }
 	

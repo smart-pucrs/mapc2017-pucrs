@@ -258,3 +258,4 @@
 	-+metrics::auctionHaveFailed(AuctionFail+1);
 	!job_failed_assist;
 	.
++!check_aucion_finished(_,_,_,_,_,_,_,_,_).

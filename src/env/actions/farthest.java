@@ -5,7 +5,9 @@ import jason.asSemantics.TransitionSystem;
 import jason.asSemantics.Unifier;
 import jason.asSyntax.ListTerm;
 import jason.asSyntax.Literal;
+import jason.asSyntax.NumberTermImpl;
 import jason.asSyntax.Term;
+import massim.scenario.city.data.Location;
 import massim.scenario.city.data.Route;
 import env.MapHelper;
 
@@ -22,14 +24,32 @@ public class farthest extends DefaultInternalAction {
 		if(role.equals("drone")){
 			type = "air";
 		}
-		ListTerm ids = (ListTerm) args[1];
-		String from = ts.getUserAgArch().getAgName();
-		for (Term term : ids) {
-			String to = term.toString();
-			Route route = MapHelper.getInstance().getNewRoute(from, to, type);
-			if(route.getRouteLength() > len){
-				farthest = to;
-				len = route.getRouteLength();
+		if (args.length == 5) {
+			NumberTermImpl a1 = (NumberTermImpl) args[1];
+			NumberTermImpl a2 = (NumberTermImpl) args[2];
+			double locationLat = a1.solve();
+			double locationLon = a2.solve();
+			ListTerm ids = (ListTerm) args[3];
+			Location from = new Location(locationLon, locationLat);
+			for (Term term : ids) {
+				String to = term.toString();
+				Route route = MapHelper.getInstance().getNewRoute(from, to, type);
+				if(route.getRouteLength() > len){
+					farthest = to;
+					len = route.getRouteLength();
+				}
+			}
+		}
+		else {
+			ListTerm ids = (ListTerm) args[1];
+			String from = ts.getUserAgArch().getAgName();
+			for (Term term : ids) {
+				String to = term.toString();
+				Route route = MapHelper.getInstance().getNewRoute(from, to, type);
+				if(route.getRouteLength() > len){
+					farthest = to;
+					len = route.getRouteLength();
+				}
 			}
 		}
 		boolean ret = true;

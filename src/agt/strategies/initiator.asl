@@ -76,7 +76,8 @@ task_id(0).
 	for ( .member(Item,Bases) ) {
 		?bases(L,Id);
 		.concat(L,Item,New);
-		-+bases(New,Id);
+		-bases(L,Id);
+		+bases(New,Id);
 	}
 	?bases(B,Id);
 	-bases(B,Id);
@@ -88,14 +89,14 @@ task_id(0).
 	.
 
 +!evaluate_job(Items, End, Storage, Id, Reward)
-	: new::vehicle_job(Role,Speed) & new::shopList(SList) & new::workshopList(WList) & default::steps(TotalSteps) & default::step(Step) & mapCenter(CLat,CLon) & initiator::free_agents(FreeAgents) & default::get_roles(FreeAgents,[],Roles) & default::get_tools(Roles,[],AvailableTools)
+	: new::vehicle_job(Role,Speed) & new::workshopList(WList) & default::steps(TotalSteps) & default::step(Step) & initiator::free_agents(FreeAgents) & default::get_roles(FreeAgents,[],Roles) & default::get_tools(Roles,[],AvailableTools) & initiator::eval_shop_route(FarthestShop,RouteShop)
 <-
 	!decompose(Items,ListItems,ListToolsNew,Id);
 	.length(ListToolsNew,NumberOfBuyTool);
 	.length(ListItems,NumberOfBuyItem);
 	.length(Items,NumberOfAssemble);
 	?default::concat_bases(ListItems,[],ListItemsConcat);
-	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.farthest(Role,SList,FarthestShop) & actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop) & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
+	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
@@ -107,7 +108,7 @@ task_id(0).
 	.
 	
 +!evaluate_mission(Items, End, Storage, Id, Reward, Fine)
-	: not initiator::eval(Id) & default::steps(TotalSteps) & default::step(Step) & initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
+	: initiator::accept_jobs & not initiator::eval(Id) & default::steps(TotalSteps) & default::step(Step) & initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <-
 	+eval(Id);
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {

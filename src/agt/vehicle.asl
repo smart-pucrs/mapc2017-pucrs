@@ -42,7 +42,7 @@
 //	!!strategies::free;
 //.
 
-+default::role(Role,_,LoadCap,_,Tools)
++default::role(Role,Speed,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)
 <- 
 	addLoad(Me,LoadCap);
@@ -54,7 +54,15 @@
 	!action::recharge_is_new_skip;
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
-	if ( Me == vehicle1 ) { !initiator::add_myself_to_free; +initiator::accept_jobs; }
+	if ( Me == vehicle1 ) {
+		!initiator::add_myself_to_free;
+		?initiator::mapCenter(CLat,CLon);
+		?new::shopList(SList);
+		actions.farthest(Role,CLat,CLon,SList,FarthestShop);
+		actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop);
+		+initiator::eval_shop_route(FarthestShop,RouteShop);
+		+initiator::accept_jobs;
+	}
 	else {
 		if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }

@@ -1,7 +1,7 @@
 {begin namespace(localActions, local)}
 
 +!commitAction(Action)
-	: default::step(S) & not action::action(S) & not action::hold_action
+	: default::actionID(S) & not action::action(S) & not action::hold_action
 <-
 	+action::action(S);
 	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);

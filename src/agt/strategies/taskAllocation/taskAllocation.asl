@@ -131,7 +131,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	.
 	
 +!allocate_job(JobId,Requirements,FreeAgents)
-	: default::role(_,_,RoleLoad,_,_) & default::load(MyLoad)
+	: not default::winner(_,_) & default::role(_,_,RoleLoad,_,_) & default::load(MyLoad)
 <-
 	.print("Initialising Task Allocation ",JobId);
 	?localTask::decomposeRequirements(Requirements,[],Bases);
@@ -144,7 +144,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
     }
 	
 //	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
-	!taProcess::run_distributed_TA_algorithm(communication(broadcast,[]),Tasks,RoleLoad-MyLoad);
+//	!taProcess::run_distributed_TA_algorithm(communication(broadcast,[]),Tasks,RoleLoad-MyLoad);
 	.
 
 	

@@ -6,7 +6,7 @@
 { include("strategies/round/new-round.asl") }
 { include("strategies/common-plans.asl", strategies) }
 { include("strategies/scheme-plans.asl", org) }
-//{ include("strategies/job/auction/execute-auction.asl", execution_auction) }
+{ include("strategies/job/auction/execute-auction.asl", execution_auction) }
 { include("strategies/bidder.asl", bidder) }
 { include("strategies/round/end-round.asl") }
 

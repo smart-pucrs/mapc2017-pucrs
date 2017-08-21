@@ -181,10 +181,16 @@ public class EISArtifact extends Artifact implements AgentListener {
 				if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore
 					Literal literal = Translator.perceptToLiteral(old);
 					try{
-						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
+						if (old.getName().equals("auction")) {
+							logger.info("Removing "+literal);
+							removeObsPropertyByTemplate(old.getName(), literal.getTerm(0), null, null, null, null, null, null, null, null);
+						}
+						else {						
+							removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
+						}
 					}
 					catch (Exception e) {
-						logger.info("error removing old perception "+literal);
+						logger.info("error removing old perception "+literal+" "+e.getMessage());
 						logger.info("P*** "+percepts);
 						logger.info("O*** "+previousPercepts);
 					}

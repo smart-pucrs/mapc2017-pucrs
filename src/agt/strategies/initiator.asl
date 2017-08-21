@@ -1,4 +1,4 @@
-//{include("strategies/job/auction/evaluate-auction.asl",evaluation_auction)}
+{include("strategies/job/auction/evaluate-auction.asl",evaluation_auction)}
 
 task_id(0).
 
@@ -30,46 +30,29 @@ task_id(0).
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
-//+!wait_for_step(Step)
-//	: default::step(CurrentStep) & (Step <= CurrentStep).
-//+!wait_for_step(Step)
-//<-
-//	.wait({+default::step(Step)});
-//	.
-//@oldAuction[atomic]
-//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
-//	: evaluation_auction::bidding(Id,LastBid,_)
-//<-	
-//	if (Bid == LastBid){
-//		.print("I'm winning ",Id);
-////		!strategies::free;
-//	}
-//	else{
-//		.print("I'm losing ",Id);
-////		.wait({+step(Step)});	
-////		.wait({+default::step(Step)});	
-////		!strategies::not_free;
-//		!strategies::reasoning;
-//		!evaluation_auction::analyse_auction_job(Id);
-//	}
-//	.
-//@newAuction[atomic]
-//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
-////	: not evaluation_auction::bidding(_,_,_)
-//	: true
-//<-
-//	!wait_for_step(Start);
-//	.print("############################################################");
-////	!strategies::not_free;
-//	!strategies::reasoning;
-//	.print("New auction job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," has current bid of ",Bid," time for bids ",Time);
-//	.print("Items required: ",Items);
-//
-////	!lAuctionJob::analyse_auction_job(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items);
-////	!!separate_tasks(Id, Storage, Items, End, End - Start, Reward, type(auction));
-//	!!evaluate_job(Items, End - Start, Storage, Id, Reward);
-//	.
-//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id).
++!wait_for_step(Step)
+	: default::step(CurrentStep) & (Step <= CurrentStep).
++!wait_for_step(Step)
+<-
+	.wait({+default::step(Step)});
+	.
+@oldAuction[atomic]
++default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
+	: evaluation_auction::bidding(Id,_,_,_)
+<-	
+	!evaluation_auction::analyse_bid_posted(Id);
+	.
+@newAuction[atomic]
++default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
+//	: not evaluation_auction::bidding(_,_,_,_)
+<-
+	!wait_for_step(Start);
+	.print("New auction job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," has current bid of ",Bid," time for bids ",Time);
+	.print("Items required: ",Items);
+
+	!evaluation_auction::first_analysis(Id);
+	.
++default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id,", it shoud have not passed here").
 
 
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now."); .
@@ -85,8 +68,9 @@ task_id(0).
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
 	
-+!decompose(Items,ListItems,ListToolsNew,Id)
++!decompose(Items,ListItems,ListToolsNew,Id) : default::step(Step)
 <-
+	.print("Decomposing ",Id," at step ",Step);
 	?default::decomposeRequirements(Items,[],Bases);
 	+bases([],Id);
 	for ( .member(Item,Bases) ) {
@@ -118,6 +102,7 @@ task_id(0).
 		.print("Job ",Id," failed evaluation, ignoring it.");
 		!update_eval;
 		-action::hold_action;
+		!evaluation_auction::has_set_to_free;
 	}
 	.
 	
@@ -288,6 +273,7 @@ task_id(0).
 		.delete(AgentA,FreeAgentsA,FreeAgentsNewA);
 		-+initiator::free_agents(FreeAgentsNewA);
 //		.print("Removing ",AgentA," from free lists.");
+		.print("For ",JobId);
 		for ( initiator::awarded(Agent,Shop,List,JobId) ) {
 //			.print("Removing ",Agent," from free lists.");
 			?initiator::free_agents(FreeAgents);
@@ -300,13 +286,15 @@ task_id(0).
 			}
 	    	.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 			-awarded(Agent,Shop,List,JobId);	
+			.print(Agent," ",AgentA," ",List);
 		}
+		.print(AgentA," ",Items);
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
 		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _) }
 		-cnp(JobId);
 		
 //		.wait(50);
-//		!evaluation_auction::analyse_auction_job(JobId);
+		!evaluation_auction::analyse_auction_job(JobId);
 	}
 	else { 
 		-impossible_task(JobId);
@@ -318,9 +306,10 @@ task_id(0).
 		.print("Impossible job ",JobId,", aborting it.");
 	}
 	-action::hold_action;
-//	.print("Task allocation is done ",JobId);
+	!evaluation_auction::has_set_to_free;
+	.print("Task allocation is done ",JobId);
 	.
-+!create_scheme(JobId, st, SchArtId,OrgId) <- org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
++!create_scheme(JobId, st, SchArtId,OrgId) <- .print("Created Scheme ",JobId);org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
 -!create_scheme(JobId, st, SchArtId,OrgId) 
 <-
 	-impossible_task(JobId);

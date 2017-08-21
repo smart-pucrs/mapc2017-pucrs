@@ -4,10 +4,10 @@
 	: default::step(S) & not action::action(S) & not action::hold_action
 <-
 	+action::action(S);
-//	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
-	if ( Action \== recharge & Action \== continue) {
-		.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
-	}
+	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+//	if ( Action \== recharge & Action \== continue) {
+//		.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+//	}
 	action(Action);
 	.wait( default::actionID(S2) & S2 \== S );
 //	.print("Got out of wait from step ",S);

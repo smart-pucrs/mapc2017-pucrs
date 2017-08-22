@@ -125,7 +125,7 @@ task_id(0).
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) & NumberOfTrucks > 0 & NumberOfAgents >= 2
 <-
-//	.print("Tools to be alocated: ",ListToolsNew);
+	.print("Tools to be alocated: ",ListToolsNew);
 	+cnp(Id);
 	+job(Id, Items);
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
@@ -152,7 +152,7 @@ task_id(0).
 	.wait(500);
 	!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	.
-+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items). //<- .print(">>>>>>>>>>>>>>>>>>>>>>> Trying to allocate the same job, or job is no longer viable ",Id).
++!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items) <- .print(">>>>>>>>>>>>>>>>>>>>>>> Trying to allocate the same job, or job is no longer viable ",Id).
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)
 	: true

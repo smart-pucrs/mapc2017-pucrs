@@ -113,7 +113,7 @@ task_id(0).
 	.length(Items,NumberOfAssemble);
 	?default::concat_bases(ListItems,[],ListItemsConcat);
 	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
-		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
@@ -130,15 +130,15 @@ task_id(0).
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
 		.wait(100);
 		!decompose(Items,ListItems,ListToolsNew,Id);
-		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
 		.print("Mission ",Id," failed evaluation, ignoring it.");
 		-action::hold_action(Id);
 		-mission(Id, Storage, Items, End, Reward, Fine);
 		+failed_mission(Id, End, Fine);
+		-eval(Id);
 	}
-	-eval(Id);
 .
 +!evaluate_mission(Items, End, Storage, Id, Reward, Fine). //<- .print("Mission is already being evaluated").
 
@@ -305,7 +305,7 @@ task_id(0).
 			-awarded(Agent,Shop,List,JobId,TaskCount);	
 		}
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
-		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _) }
+		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
 		-cnp(JobId);
 		
 //		.wait(50);
@@ -316,6 +316,7 @@ task_id(0).
 		-cnp(JobId);
 		-job(JobId, _);
 		-awarded_assemble(_,_,_,JobId);
+		-eval(JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_,JobId,_));
 		.print("Impossible job ",JobId,", aborting it.");
@@ -330,6 +331,7 @@ task_id(0).
 	-cnp(JobId);
 	-job(JobId, _);
 	-awarded_assemble(_,_,_,JobId);
+	-eval(JobId);
 	.abolish(initiator::bids(_,_,JobId));
 	.abolish(initiator::awarded(_,_,_,JobId,_));
 	.print("Bug with create scheme for ",JobId,", detected, aborting it.");
@@ -344,7 +346,7 @@ task_id(0).
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
 			+action::hold_action(Id);
-			!!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}
 	.
@@ -357,7 +359,7 @@ task_id(0).
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
 			+action::hold_action(Id);
-			!!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}
 	.
@@ -369,7 +371,7 @@ task_id(0).
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
 			+action::hold_action(Id);
-			!!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}
 	.

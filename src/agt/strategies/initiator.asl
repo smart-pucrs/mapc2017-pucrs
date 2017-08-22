@@ -54,7 +54,7 @@ task_id(0).
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
-	+action::hold_action(Id);
+//	+action::hold_action(Id);
 	+mission(Id, Storage, Items, End, Reward, Fine);
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
@@ -91,7 +91,7 @@ task_id(0).
 	.length(Items,NumberOfAssemble);
 	?default::concat_bases(ListItems,[],ListItemsConcat);
 	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
-		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
@@ -107,17 +107,17 @@ task_id(0).
 	+eval(Id);
 //	.print("Evaluating mission ",Id," at step ",Step);
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
-		.wait(100);
+		+action::hold_action(Id);
 		!decompose(Items,ListItems,ListToolsNew,Id);
-		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 
 		.print("Mission ",Id," failed evaluation, ignoring it.");
 		-action::hold_action(Id);
 		-mission(Id, Storage, Items, End, Reward, Fine);
 		+failed_mission(Id, End, Fine);
+		-eval(Id);
 	}
-	-eval(Id);
 .
 +!evaluate_mission(Items, End, Storage, Id, Reward, Fine). //<- .print("Mission is already being evaluated").
 
@@ -292,7 +292,7 @@ task_id(0).
 		}
 		.print(AgentA," ",Items);
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
-		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _) }
+		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
 		-cnp(JobId);
 		
 //		.wait(50);
@@ -303,6 +303,7 @@ task_id(0).
 		-cnp(JobId);
 		-job(JobId, _);
 		-awarded_assemble(_,_,_,JobId);
+		-eval(JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_,JobId,_));
 		.print("Impossible job ",JobId,", aborting it.");
@@ -318,6 +319,7 @@ task_id(0).
 	-cnp(JobId);
 	-job(JobId, _);
 	-awarded_assemble(_,_,_,JobId);
+	-eval(JobId);
 	.abolish(initiator::bids(_,_,JobId));
 	.abolish(initiator::awarded(_,_,_,JobId,_));
 	.print("Bug with create scheme for ",JobId,", detected, aborting it.");
@@ -331,8 +333,7 @@ task_id(0).
 	-+initiator::free_agents([Agent|FreeAgents]);
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
-			+action::hold_action(Id);
-			!!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}
 	.
@@ -344,8 +345,7 @@ task_id(0).
 	-+initiator::free_trucks([Agent|FreeTrucks]);
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
-			+action::hold_action(Id);
-			!!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}
 	.
@@ -356,8 +356,7 @@ task_id(0).
 	-+initiator::free_agents([Me|FreeAgents]);
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
-			+action::hold_action(Id);
-			!!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}
 	.

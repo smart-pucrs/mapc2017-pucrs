@@ -75,9 +75,9 @@ evaluateUtilityItem(ItemId,Vol,Utility) :- Utility = -1.
 evaluateUtilityTool(ItemId,Utility) :- default::role(_,_,_,_,Tools) & .member(ItemId,Tools) & Utility = 1.
 evaluateUtilityTool(ItemId,Utility) :- Utility = -1.
 
-evaluateUtilityAssemble(StorageId,Items,Utility) :- default::load(MyLoad)
-												& 	default::total_load(Items,0,Vol)
-												&	default::role(Role, Speed, LoadCap, _, _)
+evaluateUtilityAssemble(StorageId,Items,Utility) :- default::load(MyLoad) 
+												& 	default::total_load(Items,0,Vol) 
+												&	default::role(Role, Speed, LoadCap, _, _) 
 												&	(LoadCap - MyLoad >= Vol)
 												&	new::workshopList(WList)
 												&	actions.closest(Role,WList,StorageId,ClosestWorkshop)
@@ -110,10 +110,11 @@ generateTaskList(ParentId,[compoundedItem(Item,ListItensJob)|List],Temp,Result) 
 																				&	generateSubTaskList(NewId,ListItensJob,[],Translated) 
 																				& 	.concat(Translated,Temp,NewTemp)
 																				& 	generateTaskList(NewId,List,NewTemp,Result).
-generateAssembleTask(JobId,StorageId,Items,[subtask(assemble,JobId,Vol,Utility,tcl,"")|Result]) :- evaluateUtilityAssemble(StorageId,Items,Utility) 
+generateAssembleTask(JobId,StorageId,Items,Temp,Result) :- evaluateUtilityAssemble(StorageId,Items,Utility) 
 												&	(Utility \== -1)
-												&	default::total_load(Items,0,Vol).
-generateAssembleTask(JobId,StorageId,Items,Result).
+												&	default::total_load(Items,0,Vol)
+												&	.concat([subtask(assemble,JobId,Vol,Utility,tcl,"")],Temp,Result).
+generateAssembleTask(JobId,StorageId,Items,Temp,Result) :- Result = Temp.
 
 converCoalitionMembers([],Temp,Result) :- Result = Temp.
 converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoalitionMembers(Coalition,[Member|Temp],Result).
@@ -144,8 +145,8 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
     ?localTask::convertTaskId(Tasks,[],ConvertedTasks);
 	
 	
-	?localTask::generateAssembleTask(JobId,StorageId,Requirements,ConvertedTasks);
-	.print("Tasks: ",ConvertedTasks);
+	?localTask::generateAssembleTask(JobId,StorageId,Requirements,ConvertedTasks,Test);
+	.print("Tasks: ",Test);
 	
 //	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
 	!taProcess::run_distributed_TA_algorithm(communication(broadcast,[]),ConvertedTasks,RoleLoad-MyLoad);

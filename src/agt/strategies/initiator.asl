@@ -128,7 +128,7 @@ task_id(0).
 	+eval(Id);
 //	.print("Evaluating mission ",Id," at step ",Step);
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
-//		.wait(100);
+		.wait(100);
 		!decompose(Items,ListItems,ListToolsNew,Id);
 		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}

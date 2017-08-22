@@ -77,7 +77,7 @@ task_id(0).
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
-	+action::hold_action(Id);
+//	+action::hold_action(Id);
 	+mission(Id, Storage, Items, End, Reward, Fine);
 	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 	.print("Items required: ",Items);
@@ -128,7 +128,7 @@ task_id(0).
 	+eval(Id);
 //	.print("Evaluating mission ",Id," at step ",Step);
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
-		.wait(100);
+		+action::hold_action(Id);
 		!decompose(Items,ListItems,ListToolsNew,Id);
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
@@ -345,7 +345,6 @@ task_id(0).
 	-+initiator::free_agents([Agent|FreeAgents]);
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
-			+action::hold_action(Id);
 			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}
@@ -358,7 +357,6 @@ task_id(0).
 	-+initiator::free_trucks([Agent|FreeTrucks]);
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
-			+action::hold_action(Id);
 			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}
@@ -370,7 +368,6 @@ task_id(0).
 	-+initiator::free_agents([Me|FreeAgents]);
 	if (initiator::accept_jobs) {
 		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
-			+action::hold_action(Id);
 			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 		}
 	}

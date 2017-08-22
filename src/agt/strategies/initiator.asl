@@ -126,10 +126,9 @@ task_id(0).
 	: initiator::accept_jobs & not initiator::eval(Id) & default::steps(TotalSteps) & default::step(Step) & initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <-
 	+eval(Id);
-//	?default::step(Step);
 //	.print("Evaluating mission ",Id," at step ",Step);
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
-		.wait(100);
+//		.wait(100);
 		!decompose(Items,ListItems,ListToolsNew,Id);
 		!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
@@ -169,12 +168,12 @@ task_id(0).
 	}
 	.
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
-	: not cnp(Id)
+	: not cnp(Id) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) & NumberOfTrucks > 0 & NumberOfAgents >= 2
 <-
 	.wait(500);
-	!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+	!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	.
-+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items) : cnp(Id). //<- .print(">>>>>>>>>>>>>>>>>>>>>>> Trying to allocate the same job ",Id).
++!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items). //<- .print(">>>>>>>>>>>>>>>>>>>>>>> Trying to allocate the same job, or job is no longer viable ",Id).
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)
 	: true

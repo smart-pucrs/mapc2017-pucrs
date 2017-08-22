@@ -152,7 +152,12 @@ task_id(0).
 	.wait(500);
 	!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	.
-+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items) <- -action::hold_action(Id). //<- .print(">>>>>>>>>>>>>>>>>>>>>>> Trying to allocate the same job, or job is no longer viable ",Id).
++!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items) 
+<- 	
+	-action::hold_action(Id); 
+	!evaluation_auction::has_set_to_free;
+	.print(">>>>>>>>>>>>>>>>>>>>>>> Trying to allocate the same job, or job is no longer viable ",Id);
+	.
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)
 	: true

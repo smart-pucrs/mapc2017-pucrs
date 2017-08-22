@@ -8,7 +8,6 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 
 !triggerFuturePlan.
 
-@triggerPlan[atomic]
 +!triggerFuturePlan
 	: default::step(Step) & ::futurePlans(Event,StepFuture) & (StepFuture <= Step) 
 <-
@@ -36,26 +35,69 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	
 	if (Limit < Reward) {
 		+::bidding(Id,0,0,Limit);
-		+::futurePlans(further_analysis(Id),Start+Time-1);
+//		+::futurePlans(further_analysis(Id),Start+Time-1);
 		+::futurePlans(free_for_next_auction(Id),Start+Time);
+		!::choose_between_auctions_at_same_step(Id,Start+Time-1);
 	}
 	else{
 		.print("Expected limit to bid ",Limit," is greater than the reward ",Reward);
 	}
 	.
+	
++!choose_between_auctions_at_same_step(AuctionId,StartTime)
+	: ::futurePlans(further_analysis(Id),StartTime)
+<- 
+	.print("There is other auction ",Id," at the same future step ",StartTime);
+	
+	?default::auction(Id,_,RewardOld,_,_,_,_,_,_);
+	?default::auction(AuctionId,_,RewardCurrent,_,_,_,_,_,_);
+	
+	if (RewardCurrent > RewardOld){
+		-::futurePlans(further_analysis(Id),StartTime);
+		+::futurePlans(further_analysis(AuctionId),StartTime)
+	}
+	.
++!choose_between_auctions_at_same_step(AuctionId,StartTime)
+<- 
+	.print("There is no auction at the same step");
+	+::futurePlans(further_analysis(AuctionId),StartTime);
+	.
 
-+!further_analysis(Id)	
+//+!further_analysis(Id)	
+//	: default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)	& ::bidding(Id,_,BaseBid,Limit) & ::checkStillGoodAuction(Reward,Bid,BaseBid,Limit) & default::step(S)
+//<-
+//	!strategies::not_free;
+//	+action::hold_action(Id);
+//	+::hasSetFree;
+//	.print("Final analysis for ",Id," at step ",S);	
+//	
+//	!initiator::evaluate_job(Items, End, Storage, Id, Reward);
+//	.
+//+!further_analysis(Id)	
+//<-
+//	.print(Id," is not a good auctionJob anymore");	
+//	.
++!further_analysis(Id)
+<- 
+	+action::hold_action(Id);
+	!strategies::not_free;	
+	+::hasSetFree;
+	!check_further_analysis(Id);
+	.
++!check_further_analysis(Id)	
 	: default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)	& ::bidding(Id,_,BaseBid,Limit) & ::checkStillGoodAuction(Reward,Bid,BaseBid,Limit) & default::step(S)
 <-
-	!strategies::not_free;
-	+action::hold_action;
-	+::hasSetFree;
+//	!strategies::not_free;
+//	+action::hold_action(Id);
+//	+::hasSetFree;
 	.print("Final analysis for ",Id," at step ",S);	
 	
 	!initiator::evaluate_job(Items, End, Storage, Id, Reward);
 	.
-+!further_analysis(Id)	
++!check_further_analysis(Id)	
 <-
+	-action::hold_action(Id);
+	!::has_set_to_free;
 	.print(Id," is not a good auctionJob anymore");	
 	.
 	
@@ -110,7 +152,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	?::evaluateBid(Reward,Bid,BaseBid,NewBid);
 	
 	.print("Posting bid of ",NewBid);
-	-action::hold_action;
+	-action::hold_action(Id);
 	!action::bid_for_job(Id,NewBid);
 	.
 	

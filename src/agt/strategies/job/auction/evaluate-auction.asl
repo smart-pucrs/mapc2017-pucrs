@@ -8,6 +8,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 
 !triggerFuturePlan.
 
+@triggerPlan[atomic]
 +!triggerFuturePlan
 	: default::step(Step) & ::futurePlans(Event,StepFuture) & (StepFuture <= Step) 
 <-

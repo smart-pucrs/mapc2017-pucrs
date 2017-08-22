@@ -30,12 +30,6 @@ task_id(0).
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
 
-+!wait_for_step(Step)
-	: default::step(CurrentStep) & (Step <= CurrentStep).
-+!wait_for_step(Step)
-<-
-	.wait({+default::step(Step)});
-	.
 @oldAuction[atomic]
 +default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
 	: evaluation_auction::bidding(Id,_,_,_)
@@ -46,7 +40,7 @@ task_id(0).
 +default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
 //	: not evaluation_auction::bidding(_,_,_,_)
 <-
-	!wait_for_step(Start);
+	.wait(default::step(Start));
 	.print("New auction job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," has current bid of ",Bid," time for bids ",Time);
 	.print("Items required: ",Items);
 

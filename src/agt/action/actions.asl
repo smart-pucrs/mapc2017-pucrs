@@ -120,7 +120,7 @@
 	!charge;
 	.
 +!charge
-	: default::charge(C) & not default::role(Role,_,_,CCap,_) & C >= CCap div 2 & (Role == truck & Role == car)
+	: default::charge(C) & not default::role(Role,_,_,CCap,_) & C >= CCap div 2 & (Role == truck | Role == car)
 <-
 	!localActions::commitAction(charge);
 	!charge;

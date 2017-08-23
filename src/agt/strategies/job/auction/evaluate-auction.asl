@@ -85,6 +85,15 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	!check_further_analysis(Id);
 	.
 +!check_further_analysis(Id)	
+	: action::action(S) & default::step(S) & metrics::missBidAuction(M)
+<-	
+	-action::hold_action(Id);
+	!::has_set_to_free;
+	
+	.print("¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬ We lost the action at step ",S," we cannot bid for ",Id," anymore");	
+	-+metrics::missBidAuction(M+1);
+	.
++!check_further_analysis(Id)	
 	: default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)	& ::bidding(Id,_,BaseBid,Limit) & ::checkStillGoodAuction(Reward,Bid,BaseBid,Limit) & default::step(S)
 <-
 //	!strategies::not_free;

@@ -54,9 +54,9 @@
 	.print("Number of failed jobs: ",JobsFailed);
 	?metrics::failedEvalJobs(JobsEvalFailed); // Ok
 	.print("Number of jobs that failed eval: ",JobsEvalFailed); 	
-	?metrics::completedAuctions(AuctionsCompleted);
+	?metrics::completedAuctions(AuctionsCompleted); // Ok
 	.print("Number of completed auctions: ",AuctionsCompleted); 
-	?metrics::failedAuctions(AuctionsFailed);
+	?metrics::failedAuctions(AuctionsFailed); // Ok
 	.print("Number of failed auctions: ",AuctionsFailed); 	
 	?metrics::completedMissions(MissionsCompleted); // Ok
 	.print("Number of completed missions: ",MissionsCompleted); 
@@ -66,6 +66,8 @@
 	.print("Fine paid: ",Fine);
 	?metrics::noBids(NoBids); // Ok
 	.print("Number of no bids: ",NoBids);
+	?metrics::missBidAuction(MissBids); // Ok
+	.print("Number of missed bids for auctions: ",MissBids);
 	!print_common_metrics;
 	.print("--------------------");
 	.	

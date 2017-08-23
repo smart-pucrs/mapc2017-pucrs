@@ -18,6 +18,7 @@
 	+metrics::finePaid(0);
 	+metrics::failedEvalJobs(0);
 	+metrics::noBids(0);
+	+metrics::missBidAuction(0);
 	. 
 +!add_initiator_beliefs.
 

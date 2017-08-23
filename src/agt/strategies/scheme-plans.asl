@@ -46,12 +46,14 @@
 	}
 	for ( .member(item(ItemId,Qty),TaskList) ) {
 		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop,99999);
-		if (strategies::buyList(ItemId,Qty2,Shop)) {
-			-strategies::buyList(ItemId,Qty2,Shop)
-			+strategies::buyList(ItemId,Qty+Qty2,Shop);
+		if (strategies::buyList(ItemId,Qty2,ShopOld)) {
+			-strategies::buyList(ItemId,Qty2,ShopOld);
+			?default::find_shop_qty(item(ItemId, Qty+Qty2),SList,BuyL,99999,RouteShopL,99999,"",ShopNew,99999);
+			+strategies::buyList(ItemId,Qty+Qty2,ShopNew);
 		}
 		else { +strategies::buyList(ItemId,Qty,Shop); }
 	}
+//	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }
 	!strategies::go_buy;
 	if (strategies::retrieveList(_,_,Fac)) {
 		for ( strategies::retrieveList(ItemId,Qty,Fac) ) {

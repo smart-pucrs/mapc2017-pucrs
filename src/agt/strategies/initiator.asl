@@ -38,12 +38,10 @@ task_id(0).
 	.
 @newAuction[atomic]
 +default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
-//	: not evaluation_auction::bidding(_,_,_,_)
 <-
 	.wait(default::step(Start));
 	.print("New auction job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," has current bid of ",Bid," time for bids ",Time);
 	.print("Items required: ",Items);
-
 	!evaluation_auction::first_analysis(Id);
 	.
 +default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id,", it shoud have not passed here").
@@ -64,7 +62,6 @@ task_id(0).
 	
 +!decompose(Items,ListItems,ListToolsNew,Id) : default::step(Step)
 <-
-	.print("Decomposing ",Id," at step ",Step);
 	?default::decomposeRequirements(Items,[],Bases);
 	+bases([],Id);
 	for ( .member(Item,Bases) ) {
@@ -125,7 +122,6 @@ task_id(0).
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) & NumberOfTrucks > 0 & NumberOfAgents >= 2
 <-
-	.print("Tools to be alocated: ",ListToolsNew);
 	+cnp(Id);
 	+job(Id, Items);
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
@@ -156,7 +152,7 @@ task_id(0).
 <- 	
 	-action::hold_action(Id); 
 	!evaluation_auction::has_set_to_free;
-	.print(">>>>>>>>>>>>>>>>>>>>>>> Trying to allocate the same job, or job is no longer viable ",Id);
+	.print(Id," is no longer viable");
 	.
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)
@@ -274,10 +270,8 @@ task_id(0).
 		-+initiator::free_trucks(FreeTrucksNewA);
 		.delete(AgentA,FreeAgentsA,FreeAgentsNewA);
 		-+initiator::free_agents(FreeAgentsNewA);
-//		.print("Removing ",AgentA," from free lists.");
-		.print("For ",JobId);
+//		.print("For ",JobId);
 		for ( initiator::awarded(Agent,Shop,List,JobId,TaskCount) ) {
-//			.print("Removing ",Agent," from free lists.");
 			?initiator::free_agents(FreeAgents);
 			.delete(Agent,FreeAgents,FreeAgentsNew);
 			-+initiator::free_agents(FreeAgentsNew);
@@ -288,9 +282,9 @@ task_id(0).
 			}
 	    	.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 			-awarded(Agent,Shop,List,JobId,TaskCount);	
-			.print(Agent," ",AgentA," ",List);
+//			.print(Agent," ",AgentA," ",List);
 		}
-		.print(AgentA," ",Items);
+//		.print(AgentA," ",Items);
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
 		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
 		-cnp(JobId);
@@ -310,9 +304,9 @@ task_id(0).
 	}
 	-action::hold_action(JobId);
 	!evaluation_auction::has_set_to_free;
-	.print("Task allocation is done ",JobId);
+//	.print("Task allocation is done ",JobId);
 	.
-+!create_scheme(JobId, st, SchArtId,OrgId) <- .print("Created Scheme ",JobId);org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
++!create_scheme(JobId, st, SchArtId,OrgId) <- org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
 -!create_scheme(JobId, st, SchArtId,OrgId) 
 <-
 	-impossible_task(JobId);

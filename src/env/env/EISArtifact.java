@@ -180,14 +180,8 @@ public class EISArtifact extends Artifact implements AgentListener {
 			if ((agent.equals("vehicle1") && step_obs_prop_v1.contains(old.getName()) && !old.getName().equals("job") && !old.getName().equals("mission") ) || step_obs_prop.contains(old.getName())) {
 				if (!percepts.contains(old) || old.getName().equals("lastAction") || old.getName().equals("lastActionResult")) { // not perceived anymore
 					Literal literal = Translator.perceptToLiteral(old);
-					try{
-						if (old.getName().equals("auction")) {
-							logger.info("Removing "+literal);
-							removeObsPropertyByTemplate(old.getName(), literal.getTerm(0), null, null, null, null, null, null, null, null);
-						}
-						else {						
-							removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
-						}
+					try{				
+						removeObsPropertyByTemplate(old.getName(), (Object[]) literal.getTermsArray());
 					}
 					catch (Exception e) {
 						logger.info("error removing old perception "+literal+" "+e.getMessage());
@@ -208,7 +202,8 @@ public class EISArtifact extends Artifact implements AgentListener {
 		
 		// compute new perception
 		Literal step 				= null;
-		Literal auction 			= null;
+//		Literal auction 			= null;
+		List<Literal> auction 		= new ArrayList<Literal>();
 		Literal lastActionResult 	= null;
 		Literal actionID 			= null;
 		for (Percept percept: percepts) {
@@ -218,7 +213,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 					if (percept.getName().equals("step")) {
 						step = literal;
 					} else if(percept.getName().equals("auction")){
-						auction = literal;
+						auction.add(literal);
 					} else if (percept.getName().equals("simEnd")) {
 						defineObsProperty(percept.getName(), (Object[]) literal.getTermsArray());
 						cleanObsProps(match_obs_prop);
@@ -257,8 +252,9 @@ public class EISArtifact extends Artifact implements AgentListener {
 //				acceptJobs += 1;
 //			if (acceptJobs == 1)
 //				logger.info("Accepting jobs now!");
-			if (auction != null) 
-				defineObsProperty(auction.getFunctor(), (Object[]) auction.getTermsArray());
+			for (Literal a : auction) {
+				defineObsProperty(a.getFunctor(), (Object[]) a.getTermsArray());
+			}
 			defineObsProperty(step.getFunctor(), (Object[]) step.getTermsArray());
 			defineObsProperty(lastActionResult.getFunctor(), (Object[]) lastActionResult.getTermsArray());
 			
@@ -285,7 +281,6 @@ public class EISArtifact extends Artifact implements AgentListener {
 				jobDone.clear();
 			}
 		}
-
 	}
 	
 	private void cleanObsProps(Set<String> obSet) {

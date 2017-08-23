@@ -11,7 +11,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 +!triggerFuturePlan
 	: default::step(Step) & ::futurePlans(Event,StepFuture) & (StepFuture <= Step) 
 <-
-	.print("Triggering plan ",Event," at step ",Step);
+//	.print("Triggering plan ",Event," at step ",Step);
     !!Event;
     -::futurePlans(Event,StepFuture);
     !triggerFuturePlan;
@@ -25,13 +25,13 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 +!first_analysis(Id)	
 	: default::auction(Id,_,Reward,Start,_,_,0,Time,Items) & default::step(S)
 <-
-	.print("First analysing auction job at step ",S);	
+	.print("First analysis auction job at step ",S);	
 	!initiator::decompose(Items,ListItems,ListToolsNew,Id);
 
 	?default::check_price(ListToolsNew,ListItems,0,ResultP);
 	Limit = math.ceil(ResultP*1.8);	
-	.print("Limit is ",Limit);
-	.print("Reward is ",Reward);
+//	.print("Limit is ",Limit);
+//	.print("Reward is ",Reward);
 	
 	if (Limit < Reward) {
 		+::bidding(Id,0,0,Limit);
@@ -59,7 +59,6 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	.
 +!choose_between_auctions_at_same_step(AuctionId,StartTime)
 <- 
-	.print("There is no auction at the same step");
 	+::futurePlans(further_analysis(AuctionId),StartTime);
 	.
 
@@ -113,7 +112,6 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 +!has_set_to_free
 	: (not default::winner(_,_) | strategies::waiting) & ::hasSetFree 
 <-
-	.print("set free");
 	-::hasSetFree;
 	!strategies::free;
 	.
@@ -147,13 +145,10 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 +!analyse_auction_job(Id)	
 	: default::auction(Id,_,_,_,_,_,_,_,_)	
 <-
-	.print("Analysing auction job");	
+//	.print("Analysing auction job");	
 	!send_a_bid(Id);
 	.
-+!analyse_auction_job(Id)	
-<-
-	.print("Job is not an auction");
-	.
++!analyse_auction_job(Id).
 
 +!send_a_bid(Id)
 	: default::auction(Id,_,Reward,_,_,_,Bid,_,_) & ::bidding(Id,_,BaseBid,Limit)	

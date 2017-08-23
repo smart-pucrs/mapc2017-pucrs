@@ -233,7 +233,8 @@
 	
 -default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
 <-
-	.wait(default::actionID(_));
+//	.wait(default::actionID(_));
+	.wait(500);
 	!::check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items);
 	.
 +!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)

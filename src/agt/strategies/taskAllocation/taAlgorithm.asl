@@ -1,7 +1,8 @@
-{ include("definitions.asl") }
+{include("definitions.asl") }
 
 {begin namespace (taProcess, global)}
 
+taResults::allocationProcess(none).
 currentLoad(0).
 bidsN(0).
 bidLastProcessed(0).
@@ -14,6 +15,7 @@ readyMe(false).
 @puTL[atomic]
 +!run_distributed_TA_algorithm(communication(COMMUNICATION_TYPE,AGENT_LIST),SUBTASKLIST,AVAILABLE_LOAD):true
 <- 
+!setInitialBeleives;
 .time(HH,NN,SS);
 .concat(HH,":",NN,":",SS,INITIME);
 +initime(INITIME);
@@ -24,6 +26,17 @@ readyMe(false).
 .findall(subtask(SUBTASK2,TASK2,LOAD2,UTILITY2,TASKTYPE2,ROLE2),taProcess::subtaskReceived(SUBTASK2,TASK2,LOAD2,UTILITY2,TASKTYPE2,ROLE2),LSTK2);
 !prepareTaskList;
 .
+
+@pSIB[atomic]
++!setInitialBeleives:true
+<-
+.abolish(taResults::jobAllocationStatus(_));
+//.abolish(taResults::allocatedTasks(_,_));
+-taResults::allocationProcess(XX);
++taResults::allocationProcess(running);
+-taResults::assemblerAgent(Ag);
+.
+
 
 @puTLxa[atomic]
 +!invertUtility(SUBTASKLIST):true  
@@ -612,6 +625,19 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 @pTOtalFinal[atomic]
 +!totalAllocatedFinal:true
 <-
+-taResults::allocationProcess(XX);
++taResults::allocationProcess(closing);
+
+//only for the MAS contest
+if((taProcess::subtaskReceivedOriginal(SubTask,Task,X,X2,X3,X4)) & (not taProcess::subtaskOwner(SubTask,Task,Agent))) {
+	+taResults::jobAllocationStatus(ignored);
+}
+else{
+	+taResults::jobAllocationStatus(allocated);
+}
+
+if (taResults::jobAllocationStatus(allocated)){ //this IF is valid only for the MAS contest
+
 .findall(preAllocatedTasks(NetValue, Subtask, Task),taProcess::preAllocatedTasks(NetValue, Subtask, Task),LAlloc);
 //.print("preAllocatedTasks:",LAlloc);
 	for (.member(preAllocatedTasks(NetValuea, Subtaska, Taska),LAlloc)) {
@@ -632,12 +658,23 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 	}
 	
 	}
-	+taResults ::allocationProcess(ready);
+
+	//only for the MAS contest
+	if(subtask(assemble,JobId,Ag)){
+		+taResults::assemblerAgent(Ag);
+	}
+
+}
+
+-taResults::allocationProcess(XX2);
++taResults::allocationProcess(ready);
+
 ?initime(INITIME);
 .time(HH,NN,SS);
 .concat(HH,":",NN,":",SS,ENDTIME);
 .print("INITIME:",INITIME);
 .print("ENDTIME:",ENDTIME);
+!cleanFinalBelieves;
 //!printAuxFinal;	
 .
 
@@ -898,22 +935,31 @@ else {
 @pbidxz3[atomic]
 +!processbidDone(BDNEW,A): (not taProcess::notProcessedBid(XXA,XXX)) | (taProcess::notProcessedBid(XA,NotP) & NotP<=0) 
 <-
-if(taProcess::missingBid(A,Value) & (Value>0)){
-	+taProcess::doneBid(A);
-	!updateMissingBid(A,-1);
-	!checkReady;
-}
-else{
-	if(taProcess::missingBid(A,Value) & (Value<1)){
 
+.print("!processbidDone from:",A," BD:",BDNEW);
+
+if (taResults::allocationProcess(running)){
+	if(taProcess::missingBid(A,Value) & (Value>0)){
+		+taProcess::doneBid(A);
+		!updateMissingBid(A,-1);
+		!checkReady;
 	}
-	else{ 
-			if(not taProcess::missingBid(A,Value)){
-				+taProcess::doneBid(A);
-				+taProcess::missingBid(A,-1);
-				!checkReady;
-			}
+	else{
+		if(taProcess::missingBid(A,Value) & (Value<1)){
+			
 		}
+		else{ 
+				if(not taProcess::missingBid(A,Value)){
+					+taProcess::doneBid(A);
+					+taProcess::missingBid(A,-1);
+					!checkReady;
+				}
+			}
+	}
+	
+}
+else{ 
+	.abolish(taProcess::bid(done,_)[source(A)]); 
 }
 .
 
@@ -927,7 +973,7 @@ else{
 @paddBidN[atomic]
 +!increaseBidsN[source(A)]:true
 <-
-?bidsN(NBids);
+?taProcess::bidsN(NBids);
 NBidsNEW=NBids+1;
 -bidsN(NBids);
 +bidsN(NBidsNEW);
@@ -937,10 +983,9 @@ NBidsNEW=NBids+1;
 +taProcess::bids(LBIDS)[source(A)]:true
 <-
 !increaseBidsN;
-?bidsN(NBids);
+?taProcess::bidsN(NBids);
 +taProcess::bidQueue(NBids,LBIDS,A);
 +taProcess::bidQueuePre(NBids,LBIDS,A);
-+test::xbidQueue(NBids,LBIDS,A);
 !preProcessBids;
 .
 
@@ -1170,6 +1215,59 @@ if (taProcess::removedTask(true)){
 	}
 }
 .
+
+@pcFinalBel[atomic]
++!cleanFinalBelieves:true
+<-  
+.abolish(taProcess::agentList(_));
+.abolish(taProcess::bidLastPreProcessed(_));
+.abolish(taProcess::bidLastProcessed(_));
+.abolish(taProcess::bids(_));
+//.abolish(taProcess::bidsN(_));
+.abolish(taProcess::comBidDone(_));
+.abolish(taProcess::communicationType(_));
+.abolish(taProcess::contWhile(_));
+.abolish(taProcess::currentLoad(_));
+.abolish(taProcess::doneBid(_));
+.abolish(taProcess::endWhile(_));
+.abolish(taProcess::initialBid(_));
+.abolish(taProcess::initime(_));
+.abolish(taProcess::loadCapacity(_));
+.abolish(taProcess::loadFilter(_));
+.abolish(taProcess::readyMe(_));
+//.abolish(taProcess::scalar(_));
+.abolish(taProcess::taProcessStatus(_));
+.abolish(taProcess::totalUtility(_));
+.abolish(taProcess::totalUtilityOriginal(_));
+.abolish(taProcess::bid(_,_));
+.abolish(taProcess::bidIgnorado(_,_));
+.abolish(taProcess::missingBid(_,_));
+.abolish(taProcess::notProcessedBid(_,_));
+.abolish(taProcess::subtask(_,_));
+.abolish(taProcess::task(_,_));
+.abolish(taProcess::taskMax(_,_));
+.abolish(taProcess::taskMin(_,_));
+.abolish(taProcess::taskMinLoad(_,_));
+.abolish(taProcess::netValue(_,_,_));
+.abolish(taProcess::preAllocatedTasks(_,_,_));
+.abolish(taProcess::preBid(_,_,_));
+.abolish(taProcess::priceGlobal(_,_,_));
+.abolish(taProcess::priceLocal(_,_,_));
+.abolish(taProcess::subtaskLoad(_,_,_));
+.abolish(taProcess::subtaskOwner(_,_,_));
+.abolish(taProcess::subtaskUtility(_,_,_));
+.abolish(taProcess::subtaskReceived(_,_,_,_,_,_));
+.abolish(taProcess::subtaskReceivedOriginal(_,_,_,_,_,_));
+
+-+currentLoad(0);
+-+bidsN(0);
+-+bidLastProcessed(0);
+-+bidLastPreProcessed(0);
+//-+scalar(1);
+-+comBidDone(0);//x
+-+readyMe(false);
+.
+
 
 {end}
 

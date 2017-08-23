@@ -165,6 +165,12 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::taskBiding(_,TuParent,TaskId,TuTask)),LTASKS);
 //	.findall(Task,taResults::allocatedTasks(Task,ParentId),LTASKS);
 	
+	?taResults::jobAllocationStatus(STATUS);
+	.print("jobAllocationStatus:",STATUS);
+	
+	if (taResults::assemblerAgent(Ag)){
+		.print("assemblerAgent:",Ag);
+	}
 	
 	.length(LTASKS, NTASKS);
 	if(NTASKS>0){

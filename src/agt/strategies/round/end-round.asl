@@ -11,12 +11,14 @@
 	?default::focused(vehicleart,ArtMe,Id2);
 	?default::joined(vehicleart,Id3);
 	?default::joined(main,Id4);
+	?default::joined(org,Id5);
 	if (Me == vehicle1) { ?initiator::task_id(TaskId); }
 	.abolish(_::_[source(_)]);
 	+default::focused(vehicleart,team_artifact,Id1);
 	+default::focused(vehicleart,ArtMe,Id2);
 	+default::joined(vehicleart,Id3);
 	+default::joined(main,Id4);
+	+default::joined(org,Id5);
 	if (Me == vehicle1) { +initiator::task_id(TaskId); }
     .drop_all_intentions;
     .drop_all_desires;

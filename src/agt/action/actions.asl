@@ -17,7 +17,7 @@
 	
 	.wait(100);
 	
-	if (Action \== recharge & Result == failed) {
+	if (Action \== recharge & Action \== buy & Result == failed) {
 //		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
@@ -149,7 +149,8 @@
 	if (Amount <= QtyAvailable) {
 //		.print("Trying to buy all.");
 		!localActions::commitAction(buy(ItemId,Amount));
-		!buy_loop(ItemId, Total, Total - Amount, OldAmount);
+		if ( default::lastActionResult(successful) ) { !buy_loop(ItemId, Total, Total - Amount, OldAmount); }
+		else { !buy_loop(ItemId, Total, Amount, OldAmount); }
 	}
 	else {
 		if (QtyAvailable == 0) {
@@ -160,7 +161,8 @@
 		else {
 //			.print("Trying to buy available ",QtyAvailable);
 			!localActions::commitAction(buy(ItemId,QtyAvailable));
-			!buy_loop(ItemId, Total, Amount - QtyAvailable, OldAmount);
+			if ( default::lastActionResult(successful) ) { !buy_loop(ItemId, Total, Amount - QtyAvailable, OldAmount); }
+			else { !buy_loop(ItemId, Total, Amount, OldAmount); }
 		}
 	}
 	.

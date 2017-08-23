@@ -1,7 +1,7 @@
 {begin namespace(localActions, local)}
 
 +!commitAction(Action)
-	: default::actionID(S) & not action::action(S) & not action::hold_action
+	: default::actionID(S) & not action::action(S) & not action::hold_action(_)
 <-
 	+action::action(S);
 //	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
@@ -14,7 +14,7 @@
 	?default::lastActionResult(Result);
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
-	if (Action \== recharge & Result == failed) {
+	if (Action \== recharge & Action \== buy & Result == failed) {
 //		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
@@ -30,7 +30,7 @@
 	}
 	.
 +!commitAction(Action) 
-	: action::hold_action 
+	: action::hold_action(_)
 <- 
 //	.print("Holding action ",Action);
 	.wait(500);
@@ -114,7 +114,13 @@
 // Charge
 // No parameters
 +!charge
-	: default::charge(C) & not default::role(_,_,_,C,_)
+	: default::charge(C) & not default::role(Role,_,_,C,_) & Role \== truck & Role \== car
+<-
+	!localActions::commitAction(charge);
+	!charge;
+	.
++!charge
+	: default::charge(C) & not default::role(Role,_,_,CCap,_) & (Role == truck | Role == car) & C < CCap div 2
 <-
 	!localActions::commitAction(charge);
 	!charge;
@@ -140,7 +146,8 @@
 	if (Amount <= QtyAvailable) {
 //		.print("Trying to buy all.");
 		!localActions::commitAction(buy(ItemId,Amount));
-		!buy_loop(ItemId, Total, Total - Amount, OldAmount);
+		if ( default::lastActionResult(successful) ) { !buy_loop(ItemId, Total, Total - Amount, OldAmount); }
+		else { !buy_loop(ItemId, Total, Amount, OldAmount); }
 	}
 	else {
 		if (QtyAvailable == 0) {
@@ -151,7 +158,8 @@
 		else {
 //			.print("Trying to buy available ",QtyAvailable);
 			!localActions::commitAction(buy(ItemId,QtyAvailable));
-			!buy_loop(ItemId, Total, Amount - QtyAvailable, OldAmount);
+			if ( default::lastActionResult(successful) ) { !buy_loop(ItemId, Total, Amount - QtyAvailable, OldAmount); }
+			else { !buy_loop(ItemId, Total, Amount, OldAmount); }
 		}
 	}
 	.

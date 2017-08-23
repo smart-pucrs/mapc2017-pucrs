@@ -35,7 +35,7 @@
 //		+strategies::jobDone(JobId);
 //	}
 	-default::winner(_,_)[source(_)];
-//	!strategies::check_charge;
+	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!strategies::free;
 	.
@@ -60,7 +60,7 @@
 	.abolish(org::_);
 	if ( default::hasItem(ItemId,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
-//	!strategies::check_charge;
+	!strategies::check_charge;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
 	else { 
 		.my_name(Me);
@@ -73,7 +73,7 @@
 	.
 
 +!check_charge
-	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= BatteryCap div 2 & new::chargingList(CList)
+	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= BatteryCap div 3 & new::chargingList(CList)
 <-
 	.print("Running low on battery, going to charge before taking any new tasks.");
 	actions.closest(Role,CList,ClosestChargingStation);

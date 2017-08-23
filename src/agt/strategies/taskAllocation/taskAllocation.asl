@@ -90,16 +90,21 @@ evaluateUtility(ItemId,Vol,Utility) :- evaluateUtilityTool(ItemId,Utility).
 
 
 generateSubTaskList(ParentId,[],Temp,Result) :- Result = Temp.
+//generateSubTaskList(ParentId,[item(BaseItem,Qtd)|List],Temp,Result) :-	default::item(BaseItem,Vol,_,_) 
+//																	& 	NewVol = Qtd*Vol 
+//																	& 	evaluateUtility(BaseItem,NewVol,Utility) 
+//																	&	(	
+//																			(Utility \== -1
+//																		& 	.term2string(TermId,ParentId)
+//																		& 	generateSubTaskList(ParentId,List,[subtask(required(BaseItem,Qtd),TermId,NewVol,Utility,tcl,"")|Temp],Result))
+//																	|		
+//																			(generateSubTaskList(ParentId,List,Temp,Result))
+//																		).
 generateSubTaskList(ParentId,[item(BaseItem,Qtd)|List],Temp,Result) :-	default::item(BaseItem,Vol,_,_) 
 																	& 	NewVol = Qtd*Vol 
-																	& 	evaluateUtility(BaseItem,NewVol,Utility) 
-																	&	(	
-																			(Utility \== -1
-																		& 	.term2string(TermId,ParentId)
-																		& 	generateSubTaskList(ParentId,List,[subtask(required(BaseItem,Qtd),TermId,NewVol,Utility,tcl,"")|Temp],Result))
-																	|		
-																			(generateSubTaskList(ParentId,List,Temp,Result))
-																		).
+																	& 	evaluateUtility(BaseItem,NewVol,Utility)
+																	& 	.term2string(TermId,ParentId)
+																	& 	generateSubTaskList(ParentId,List,[subtask(required(BaseItem,Qtd),TermId,NewVol,Utility,tcl,"")|Temp],Result).
 generateSubTaskList(ParentId,[compoundedItem(Item,ListItensJob)|List],Temp,Result) :- 
 																					generateTaskList(ParentId,[compoundedItem(Item,ListItensJob)],[],Translated) 
 																				&	.concat(Translated,Temp,NewTemp) 
@@ -111,7 +116,7 @@ generateTaskList(ParentId,[compoundedItem(Item,ListItensJob)|List],Temp,Result) 
 																				& 	.concat(Translated,Temp,NewTemp)
 																				& 	generateTaskList(NewId,List,NewTemp,Result).
 generateAssembleTask(JobId,StorageId,Items,Temp,Result) :- evaluateUtilityAssemble(StorageId,Items,Utility) 
-												&	(Utility \== -1)
+//												&	(Utility \== -1)
 												&	default::total_load(Items,0,Vol)
 												&	.concat([subtask(assemble,JobId,Vol,Utility,tcl,"")],Temp,Result).
 generateAssembleTask(JobId,StorageId,Items,Temp,Result) :- Result = Temp.

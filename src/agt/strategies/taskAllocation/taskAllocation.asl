@@ -39,6 +39,14 @@ decomposeItem(Item,Qtd,Tools,Parts,Temp,ListItensJob) 	:- findTools(Tools,Temp,N
 decomposeRequirements([],Temp,Result):- Result = Temp.
 decomposeRequirements([required(Item,Qtd) | Requirements],Temp,Result):- default::item(Item,_,tools(Tools),parts(Parts)) & decomposeItem(Item,Qtd,Tools,Parts,[],ListItensJob) & decomposeRequirements(Requirements,[compoundedItem(Item,ListItensJob)|Temp],Result).
 
+removeDuplicateTool([],ListTools). 	
+removeDuplicateTool([subtask(required(BaseItem,_),_,_,_,_,_)|B],ListTools) 					
+:- 
+	.substring("tool",BaseItem) & 
+	.member(subtask(required(BaseItem,_),_,_,_,_,_),B) & 
+	removeDuplicateTool(B,ListTools).
+removeDuplicateTool([Task|B],[Task|ListTools]) :- removeDuplicateTool(B,ListTools).
+
 
 //evaluateUtilityItem(ItemId,Vol,Utility) :-default::load(MyLoad) 
 //										& default::role(Role,Speed,LoadCap,_,_) 
@@ -139,22 +147,27 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 <-
 	.print("Initialising Task Allocation ",JobId);
 	?localTask::decomposeRequirements(Requirements,[],Bases);
-	.print("Itens Base: ",Bases);
-	?localTask::generateTaskList(JobId,Bases,[],Tasks);
+	.print("Itens Base: ",Bases);	
+	?localTask::generateTaskList(JobId,Bases,[],DuplicatedToolsTasks);
+//	.print("Tasks: ",DuplicatedToolsTasks);
+	?localTask::removeDuplicateTool(DuplicatedToolsTasks,Tasks);
 	.print("Tasks: ",Tasks);
+	
+	Namespace = taProcess;
 
+	+Namespace::task(JobId,StorageId);
 	for ( .member(subtask(required(TaskId,Qtd),ParentId,_,_,_,_),Tasks) ) {
-        +::taskBiding(JobId,ParentId,required(TaskId,Qtd),TaskId);
+        +Namespace::taskBiding(JobId,ParentId,required(TaskId,Qtd),TaskId);
     }
     
     ?localTask::convertTaskId(Tasks,[],ConvertedTasks);
 	
 	
-	?localTask::generateAssembleTask(JobId,StorageId,Requirements,ConvertedTasks,Test);
-	.print("Tasks: ",Test);
+	?localTask::generateAssembleTask(JobId,StorageId,Requirements,ConvertedTasks,FullTasks);
+	.print("Tasks: ",FullTasks);
 	
 //	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
-	!taProcess::run_distributed_TA_algorithm(communication(broadcast,[]),ConvertedTasks,RoleLoad-MyLoad);
+	!Namespace::run_distributed_TA_algorithm(communication(broadcast,[]),FullTasks,RoleLoad-MyLoad);
 	.
 	
 {end}
@@ -181,6 +194,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	else {
 		.print("I won 0 tasks");
 	}
+	+winner(LTASKS, assist(Storage, Assembler, JobId))
 	.
 
 

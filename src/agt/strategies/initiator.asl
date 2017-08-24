@@ -71,31 +71,18 @@ task_id(0).
 //	.
 //+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id).
 
-
 //+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now."); .
 //@mission[atomic]
 //+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
 //	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 //<- 
-//	+action::hold_action;
+////	+action::hold_action(Id);
 //	+mission(Id, Storage, Items, End, Reward, Fine);
 //	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
 //	.print("Items required: ",Items);
 //	!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 //	.
 //+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now."); .
-@mission[atomic]
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
-	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
-<- 
-//	+action::hold_action(Id);
-	+mission(Id, Storage, Items, End, Reward, Fine);
-	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
-	.print("Items required: ",Items);
-	!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
-	.
-+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
 	
 +!decompose(Items,ListItems,ListToolsNew,Id)
 <-

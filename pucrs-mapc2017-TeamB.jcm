@@ -1,0 +1,185 @@
+mas scenario {
+		
+	agent vehicle1: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle1, vehicleart.team_artifact
+		goals: register("connectionB1"), add_initiator
+	}
+	agent vehicle2: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle2, vehicleart.team_artifact
+		goals: register("connectionB2")
+	}
+	agent vehicle3: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle3, vehicleart.team_artifact
+		goals: register("connectionB3")
+	}
+	agent vehicle4: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle4, vehicleart.team_artifact
+		goals: register("connectionB4")
+	}
+	agent vehicle5: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle5, vehicleart.team_artifact
+		goals: register("connectionB5")
+	}
+	agent vehicle6: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle6, vehicleart.team_artifact
+		goals: register("connectionB6")
+	}
+	agent vehicle7: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle7, vehicleart.team_artifact
+		goals: register("connectionB7")
+	}
+	agent vehicle8: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle8, vehicleart.team_artifact
+		goals: register("connectionB8")
+	}
+	agent vehicle9: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle9, vehicleart.team_artifact
+		goals: register("connectionB9")
+	}
+	agent vehicle10: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle10, vehicleart.team_artifact
+		goals: register("connectionB10")
+	}
+	agent vehicle11: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle11, vehicleart.team_artifact
+		goals: register("connectionB11")
+	}
+	agent vehicle12: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle12, vehicleart.team_artifact
+		goals: register("connectionB12")
+	}
+	agent vehicle13: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle13, vehicleart.team_artifact
+		goals: register("connectionB13")
+	}
+	agent vehicle14: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle14, vehicleart.team_artifact
+		goals: register("connectionB14")
+	}
+	agent vehicle15: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle15, vehicleart.team_artifact
+		goals: register("connectionB15")
+	}
+	agent vehicle16: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle16, vehicleart.team_artifact
+		goals: register("connectionB16")
+	}
+	agent vehicle17: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle17, vehicleart.team_artifact
+		goals: register("connectionB17")
+	}
+	agent vehicle18: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle18, vehicleart.team_artifact
+		goals: register("connectionB18")
+	}
+	agent vehicle19: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle19, vehicleart.team_artifact
+		goals: register("connectionB19")
+	}
+	agent vehicle20: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle20, vehicleart.team_artifact
+		goals: register("connectionB20")
+	}
+	agent vehicle21: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle21, vehicleart.team_artifact
+		goals: register("connectionB21")
+	}
+	agent vehicle22: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle22, vehicleart.team_artifact
+		goals: register("connectionB22")
+	}
+	agent vehicle23: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle23, vehicleart.team_artifact
+		goals: register("connectionB23")
+	}
+	agent vehicle24: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle24, vehicleart.team_artifact
+		goals: register("connectionB24")
+	}
+	agent vehicle25: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle25, vehicleart.team_artifact
+		goals: register("connectionB25")
+	}
+	agent vehicle26: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle26, vehicleart.team_artifact
+		goals: register("connectionB26")
+	}
+	agent vehicle27: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle27, vehicleart.team_artifact
+		goals: register("connectionB27")
+	}
+	agent vehicle28: vehicle.asl {
+		join: vehicleart, org
+		focus: vehicleart.eis_art_vehicle28, vehicleart.team_artifact
+		goals: register("connectionB28")
+	}
+	
+	workspace vehicleart {
+		artifact eis_art_vehicle1: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig1.json")
+		artifact eis_art_vehicle2: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig2.json")
+		artifact eis_art_vehicle3: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig3.json")
+		artifact eis_art_vehicle4: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig4.json")
+		artifact eis_art_vehicle5: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig5.json")
+		artifact eis_art_vehicle6: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig6.json")
+		artifact eis_art_vehicle7: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig7.json")
+		artifact eis_art_vehicle8: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig8.json")
+		artifact eis_art_vehicle9: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig9.json")
+		artifact eis_art_vehicle10: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig10.json")
+		artifact eis_art_vehicle11: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig11.json")
+		artifact eis_art_vehicle12: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig12.json")
+		artifact eis_art_vehicle13: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig13.json")
+		artifact eis_art_vehicle14: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig14.json")
+		artifact eis_art_vehicle15: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig15.json")
+		artifact eis_art_vehicle16: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig16.json")
+		artifact eis_art_vehicle17: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig17.json")
+		artifact eis_art_vehicle18: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig18.json")
+		artifact eis_art_vehicle19: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig19.json")
+		artifact eis_art_vehicle20: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig20.json")
+		artifact eis_art_vehicle21: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig21.json")
+		artifact eis_art_vehicle22: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig22.json")
+		artifact eis_art_vehicle23: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig23.json")
+		artifact eis_art_vehicle24: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig24.json")
+		artifact eis_art_vehicle25: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig25.json")
+		artifact eis_art_vehicle26: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig26.json")
+		artifact eis_art_vehicle27: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig27.json")
+		artifact eis_art_vehicle28: env.EISArtifact("conf/eisconfigTeamB/eismassimconfig28.json")
+		artifact team_artifact: env.TeamArtifact()
+	}
+	
+	workspace org {
+		artifact myorg: ora4mas.nopl.OrgBoard("src/org/sch.xml")
+	}
+
+    asl-path: src/agt
+              src/agt/inc
+	
+	platform: cartago("infrastructure")
+
+}

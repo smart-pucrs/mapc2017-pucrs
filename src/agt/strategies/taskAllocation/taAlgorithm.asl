@@ -15,6 +15,7 @@ readyMe(false).
 @puTL[atomic]
 +!run_distributed_TA_algorithm(communication(COMMUNICATION_TYPE,AGENT_LIST),SUBTASKLIST,AVAILABLE_LOAD):true
 <- 
+	.print("ALg: ",SUBTASKLIST);
 !setInitialBeleives;
 .time(HH,NN,SS);
 .concat(HH,":",NN,":",SS,INITIME);

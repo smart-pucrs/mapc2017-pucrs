@@ -155,18 +155,19 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 	Namespace = taProcess;
 
-	+Namespace::task(JobId,StorageId);
+	+::task(JobId,StorageId);
 	for ( .member(subtask(required(TaskId,Qtd),ParentId,_,_,_,_),Tasks) ) {
-        +Namespace::taskBiding(JobId,ParentId,required(TaskId,Qtd),TaskId);
+        +::taskBiding(JobId,ParentId,required(TaskId,Qtd),TaskId);
     }
     
     ?localTask::convertTaskId(Tasks,[],ConvertedTasks);
 	
 	
 	?localTask::generateAssembleTask(JobId,StorageId,Requirements,ConvertedTasks,FullTasks);
-	.print("Tasks: ",FullTasks);
+	.print("Full Tasks: ",FullTasks);
 	
 //	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
+	+Namespace::integration(JobId,StorageId);
 	!Namespace::run_distributed_TA_algorithm(communication(broadcast,[]),FullTasks,RoleLoad-MyLoad);
 	.
 	
@@ -175,6 +176,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 +taResults::allocationProcess(ready)
 	//: ::taskBiding(JobId,_)
 <-
+	?Namespace::integration(JobId,StorageId);
 	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::taskBiding(_,TuParent,TaskId,TuTask)),LTASKS);
 //	.findall(Task,taResults::allocatedTasks(Task,ParentId),LTASKS);
 	
@@ -194,7 +196,8 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	else {
 		.print("I won 0 tasks");
 	}
-	+winner(LTASKS, assist(Storage, Assembler, JobId))
+	+gTaskAllocation::winner(LTASKS, assist(StorageId,Ag,JobId));
+	.print("Feitoooo");
 	.
 
 

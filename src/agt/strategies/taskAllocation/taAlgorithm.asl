@@ -63,7 +63,7 @@ else{
 		}
 		else{
 			if(UTILITY>-1){
-				+taProcess::subtaskReceived(SUBTASK,TASK,LOAD,0,TASKTYPE,ROLE);
+				+taProcess::subtaskReceived(SUBTASK,TASK,LOAD,1,TASKTYPE,ROLE);
 			}
 		}
 	}

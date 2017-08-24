@@ -936,7 +936,7 @@ else {
 +!processbidDone(BDNEW,A): (not taProcess::notProcessedBid(XXA,XXX)) | (taProcess::notProcessedBid(XA,NotP) & NotP<=0) 
 <-
 
-.print("!processbidDone from:",A," BD:",BDNEW);
+//.print("!processbidDone from:",A," BD:",BDNEW);
 
 if (taResults::allocationProcess(running)){
 	if(taProcess::missingBid(A,Value) & (Value>0)){

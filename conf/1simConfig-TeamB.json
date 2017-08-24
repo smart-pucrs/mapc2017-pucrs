@@ -148,8 +148,8 @@
   ],
 
   "teams" : {
-    "A" : "$(teams/A.json)",
-    "B" : "$(teams/B.json)",
+    "A" : "$(teams/B.json)",
+    "B" : "$(teams/A.json)",
     "C" : "$(teams/C.json)",
     "D" : "$(teams/D.json)",
     "E" : "$(teams/E.json)"

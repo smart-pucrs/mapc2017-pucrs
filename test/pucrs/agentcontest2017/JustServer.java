@@ -13,7 +13,7 @@ public class JustServer {
 	@Before
 	public void setUp() {
 		try {
-			Server.main(new String[] {"-conf", "conf/1simConfig.json", "--monitor"});					
+			Server.main(new String[] {"-conf", "conf/1simConfig-TeamB.json", "--monitor"});					
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

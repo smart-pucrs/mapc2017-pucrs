@@ -102,7 +102,7 @@ task_id(0).
 	: initiator::accept_jobs & not initiator::eval(Id) & default::steps(TotalSteps) & default::step(Step) & initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <-
 	+eval(Id);
-//	.print("Evaluating mission ",Id," at step ",Step);
+	.print("Evaluating mission ",Id," at step ",Step);
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
 		+action::hold_action(Id);
 		!decompose(Items,ListItems,ListToolsNew,Id);
@@ -116,7 +116,7 @@ task_id(0).
 		-eval(Id);
 	}
 .
-+!evaluate_mission(Items, End, Storage, Id, Reward, Fine). //<- .print("Mission is already being evaluated").
++!evaluate_mission(Items, End, Storage, Id, Reward, Fine) <- .print("Mission is already being evaluated").
 
 @sep_task[atomic]
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
@@ -304,7 +304,7 @@ task_id(0).
 	}
 	-action::hold_action(JobId);
 	!evaluation_auction::has_set_to_free;
-//	.print("Task allocation is done ",JobId);
+	.print("Task allocation is done ",JobId);
 	.
 +!create_scheme(JobId, st, SchArtId,OrgId) <- org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
 -!create_scheme(JobId, st, SchArtId,OrgId) 

@@ -84,7 +84,7 @@
 <-
 	-strategies::assembling;
 	-default::winner(_,_)[source(_)];
-//	!!strategies::empty_load;
+//	for ( default::hasItem(ItemId,Qty) ) { .print(">>>>>>>>> Assist assemble ended, I have #",Qty," of ",ItemId); }
 	!!strategies::empty_load;
 	.
 +!stop_assist_assemble <- .print("!!!!!!!!!!!!! Received stop assist from scheme but did not have the winner belief anymore.").

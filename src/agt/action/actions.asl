@@ -12,9 +12,10 @@
 	.wait( default::actionID(S2) & S2 \== S );
 //	.print("Got out of wait from step ",S);
 	?default::lastActionResult(Result);
+//	.print("Last action result was: ",Result);
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
-	if (Action \== recharge & Action \== buy & Result == failed) {
+	if (Action \== recharge & Action \== continue & not .substring("assist_assemble",Action) & not .substring("buy",Action) & Result == failed) {
 //		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}

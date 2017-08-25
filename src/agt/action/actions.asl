@@ -12,6 +12,7 @@
 	.wait( default::actionID(S2) & S2 \== S );
 //	.print("Got out of wait from step ",S);
 	?default::lastActionResult(Result);
+//	.print("Last action result was: ",Result);
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
 	if (Action \== recharge & Action \== continue & not .substring("assist_assemble",Action) & not .substring("buy",Action) & Result == failed) {

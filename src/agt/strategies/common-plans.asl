@@ -1,4 +1,3 @@
-//+default::actionID(0).
 //+default::actionID(X) 
 //	: free & not strategies::hold_action(Action)
 //<-
@@ -102,8 +101,8 @@
 //			.print("Trying to store #",Qty," of ",ItemId);
 			?default::storage(Facility, _, _, TotCapL, UsedCapL, _);
 			if ( default::load(LoadL) & UsedCapL + LoadL < TotCapL ) {
-				addAvailableItem(Facility,ItemId,Qty);
 				!action::store(ItemId,Qty);
+				addAvailableItem(Facility,ItemId,Qty);
 			}
 		}
 	}

@@ -13,6 +13,7 @@
 	+metrics::failedJobs(0);
 	+metrics::completedAuctions(0);
 	+metrics::failedAuctions(0);
+	+metrics::lostAuctions(0);
 	+metrics::completedMissions(0);
 	+metrics::failedMissions(0);
 	+metrics::finePaid(0);

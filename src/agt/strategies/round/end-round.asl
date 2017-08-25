@@ -58,6 +58,8 @@
 	.print("Number of jobs that failed eval: ",JobsEvalFailed); 	
 	?metrics::completedAuctions(AuctionsCompleted); // Ok
 	.print("Number of completed auctions: ",AuctionsCompleted); 
+	?metrics::lostAuctions(AuctionsLost); // Ok
+	.print("Number of lost auctions: ",AuctionsLost); 
 	?metrics::failedAuctions(AuctionsFailed); // Ok
 	.print("Number of failed auctions: ",AuctionsFailed); 	
 	?metrics::completedMissions(MissionsCompleted); // Ok

@@ -183,8 +183,11 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	.
 @loseAuction[atomic]
 +!figure_out_auction_winning(JobId) 
+	: metrics::lostAuctions(L)
 <- 
 	.print("We lost auction ",JobId);
+	
+	-+metrics::lostAuctions(L+1);
 	
 	?initiator::free_trucks_auction(JobId,FreeTrucksAuction);
 	-initiator::free_trucks_auction(JobId,FreeTrucksAuction);

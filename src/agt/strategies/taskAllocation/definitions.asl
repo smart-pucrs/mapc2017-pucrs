@@ -5,7 +5,7 @@ agentsBid(28).
 //taUtilityGoal("maximize").
 taUtilityGoal("minimize").
 
-maxUtility(10).
+maxUtility(50).
 
 typeMin(sd,"N").
 typeMax(sd,"N").

@@ -1,4 +1,3 @@
-//+default::actionID(0).
 //+default::actionID(X) 
 //	: free & not strategies::hold_action(Action)
 //<-
@@ -58,7 +57,9 @@
 	: default::role(Role, _, _, _, _) 
 <- 
 	.abolish(org::_);
-	if ( default::hasItem(ItemId,_) ) { !go_store(Role); }
+	if (action::action(S)) { .wait( default::actionID(S2) & S2 \== S ); }
+//	!action::recharge_is_new_skip;
+	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!strategies::check_charge;
 	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
@@ -102,8 +103,8 @@
 //			.print("Trying to store #",Qty," of ",ItemId);
 			?default::storage(Facility, _, _, TotCapL, UsedCapL, _);
 			if ( default::load(LoadL) & UsedCapL + LoadL < TotCapL ) {
-				addAvailableItem(Facility,ItemId,Qty);
 				!action::store(ItemId,Qty);
+				addAvailableItem(Facility,ItemId,Qty);
 			}
 		}
 	}

@@ -12,7 +12,7 @@
 	.wait( default::actionID(S2) & S2 \== S );
 //	.print("Got out of wait from step ",S);
 	?default::lastActionResult(Result);
-//	.print(Result);
+//	.print("Last action result was: ",Result);
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
 		

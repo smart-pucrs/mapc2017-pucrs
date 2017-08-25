@@ -15,7 +15,7 @@
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
 		
-	if (Action \== recharge & Action \== buy & Action \== bid_for_job & Result == failed) {
+	if (Action \== recharge & not .substring("buy",Action) & .substring("bid_for_job",Action) & Result == failed) {
 		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}

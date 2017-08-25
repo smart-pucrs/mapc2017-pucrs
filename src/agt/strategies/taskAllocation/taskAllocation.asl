@@ -135,6 +135,9 @@ converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoaliti
 convertTaskId([],Temp,Result) :- Result = Temp.
 convertTaskId([subtask(required(BaseItem,Qtd),ParentId,NewVol,Utility,Type,Unkown)|List],Temp,Result) :- convertTaskId(List,[subtask(BaseItem,ParentId,NewVol,Utility,Type,Unkown)|Temp],Result).
 
+mapIds([],[]) .
+mapIds([subtask(required(TaskId,Qtd),ParentId,_,_,_,_)|Tasks],[mapId(ParentId,required(TaskId,Qtd),TaskId)|Result]) :- mapIds(Tasks,Result).
+
 {end}
 
 {begin namespace(gTaskAllocation, global) }
@@ -156,91 +159,95 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	Namespace = taProcess;
 
 	+::task(JobId,StorageId);
+//	?localTask::mapIds(Tasks,MapIds);
+//	+Namespace::integration(JobId,StorageId,MapIds);
+	+Namespace::integration(JobId,StorageId,Requirements);
 	for ( .member(subtask(required(TaskId,Qtd),ParentId,_,_,_,_),Tasks) ) {
-        +::taskBiding(JobId,ParentId,required(TaskId,Qtd),TaskId);
+        +::int_mapIds(JobId,ParentId,required(TaskId,Qtd),TaskId);
     }
     
     ?localTask::convertTaskId(Tasks,[],ConvertedTasks);
-	
 	
 	?localTask::generateAssembleTask(JobId,StorageId,Requirements,ConvertedTasks,FullTasks);
 	.print("Full Tasks: ",FullTasks);
 	
 //	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
-	+Namespace::integration(JobId,StorageId);
+	
 	!Namespace::run_distributed_TA_algorithm(communication(broadcast,[]),FullTasks,RoleLoad-MyLoad);
 	.
 	
 {end}
 
+//+taResults::allocationProcess(ready)
+//	//: ::taskBiding(JobId,_)
+//<-
+////	?Namespace::integration(JobId,StorageId,Ids);
+//	?Namespace::integration(JobId,StorageId,Requirements);
+//	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::int_mapIds(JobId,TuParent,TaskId,TuTask) & TuTask\==assemble),AssistList);
+//	.print("TaskId ",TaskId);
+//	
+//	?taResults::jobAllocationStatus(STATUS);
+//	.print("jobAllocationStatus:",STATUS);
+//	
+//	.length(AssistList, SizeAssist);
+//	if(SizeAssist>0){
+//		.print("I won ",SizeAssist, " tasks to assist!");
+//		.print("Tasks I won:",AssistList);
+//		
+////		?taResults::assemblerAgent(Assembler);
+//		Assembler = vehicle1;
+//		
+//		+gTaskAllocation::winner(AssistList, assist(StorageId,Assembler,JobId));
+//		//.abolish(::taskBiding(JobId,_));
+//	}
+//	else {
+//		.print("I won 0 tasks to assist");
+//	}
+//	
+//	if (taResults::allocatedTasks(assemble,TuParent)){
+//		.print("I'm going to perform the assemble");
+//		+gTaskAllocation::winner(Requirements,assemble(StorageId, JobId));
+//	}
+//	.print("Feitoooo");
+//	.
 +taResults::allocationProcess(ready)
 	//: ::taskBiding(JobId,_)
 <-
-	?Namespace::integration(JobId,StorageId);
-	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::taskBiding(_,TuParent,TaskId,TuTask)),LTASKS);
-//	.findall(Task,taResults::allocatedTasks(Task,ParentId),LTASKS);
+	?Namespace::integration(JobId,StorageId,Requirements);
+	!finish_task_allocation(JobId,StorageId,Requirements);
+	.
+
++!finish_task_allocation(JobId,StorageId,Requirements)
+//	: taResults::jobAllocationStatus(STATUS)
+	: .my_name(Me)
+<-
+	.print("Finalysing the allocation process");
+	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::int_mapIds(JobId,TuParent,TaskId,TuTask) & TuTask\==assemble),AssistList);
 	
-	?taResults::jobAllocationStatus(STATUS);
-	.print("jobAllocationStatus:",STATUS);
-	
-	if (taResults::assemblerAgent(Ag)){
-		.print("assemblerAgent:",Ag);
-	}
-	
-	.length(LTASKS, NTASKS);
-	if(NTASKS>0){
-		.print("I won ",NTASKS, " tasks!");
-		.print("Tasks I won:",LTASKS);
+	.length(AssistList, SizeAssist);
+	if(SizeAssist>0){
+		.print("I won ",SizeAssist, " tasks to assist!");
+		.print("Tasks I won:",AssistList);
+		
+//		?taResults::assemblerAgent(Assembler);
+		Assembler = vehicle1;
+		
+		+default::winner(AssistList, assist(StorageId,Assembler,JobId));
 		//.abolish(::taskBiding(JobId,_));
 	}
 	else {
-		.print("I won 0 tasks");
+		.print("I won 0 tasks to assist");
 	}
-	+gTaskAllocation::winner(LTASKS, assist(StorageId,Ag,JobId));
-	.print("Feitoooo");
-	.
-
-
-
-
-//+taResults:: allocatedTasks(Task,Parent)
-//	: ::taskBiding(JobId,Parent)
-//<-
-//	.print("I won task ",Task," for ",JobId);
-//	.abolish(::taskBiding(JobId,_));
-//	.
 	
-//+default::winner(TaskList, assist(Storage, Assembler, JobId))
-//	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
-//<-
-//	!strategies::not_free;
-//	-+metrics::jobHaveWorked(Jobs+1);
-//	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
-//	org::focus(SchArtId)[wid(OrgId)];
-//	.print("I won the tasks(",JobId,") ",TaskList);
-//	org::commitMission(massist)[artifact_id(SchArtId)];
-//	.
-//+default::winner(TaskList, assemble(Storage, JobId))
-//	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
-//<-
-//	!strategies::not_free;
-//	-+metrics::jobHaveWorked(Jobs+1);
-//	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
-//	org::focus(SchArtId)[wid(OrgId)];
-//	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
-//	org::commitMission(massemble)[artifact_id(SchArtId)];
-//	.
-
-
-+!task_allocation_coalition(JobId, Requirements)
-	: true
-<-
-	.print("Initialising Task Allocation");
-	?localTask::decomposeRequirements(Requirements,[],Bases);
-	.print("Itens Base: ",Bases);
-	?localTask::generateTaskList(Bases,[],Tasks);
-	.print("Tasks: ",Tasks);
-//	!algorithm::run_distributed_algorithm(communication(coalition,[agent1,agent2]),Tasks);
-	.
+	if (taResults::allocatedTasks(assemble,TuParent)){
+		.print("I'm going to perform the assemble");
+		+default::winner(Requirements,assemble(StorageId, JobId));
+	}
 	
+	if (Me == vehicle1){
+		?default::joined(org,OrgId);
+		org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
+		-action::hold_action(JobId);
+	}
+	.
 

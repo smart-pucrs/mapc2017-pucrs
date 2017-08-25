@@ -116,6 +116,7 @@ task_id(0).
 		
 		.broadcast(achieve,gTaskAllocation::allocate_job(Id,Storage,Items,[]));
 		!gTaskAllocation::allocate_job(Id,Storage,Items,[]);
+		-initiator::accept_jobs; // só para forçar somente uma alocação de tarefas
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");

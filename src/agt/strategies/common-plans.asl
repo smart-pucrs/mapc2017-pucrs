@@ -58,7 +58,7 @@
 <- 
 	.abolish(org::_);
 	if (action::action(S)) { .wait( default::actionID(S2) & S2 \== S ); }
-//	!action::recharge_is_new_skip;
+	else { !action::recharge_is_new_skip; }
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!strategies::check_charge;

@@ -15,8 +15,8 @@
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
 		
-	if (Action \== recharge & not .substring("buy",Action) & .substring("bid_for_job",Action) & Result == failed) {
-		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
+	if (Action \== recharge & Action \== continue & not .substring("assist_assemble",Action) & not .substring("buy",Action) & .substring("bid_for_job",Action) & Result == failed) {
+//		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
 	else {

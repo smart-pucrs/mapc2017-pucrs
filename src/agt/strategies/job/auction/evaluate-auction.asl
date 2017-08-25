@@ -11,7 +11,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 +!triggerFuturePlan
 	: default::step(Step) & ::futurePlans(Event,StepFuture) & (StepFuture <= Step) 
 <-
-//	.print("Triggering plan ",Event," at step ",Step);
+	.print("Triggering plan ",Event," at step ",Step);
     !!Event;
     -::futurePlans(Event,StepFuture);
     !triggerFuturePlan;
@@ -37,8 +37,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 		+::bidding(Id,0,0,Limit);
 //		+::futurePlans(further_analysis(Id),Start+Time-1);
 		!::choose_between_auctions_at_same_step(Id,Start+Time-1);
-		+::futurePlans(free_for_next_auction(Id),Start+Time);		
-		+::futurePlans(check_scheme_auction(Id),Start+Time);		
+		+::futurePlans(free_for_next_auction(Id),Start+Time);			
 	}
 	else{
 		.print("Expected limit to bid ",Limit," is greater than the reward ",Reward);
@@ -143,30 +142,16 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	}
 	.
 
-+!analyse_auction_job(Id)	
-	: default::auction(Id,_,_,_,_,_,_,_,_)	
-<-
-//	.print("Analysing auction job");	
-	!send_a_bid(Id);
-	.
-+!analyse_auction_job(Id).
-
 +!send_a_bid(Id)
-	: default::auction(Id,_,Reward,_,_,_,Bid,_,_) & ::bidding(Id,_,BaseBid,Limit)	
+	: default::auction(Id,_,Reward,Start,_,_,Bid,Time,_) & ::bidding(Id,_,BaseBid,Limit)	
 <-
 	?::evaluateBid(Reward,Bid,BaseBid,NewBid);
+	
+	+::futurePlans(figure_out_auction_winning(Id),Start+Time);
 	
 	.print("Posting bid of ",NewBid);
 	-action::hold_action(Id);
 	!action::bid_for_job(Id,NewBid);
-	.
-	
-+!check_scheme_auction(JobId)
-	: default::joined(org,OrgId)
-<-
-	.print("Creating scheme for auction ",JobId);
-	org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
-	.print("Created scheme ",SchArtId);
 	.
 
 +!free_for_next_auction(AuctionId) 
@@ -174,3 +159,48 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 <- 
 	-::bidding(AuctionId,_,_,_);
 	. 
+	
++!figure_out_auction_winning(JobId)
+	: default::auction(JobId,_,_,_,_,_,_,_,_) & default::joined(org,OrgId)
+<-
+	.print("We win auction ",JobId);
+	
+	org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
+	?initiator::awarded_assemble(AgentA,Items,Storage,JobId);
+	-initiator::awarded_assemble(AgentA,Items,Storage,JobId);
+	
+	-initiator::free_trucks_auction(JobId,_);
+	-initiator::free_agents_auction(JobId,_);
+	
+	.print("For ",JobId);
+	for ( initiator::awarded(Agent,Shop,List,JobId,TaskCount) ) {
+		.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
+		-initiator::awarded(Agent,Shop,List,JobId,TaskCount);	
+		.print(Agent," ",AgentA," ",List);
+	}
+	.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
+	.print(AgentA," ",Items);
+	.
+@loseAuction[atomic]
++!figure_out_auction_winning(JobId) 
+<- 
+	.print("We lost auction ",JobId);
+	
+	?initiator::free_trucks_auction(JobId,FreeTrucksAuction);
+	-initiator::free_trucks_auction(JobId,FreeTrucksAuction);
+	?initiator::free_trucks(FreeTrucksA);			
+	.concat(FreeTrucksAuction,FreeTrucksA,FreeTrucksNewA);			
+	-+initiator::free_trucks(FreeTrucksNewA);
+	
+	?initiator::free_agents_auction(JobId,FreeAgentsAuction);
+	-initiator::free_agents_auction(JobId,FreeAgentsAuction);
+	?initiator::free_agents(FreeAgents);
+	.concat(FreeAgentsAuction,FreeAgents,FreeAgentsNew);
+	-+initiator::free_agents(FreeAgentsNew);
+	
+	-job(JobId,_);
+	-awarded_assemble(_,_,_,JobId);
+	-eval(JobId);
+	.abolish(initiator::bids(_,_,JobId));
+	.abolish(initiator::awarded(_,_,_,JobId,_));
+	.

@@ -258,6 +258,44 @@ task_id(0).
 		}
 	}
 	if (not initiator::impossible_task(JobId)) {
+		if (default::auction(JobId,_,_,_,_,_,_,_,_)){			
+			?awarded_assemble(AgentA,Items,Storage,JobId);
+			
+			?initiator::free_trucks(FreeTrucksA);			
+			.delete(AgentA,FreeTrucksA,FreeTrucksNewA);			
+			-+initiator::free_trucks(FreeTrucksNewA);
+			+::free_trucks_auction(JobId,[AgentA]);
+			
+			?initiator::free_agents(FreeAgentsA);
+			.delete(AgentA,FreeAgentsA,FreeAgentsNewA);
+			-+initiator::free_agents(FreeAgentsNewA);
+			+::free_agents_auction(JobId,[AgentA]);
+			
+			for ( initiator::awarded(Agent,Shop,List,JobId,TaskCount) ) {
+				?initiator::free_agents(FreeAgents);
+				.delete(Agent,FreeAgents,FreeAgentsNew);
+				-+initiator::free_agents(FreeAgentsNew);
+				
+				?::free_agents_auction(JobId,FreeAgentsAuction);
+				.concat([Agent],FreeAgentsAuction,FreeAgentsAuctionNew);
+				-::free_agents_auction(JobId,FreeAgentsAuction);
+				+::free_agents_auction(JobId,FreeAgentsAuctionNew);
+				
+				?initiator::free_trucks(FreeTrucks);
+				if (.member(Agent,FreeTrucks)) {
+					.delete(Agent,FreeTrucks,FreeTrucksNew);
+					-+initiator::free_trucks(FreeTrucksNew);
+					
+					?::free_trucks_auction(JobId,FreeTrucksAuction);
+					.concat([Agent],FreeTrucksAuction,FreeTrucksAuctionNew);
+					-::free_trucks_auction(JobId,FreeTrucksAuction);
+					+::free_trucks_auction(JobId,FreeTrucksAuctionNew);
+				}
+			}
+			-cnp(JobId);			
+			!evaluation_auction::send_a_bid(JobId);
+		}
+		else{
 			?default::joined(org,OrgId);
 	//		.print("Creating scheme for ",JobId);		
 			!create_scheme(JobId, st, SchArtId,OrgId);
@@ -270,7 +308,7 @@ task_id(0).
 			-+initiator::free_trucks(FreeTrucksNewA);
 			.delete(AgentA,FreeAgentsA,FreeAgentsNewA);
 			-+initiator::free_agents(FreeAgentsNewA);
-	//		.print("For ",JobId);
+			.print("For ",JobId);
 			for ( initiator::awarded(Agent,Shop,List,JobId,TaskCount) ) {
 				?initiator::free_agents(FreeAgents);
 				.delete(Agent,FreeAgents,FreeAgentsNew);
@@ -282,15 +320,13 @@ task_id(0).
 				}
 		    	.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 				-awarded(Agent,Shop,List,JobId,TaskCount);	
-	//			.print(Agent," ",AgentA," ",List);
+				.print(Agent," ",AgentA," ",List);
 			}
-	//		.print(AgentA," ",Items);
+			.print(AgentA," ",Items);
 			.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
 			if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
 			-cnp(JobId);
-			
-			//			.wait(50);
-			!evaluation_auction::analyse_auction_job(JobId);
+		}		
 	}
 	else { 
 		-impossible_task(JobId);

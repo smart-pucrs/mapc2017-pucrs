@@ -36,8 +36,9 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	if (Limit < Reward) {
 		+::bidding(Id,0,0,Limit);
 //		+::futurePlans(further_analysis(Id),Start+Time-1);
-		+::futurePlans(free_for_next_auction(Id),Start+Time);
 		!::choose_between_auctions_at_same_step(Id,Start+Time-1);
+		+::futurePlans(free_for_next_auction(Id),Start+Time);		
+		+::futurePlans(check_scheme_auction(Id),Start+Time);		
 	}
 	else{
 		.print("Expected limit to bid ",Limit," is greater than the reward ",Reward);
@@ -54,7 +55,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	
 	if (RewardCurrent > RewardOld){
 		-::futurePlans(further_analysis(Id),StartTime);
-		+::futurePlans(further_analysis(AuctionId),StartTime)
+		+::futurePlans(further_analysis(AuctionId),StartTime);
 	}
 	.
 +!choose_between_auctions_at_same_step(AuctionId,StartTime)
@@ -160,6 +161,14 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	!action::bid_for_job(Id,NewBid);
 	.
 	
++!check_scheme_auction(JobId)
+	: default::joined(org,OrgId)
+<-
+	.print("Creating scheme for auction ",JobId);
+	org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
+	.print("Created scheme ",SchArtId);
+	.
+
 +!free_for_next_auction(AuctionId) 
 	: ::bidding(AuctionId,_,_,_) 
 <- 

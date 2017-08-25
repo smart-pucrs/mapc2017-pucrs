@@ -18,13 +18,13 @@
 	: default::auction(JobId,_,_,Start,_,_,_,Time,_)
 <-
 	.print("I won the auction tasks(",JobId,") ",TaskList);
-	+::futurePlans(figure_out_auction_winning(JobId,massist),Start+Time);
+	+::futurePlans(figure_out_auction_winning(JobId,massist),Start+Time+1);
 	.
 +default::winner(TaskList, assemble(Storage, JobId))
 	: default::auction(JobId,_,_,Start,_,_,_,Time,_)
 <-
 	.print("I won the auction tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
-	+::futurePlans(figure_out_auction_winning(JobId,massemble),Start+Time);
+	+::futurePlans(figure_out_auction_winning(JobId,massemble),Start+Time+1);
 	.
 		
 +!figure_out_auction_winning(JobId,Mission)

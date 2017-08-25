@@ -260,7 +260,9 @@ task_id(0).
 	if (not initiator::impossible_task(JobId)) {
 		?default::joined(org,OrgId);
 //		.print("Creating scheme for ",JobId);
-		!create_scheme(JobId, st, SchArtId,OrgId);
+		if (not default::auction(JobId,_,_,_,_,_,_,_,_)){
+			!create_scheme(JobId, st, SchArtId,OrgId)		
+		}
 //		debug(inspector_gui(on))[artifact_id(SchArtId)];
 		?awarded_assemble(AgentA,Items,Storage,JobId);
 		-awarded_assemble(AgentA,Items,Storage,JobId);

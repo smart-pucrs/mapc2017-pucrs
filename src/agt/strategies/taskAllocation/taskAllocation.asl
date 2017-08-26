@@ -229,8 +229,9 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 		.print("I won ",SizeAssist, " tasks to assist!");
 		.print("Tasks I won:",AssistList);
 		
-//		?taResults::assemblerAgent(Assembler);
-		Assembler = vehicle1;
+		?taResults::assemblerAgent(Assembler);
+		//Assembler = vehicle1;
+		.print("Assembler agent:",Assembler);
 		
 		+default::winner(AssistList, assist(StorageId,Assembler,JobId));
 		//.abolish(::taskBiding(JobId,_));

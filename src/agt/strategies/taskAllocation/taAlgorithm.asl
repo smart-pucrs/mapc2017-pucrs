@@ -661,7 +661,7 @@ if (taResults::jobAllocationStatus(allocated)){ //this IF is valid only for the 
 	}
 
 	//only for the MAS contest
-	if(subtask(assemble,JobId,Ag)){
+	if(taProcess::subtaskOwner(assemble,JobId,Ag)){
 		+taResults::assemblerAgent(Ag);
 	}
 

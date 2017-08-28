@@ -234,25 +234,26 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	.print("Finalysing the allocation process");
 	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::int_mapIds(JobId,TuParent,TaskId,TuTask) & TuTask\==assemble),AssistList);
 	
-	.length(AssistList, SizeAssist);
-	if(SizeAssist>0){
-		.print("I won ",SizeAssist, " tasks to assist!");
-		.print("Tasks I won:",AssistList);
-		
-		?taResults::assemblerAgent(Assembler);
-		//Assembler = vehicle1;
-		.print("Assembler agent:",Assembler);
-		
-		+default::winner(AssistList, assist(StorageId,Assembler,JobId));
-		//.abolish(::taskBiding(JobId,_));
-	}
-	else {
-		.print("I won 0 tasks to assist");
-	}
+	
 	
 	if (taResults::allocatedTasks(assemble,TuParent)){
-		.print("I'm going to perform the assemble");
-		+default::winner(Requirements,assemble(StorageId, JobId));
+		.print("I'm going to perform the assemble and I have the tasks ",AssistList);
+		+default::winner(Requirements,assemble(StorageId,JobId,AssistList));
+	}
+	else{
+		.length(AssistList, SizeAssist);
+		if(SizeAssist>0){
+			.print("I won ",SizeAssist, " tasks to assist!");
+			.print("Tasks I won:",AssistList);
+			
+			?taResults::assemblerAgent(Assembler);
+			
+			+default::winner(AssistList, assist(StorageId,Assembler,JobId));
+			//.abolish(::taskBiding(JobId,_));
+		}
+		else {
+			.print("I won 0 tasks to assist");
+		}
 	}
 	
 	if (Me == vehicle1){

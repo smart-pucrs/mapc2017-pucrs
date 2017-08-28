@@ -135,8 +135,11 @@ converCoalitionMembers([agent(Member,_)|Coalition],Temp,Result) :- converCoaliti
 convertTaskId([],Temp,Result) :- Result = Temp.
 convertTaskId([subtask(required(BaseItem,Qtd),ParentId,NewVol,Utility,Type,Unkown)|List],Temp,Result) :- convertTaskId(List,[subtask(BaseItem,ParentId,NewVol,Utility,Type,Unkown)|Temp],Result).
 
+//mapIds([],[]) .
+//mapIds([subtask(required(TaskId,Qtd),ParentId,_,_,_,_)|Tasks],[mapId(ParentId,required(TaskId,Qtd),TaskId)|Result]) :- mapIds(Tasks,Result).
 mapIds([],[]) .
-mapIds([subtask(required(TaskId,Qtd),ParentId,_,_,_,_)|Tasks],[mapId(ParentId,required(TaskId,Qtd),TaskId)|Result]) :- mapIds(Tasks,Result).
+mapIds([subtask(required(TaskId,Qtd),ParentId,_,_,_,_)|Tasks],[mapId(ParentId,tool(TaskId),TaskId)|Result]) 	:- .substring("tool",TaskId) & mapIds(Tasks,Result).
+mapIds([subtask(required(TaskId,Qtd),ParentId,_,_,_,_)|Tasks],[mapId(ParentId,item(TaskId,Qtd),TaskId)|Result]) :- .substring("item",TaskId) & mapIds(Tasks,Result).
 
 {end}
 
@@ -163,7 +166,14 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 //	+Namespace::integration(JobId,StorageId,MapIds);
 	+Namespace::integration(JobId,StorageId,Requirements);
 	for ( .member(subtask(required(TaskId,Qtd),ParentId,_,_,_,_),Tasks) ) {
-        +::int_mapIds(JobId,ParentId,required(TaskId,Qtd),TaskId);
+//		+::int_mapIds(JobId,ParentId,required(TaskId,Qtd),TaskId);
+		if(.substring("tool",TaskId)){
+			+::int_mapIds(JobId,ParentId,tool(TaskId),TaskId);
+		}
+		else{
+			+::int_mapIds(JobId,ParentId,item(TaskId,Qtd),TaskId);
+		}
+        
     }
     
     ?localTask::convertTaskId(Tasks,[],ConvertedTasks);

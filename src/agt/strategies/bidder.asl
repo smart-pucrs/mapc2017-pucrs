@@ -114,7 +114,7 @@
 	.print("I won the tasks(",JobId,") ",TaskList);
 	org::commitMission(massist)[artifact_id(SchArtId)];
 	.
-+default::winner(TaskList, assemble(Storage, JobId))
++default::winner(ItemsAssemble, assemble(Storage, JobId, TaskList))
 	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
 <-
 	!strategies::not_free;
@@ -122,7 +122,8 @@
 //	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
 	!get_scheme_artifact(JobId,OrgId,SchArtId);
 	org::focus(SchArtId)[wid(OrgId)];
-	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
+	.print("I won the tasks to assemble ",ItemsAssemble," and deliver to ",Storage," for ",JobId);
+	if ( not .empty(TaskList) ) { .print("I also won the tasks(",JobId,") ",TaskList); }
 	org::commitMission(massemble)[artifact_id(SchArtId)];
 	.
 +!get_scheme_artifact(JobId,OrgId,SchArtId)

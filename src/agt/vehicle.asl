@@ -56,6 +56,7 @@
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
 	if ( Me == vehicle1 ) {
+		saveDuplicateLoad;
 		!initiator::add_myself_to_free;
 		?initiator::mapCenter(CLat,CLon);
 		?new::shopList(SList);

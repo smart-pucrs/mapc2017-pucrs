@@ -1,20 +1,23 @@
 +goalState(JobId,job_delivered,_,_,satisfied)
-	: default::winner(_, assemble(_, JobId))
+	: default::winner(_, assemble(_, JobId, _))
 <-
 //   .print("*** all done! ***");
    removeScheme(JobId);
    .abolish(org::_);
    .
 
-+!go_to_workshop
-	: default::winner(_, assemble(Storage, _))
++!prepare_assemble
+	: default::winner(_, assemble(Storage, _, TaskList))
 <-
-	!strategies::go_to_workshop(Storage);
-	!!strategies::free;
+	if ( not .empty(TaskList) ) { !buy_items; }
+	else {
+		!strategies::go_to_workshop(Storage);
+		!!strategies::free;
+	}
 	.
 
 +!do_assemble
-	: default::winner(TaskList, assemble(_, _)) & default::get_assemble(TaskList, [], AssembleListNotSorted, 0)
+	: default::winner(TaskList, assemble(_, _, _)) & default::get_assemble(TaskList, [], AssembleListNotSorted, 0)
 <-
 	!strategies::not_free;
 	.sort(AssembleListNotSorted,AssembleList);
@@ -29,7 +32,7 @@
 	.
 
 +!buy_items
-	: default::role(Role, _, _, _, _) & new::shopList(SList) & default::winner(TaskList, assist(Storage, _, _)) & .my_name(Me)
+	: default::role(Role, _, _, _, _) & new::shopList(SList) & (default::winner(TaskList, assist(Storage, _, _)) | default::winner(_, assemble(Storage, _, TaskList))) & .my_name(Me)
 <-
 	for ( .member(tool(ItemId),TaskList) ) {
 		.findall(StorageAdd,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .substring(ToolS,AvailableT) & .term2string(StorageAdd,StorageS), StorageList);
@@ -55,11 +58,13 @@
 	}
 //	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }
 	!strategies::go_buy;
-	if (strategies::retrieveList(_,_,Fac)) {
-		for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
+	if (strategies::retrieveList(_,_,_)) {
+		for ( strategies::retrieveList(_,_,Fac) ) {
 			!action::goto(Fac);
-			-strategies::retrieveList(ItemId,Qty,Fac);
-			!action::retrieve(ItemId,Qty);
+			for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
+				-strategies::retrieveList(ItemId,Qty,Fac);
+				!action::retrieve(ItemId,Qty);
+			}
 		}
 	}
 	!strategies::go_to_workshop(Storage);

@@ -22,7 +22,7 @@
           </goal>
           <goal id="assemblep1" type="performance">
             <plan operator="sequence">
-              <goal id="go_to_workshop" type="performance"/>
+              <goal id="prepare_assemble" type="performance"/>
             </plan>
           </goal>
         </plan>
@@ -47,7 +47,7 @@
 
   <mission id="massemble">
     <goal id="do_assemble"/>
-    <goal id="go_to_workshop"/>
+    <goal id="prepare_assemble"/>
   </mission>
   <mission id="massist">
     <goal id="stop_assist_assemble"/>

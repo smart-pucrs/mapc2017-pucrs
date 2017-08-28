@@ -55,11 +55,13 @@
 	}
 //	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }
 	!strategies::go_buy;
-	if (strategies::retrieveList(_,_,Fac)) {
-		for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
+	if (strategies::retrieveList(_,_,_)) {
+		for ( strategies::retrieveList(_,_,Fac) ) {
 			!action::goto(Fac);
-			-strategies::retrieveList(ItemId,Qty,Fac);
-			!action::retrieve(ItemId,Qty);
+			for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
+				-strategies::retrieveList(ItemId,Qty,Fac);
+				!action::retrieve(ItemId,Qty);
+			}
 		}
 	}
 	!strategies::go_to_workshop(Storage);

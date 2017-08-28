@@ -60,7 +60,7 @@ task_id(0).
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
 	
-+!decompose(Items,ListItems,ListToolsNew,Id) : default::step(Step)
++!decompose(Items,ListItems,ListToolsNew,Id)
 <-
 	?default::decomposeRequirements(Items,[],Bases);
 	+bases([],Id);
@@ -338,6 +338,7 @@ task_id(0).
 		.abolish(initiator::awarded(_,_,_,JobId,_));
 		.print("Impossible job ",JobId,", aborting it.");
 	}
+	resetLoads;
 	-action::hold_action(JobId);
 	!evaluation_auction::has_set_to_free;
 	.print("Task allocation is done ",JobId);
@@ -345,6 +346,7 @@ task_id(0).
 +!create_scheme(JobId, st, SchArtId,OrgId) <- org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
 -!create_scheme(JobId, st, SchArtId,OrgId) 
 <-
+	resetLoads;
 	-impossible_task(JobId);
 	-cnp(JobId);
 	-job(JobId, _);

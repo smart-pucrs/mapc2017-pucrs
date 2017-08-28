@@ -18,6 +18,7 @@ public class TeamArtifact extends Artifact {
 	private static Map<String, String> agentNames = new HashMap<String, String>();
 	private static Map<String, String> agentRoles = new HashMap<String, String>();
 	private static Map<String, Integer> loads = new HashMap<String, Integer>();
+	private static Map<String, Integer> duplicateLoads = new HashMap<String, Integer>();
 	private Map<String, ArrayList<String>> availableItems = new HashMap<String,ArrayList<String>>();
 	
 	void init(){
@@ -80,11 +81,21 @@ public class TeamArtifact extends Artifact {
 	}
 	
 	@OPERATION void addLoad(String agent, int load){
+//		logger.info("Loads before "+loads);
 		loads.put(agent,load);
+//		logger.info("Loads after "+loads);
 	}
 	
 	@OPERATION void getLoad(String agent, OpFeedbackParam<Integer> load){
 		load.set(loads.get(agent));
+	}
+	
+	@OPERATION void saveDuplicateLoad(){
+		duplicateLoads.putAll(loads);
+	}
+	
+	@OPERATION void resetLoads(){
+		loads.putAll(duplicateLoads);
 	}
 	
 	@OPERATION void addShopItem(String item, int qty, String itemId, int price){

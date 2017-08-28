@@ -306,12 +306,14 @@ task_id(0).
 		}
 		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
 		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
+		resetLoads;
 		-cnp(JobId);
 		
 //		.wait(50);
 //		!evaluation_auction::analyse_auction_job(JobId);
 	}
-	else { 
+	else {
+		resetLoads;
 		-impossible_task(JobId);
 		-cnp(JobId);
 		-job(JobId, _);
@@ -327,6 +329,7 @@ task_id(0).
 +!create_scheme(JobId, st, SchArtId,OrgId) <- org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
 -!create_scheme(JobId, st, SchArtId,OrgId) 
 <-
+	resetLoads;
 	-impossible_task(JobId);
 	-cnp(JobId);
 	-job(JobId, _);

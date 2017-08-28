@@ -20,7 +20,7 @@
 		!commitAction(Action);
 	}
 	else {
-		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId))) { +strategies::jobDone(JobId); }
+		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId, _))) { +strategies::jobDone(JobId); }
 		if (action::next_action(Action2)) {
 			-action::next_action(Action2);
 //			.print("Removing held action ",Action2);

@@ -18,14 +18,14 @@
 	.
 	
 +!go_to_storage
-	: default::winner(_, assemble(Storage, _))
+	: default::winner(_, assemble(Storage, _, _))
 <-
 	.print("Finished assembling all items, going to deliver.");
 	!action::goto(Storage);
 	.
 	
 +!deliver
-	: default::winner(_, assemble(_, JobId))
+	: default::winner(_, assemble(_, JobId, _))
 <-
 	
 	!action::deliver_job(JobId);
@@ -141,7 +141,7 @@
 +!job_failed_assemble
 	: default::role(Role, _, _, _, _)
 <-
-	-default::winner(_, assemble(_, JobId))[source(_)];
+	-default::winner(_, assemble(_, JobId, _))[source(_)];
 	if ( org::goalState(JobId,job_delivered,_,_,waiting) ) { org::removeScheme(JobId); }
 	.drop_desire(org::_);
 	.abolish(org::_);
@@ -194,7 +194,7 @@
 	.print("$$$$$$$$$$$$ Job ",JobId," completed, got reward ",Reward);
 	.
 +default::job_done(JobId, _, _, _, _, _)
-	: default::winner(_, assemble(_, JobId)) & metrics::jobHaveFailed(JobsFail)
+	: default::winner(_, assemble(_, JobId, _)) & metrics::jobHaveFailed(JobsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
 	-+metrics::jobHaveFailed(JobsFail+1);
@@ -217,7 +217,7 @@
 	
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)
-	: default::winner(_, assemble(_, JobId)) & metrics::missionHaveFailed(MissionsFail)
+	: default::winner(_, assemble(_, JobId, _)) & metrics::missionHaveFailed(MissionsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
 	-+metrics::missionHaveFailed(MissionsFail+1);

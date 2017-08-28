@@ -226,7 +226,7 @@ task_id(0).
 			if (Distance \== 99999) {
 //				.print("Awarding assemble of ",JobId," to ",Agent);
 				?initiator::job(JobId, Items);
-				+awarded_assemble(Agent,Items,StorageId,JobId);
+				+awarded_assemble(Agent,Items,StorageId,[],JobId);
 			}
 			else { +initiator::impossible_task(JobId); .print("Unable to allocate assemble to deliver at ",StorageId); }
 		}
@@ -282,8 +282,8 @@ task_id(0).
 //		.print("Creating scheme for ",JobId);
 		!create_scheme(JobId, st, SchArtId,OrgId);
 //		debug(inspector_gui(on))[artifact_id(SchArtId)];
-		?awarded_assemble(AgentA,Items,Storage,JobId);
-		-awarded_assemble(AgentA,Items,Storage,JobId);
+		?awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId);
+		-awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId);
 		?initiator::free_agents(FreeAgentsA);
 		?initiator::free_trucks(FreeTrucksA);
 		.delete(AgentA,FreeTrucksA,FreeTrucksNewA);
@@ -304,7 +304,7 @@ task_id(0).
 	    	.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 			-awarded(Agent,Shop,List,JobId,TaskCount);	
 		}
-		.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
+		.send(AgentA,tell,winner(Items,assemble(Storage,JobId,AssTaskList)));
 		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
 		resetLoads;
 		-cnp(JobId);
@@ -317,7 +317,7 @@ task_id(0).
 		-impossible_task(JobId);
 		-cnp(JobId);
 		-job(JobId, _);
-		-awarded_assemble(_,_,_,JobId);
+		-awarded_assemble(_,_,_,_,JobId);
 		-eval(JobId);
 		.abolish(initiator::bids(_,_,JobId));
 		.abolish(initiator::awarded(_,_,_,JobId,_));
@@ -333,7 +333,7 @@ task_id(0).
 	-impossible_task(JobId);
 	-cnp(JobId);
 	-job(JobId, _);
-	-awarded_assemble(_,_,_,JobId);
+	-awarded_assemble(_,_,_,_,JobId);
 	-eval(JobId);
 	.abolish(initiator::bids(_,_,JobId));
 	.abolish(initiator::awarded(_,_,_,JobId,_));

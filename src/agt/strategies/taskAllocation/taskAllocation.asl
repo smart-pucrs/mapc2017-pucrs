@@ -183,6 +183,10 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 	!Namespace::run_distributed_TA_algorithm(communication(broadcast,[]),FullTasks,RoleLoad-MyLoad);
 	.
++!allocate_job(JobId,StorageId,Requirements,FreeAgents)
+<- 
+	.print("I already have a job to do");
+	.
 	
 {end}
 

@@ -22,7 +22,7 @@
       "centerLon" : 2.3209,
       "proximity" : 5,
       "cellSize" : 200,
-      "randomSeed" : 17,
+      "randomSeed" : 1,
       "randomFail" : 1,
       "postJobLimit": 10,
       "gotoCost" : 10,

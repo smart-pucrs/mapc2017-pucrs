@@ -4,10 +4,10 @@
 	: default::actionID(S) & not action::action(S) & not action::hold_action(_)
 <-
 	+action::action(S);
-//	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
-	if ( Action \== recharge & Action \== continue) {
-		.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
-	}
+	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+//	if ( Action \== recharge & Action \== continue) {
+//		.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+//	}
 	action(Action);
 	.wait( default::actionID(S2) & S2 \== S );
 //	.print("Got out of wait from step ",S);
@@ -15,8 +15,9 @@
 //	.print("Last action result was: ",Result);
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
-	if (Action \== recharge & Action \== continue & not .substring("assist_assemble",Action) & not .substring("buy",Action) & Result == failed) {
-//		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
+		
+	if (Action \== recharge & Action \== continue & not .substring("assist_assemble",Action) & not .substring("buy",Action) & not .substring("bid_for_job",Action) & Result == failed) {
+		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
 	else {

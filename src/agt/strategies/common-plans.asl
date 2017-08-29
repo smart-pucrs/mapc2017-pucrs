@@ -233,3 +233,39 @@
 	-+metrics::missionHaveFailed(MissionsFail+1);
 	!job_failed_assist;
 	.
+	
+-default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+<-
+//	.wait(default::actionID(_));
+	+action::hold_action(Id);
+	.wait(default::actionID(_));
+	.wait(100);
+	-action::hold_action(Id);
+	!::check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items);
+	.
++!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+	: default::step(S) & (S <= (Start+Time+2))
+	.
++!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+	: jobDone(Id)
+<-
+	-jobDone(Id);
+	.send(vehicle1,achieve,initiator::auction_finished(Id)); 
+	.print("$$$$$$$$$$$$ Auction ",Id," completed, got reward ",Reward);	
+	.
++!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+	: default::winner(_, assemble(_, Id)) & metrics::auctionHaveFailed(AuctionFail)
+<-
+	.print("!!!!!!!!!!!!!!!!! Auction ",Id," failed, paying fine ",Fine);
+	-+metrics::auctionHaveFailed(AuctionFail+1);
+	.send(vehicle1,achieve,initiator::update_auction_failed(Fine));
+	!job_failed_assemble;
+	.
++!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+	: default::winner(_, assist(_, _, Id)) & metrics::auctionHaveFailed(AuctionFail)
+<-
+	.print("!!!!!!!!!!!!!!!!! Auction ",Id," failed, paying fine ",Fine);
+	-+metrics::auctionHaveFailed(AuctionFail+1);
+	!job_failed_assist;
+	.
++!check_aucion_finished(_,_,_,_,_,_,_,_,_).

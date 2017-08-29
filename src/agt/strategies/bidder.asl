@@ -27,7 +27,6 @@
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList) 
 <-
 	if (LoadCap - MyLoad >= Vol * Qty) {
-		HaHa = []; // strange Jason parser bug 
 		.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
 //		.print(StorageList," for task #",Qty," of ",ItemId);
 		if ( not .empty(StorageList) ) {

@@ -344,6 +344,7 @@ task_id(0).
 		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
 		resetLoads;
 		-cnp(JobId);
+		}
 	}
 	else { 
 		-impossible_task(JobId);

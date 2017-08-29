@@ -166,8 +166,8 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	.print("We win auction ",JobId);
 	
 	org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
-	?initiator::awarded_assemble(AgentA,Items,Storage,JobId);
-	-initiator::awarded_assemble(AgentA,Items,Storage,JobId);
+	?initiator::awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId,AssTaskCount);
+	-initiator::awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId,AssTaskCount);
 	
 	-initiator::free_trucks_auction(JobId,_);
 	-initiator::free_agents_auction(JobId,_);
@@ -176,10 +176,10 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	for ( initiator::awarded(Agent,Shop,List,JobId,TaskCount) ) {
 		.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 		-initiator::awarded(Agent,Shop,List,JobId,TaskCount);	
-		.print(Agent," ",AgentA," ",List);
+//		.print(Agent," ",AgentA," ",List);
 	}
-	.send(AgentA,tell,winner(Items,assemble(Storage,JobId)));
-	.print(AgentA," ",Items);
+	.send(AgentA,tell,winner(Items,assemble(Storage,JobId,AssTaskList)));
+//	.print(AgentA," ",Items);
 	.
 @loseAuction[atomic]
 +!figure_out_auction_winning(JobId) 
@@ -202,7 +202,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	-+initiator::free_agents(FreeAgentsNew);
 	
 	-job(JobId,_);
-	-awarded_assemble(_,_,_,JobId);
+	-awarded_assemble(_,_,_,_,JobId,_);
 	-eval(JobId);
 	.abolish(initiator::bids(_,_,JobId));
 	.abolish(initiator::awarded(_,_,_,JobId,_));

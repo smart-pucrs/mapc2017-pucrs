@@ -21,7 +21,7 @@
 		!commitAction(Action);
 	}
 	else {
-		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId))) { +strategies::jobDone(JobId); }
+		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId, _))) { +strategies::jobDone(JobId); }
 		if (action::next_action(Action2)) {
 			-action::next_action(Action2);
 //			.print("Removing held action ",Action2);
@@ -116,13 +116,7 @@
 // Charge
 // No parameters
 +!charge
-	: default::charge(C) & not default::role(Role,_,_,C,_) & Role \== truck & Role \== car
-<-
-	!localActions::commitAction(charge);
-	!charge;
-	.
-+!charge
-	: default::charge(C) & not default::role(Role,_,_,CCap,_) & (Role == truck | Role == car) & C < CCap div 2
+	: default::charge(C) & default::role(Role,_,_,CCap,_) & (((Role == truck | Role == car) & C < math.round(CCap / 1.3)) | (Role \== truck & Role \== car & C < CCap))
 <-
 	!localActions::commitAction(charge);
 	!charge;
@@ -370,7 +364,7 @@
 // Recharge
 // No parameters
 +!recharge
-	: default::charge(C) & not default::role(_,_,_,C,_)
+	: default::charge(C) & default::role(_,_,_,CCap,_) & C < math.round(CCap / 5)
 <-
 	!localActions::commitAction(recharge);
 	!recharge;

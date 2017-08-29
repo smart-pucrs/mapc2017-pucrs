@@ -1,20 +1,23 @@
 +goalState(JobId,job_delivered,_,_,satisfied)
-	: default::winner(_, assemble(_, JobId))
+	: default::winner(_, assemble(_, JobId, _))
 <-
 //   .print("*** all done! ***");
    removeScheme(JobId);
    .abolish(org::_);
    .
 
-+!go_to_workshop
-	: default::winner(_, assemble(Storage, _))
++!prepare_assemble
+	: default::winner(_, assemble(Storage, _, TaskList))
 <-
-	!strategies::go_to_workshop(Storage);
-	!!strategies::free;
+	if ( not .empty(TaskList) ) { !buy_items; }
+	else {
+		!strategies::go_to_workshop(Storage);
+		!!strategies::free;
+	}
 	.
 
 +!do_assemble
-	: default::winner(TaskList, assemble(_, _)) & default::get_assemble(TaskList, [], AssembleListNotSorted, 0)
+	: default::winner(TaskList, assemble(_, _, _)) & default::get_assemble(TaskList, [], AssembleListNotSorted, 0)
 <-
 	!strategies::not_free;
 	.sort(AssembleListNotSorted,AssembleList);
@@ -29,7 +32,7 @@
 	.
 
 +!buy_items
-	: default::role(Role, _, _, _, _) & new::shopList(SList) & default::winner(TaskList, assist(Storage, _, _)) & .my_name(Me)
+	: default::role(Role, _, _, _, _) & new::shopList(SList) & (default::winner(TaskList, assist(Storage, _, _)) | default::winner(_, assemble(Storage, _, TaskList))) & .my_name(Me)
 <-
 	for ( .member(tool(ItemId),TaskList) ) {
 		.findall(StorageAdd,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .substring(ToolS,AvailableT) & .term2string(StorageAdd,StorageS), StorageList);
@@ -45,13 +48,21 @@
 		}
 	}
 	for ( .member(item(ItemId,Qty),TaskList) ) {
+		.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
 		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop,99999);
-		if (strategies::buyList(ItemId,Qty2,ShopOld)) {
-			-strategies::buyList(ItemId,Qty2,ShopOld);
-			?default::find_shop_qty(item(ItemId, Qty+Qty2),SList,BuyL,99999,RouteShopL,99999,"",ShopNew,99999);
-			+strategies::buyList(ItemId,Qty+Qty2,ShopNew);
+		if ( not .empty(StorageList) ) {
+			actions.closest(Role,StorageList,Facility);
+			removeAvailableItem(Facility,ItemId,Qty);
+			+strategies::retrieveList(ItemId,Qty,Facility);
 		}
-		else { +strategies::buyList(ItemId,Qty,Shop); }
+		else {
+			if (strategies::buyList(ItemId,Qty2,ShopOld)) {
+				-strategies::buyList(ItemId,Qty2,ShopOld);
+				?default::find_shop_qty(item(ItemId, Qty+Qty2),SList,BuyL,99999,RouteShopL,99999,"",ShopNew,99999);
+				+strategies::buyList(ItemId,Qty+Qty2,ShopNew);
+			}
+			else { +strategies::buyList(ItemId,Qty,Shop); }
+		}
 	}
 //	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }
 	!strategies::go_buy;

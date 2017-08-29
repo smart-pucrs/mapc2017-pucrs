@@ -27,7 +27,6 @@
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList) 
 <-
 	if (LoadCap - MyLoad >= Vol * Qty) {
-		HaHa = []; // strange Jason parser bug 
 		.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
 //		.print(StorageList," for task #",Qty," of ",ItemId);
 		if ( not .empty(StorageList) ) {
@@ -92,13 +91,14 @@
 	.print("I won the tasks(",JobId,") ",TaskList);
 	org::commitMission(massist)[artifact_id(SchArtId)];
 	.
-+default::winner(TaskList, assemble(Storage, JobId))
++default::winner(ItemsAssemble, assemble(Storage, JobId, TaskList))
 	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
 <-
 	!strategies::not_free;
 	-+metrics::jobHaveWorked(Jobs+1);
 	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
 	org::focus(SchArtId)[wid(OrgId)];
-	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
+	.print("I won the tasks to assemble ",ItemsAssemble," and deliver to ",Storage," for ",JobId);
+	if ( not .empty(TaskList) ) { .print("I also won the tasks(",JobId,") ",TaskList); }
 	org::commitMission(massemble)[artifact_id(SchArtId)];
 	.

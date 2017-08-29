@@ -18,14 +18,14 @@
 	.
 	
 +!go_to_storage
-	: default::winner(_, assemble(Storage, _))
+	: default::winner(_, assemble(Storage, _, _))
 <-
 	.print("Finished assembling all items, going to deliver.");
 	!action::goto(Storage);
 	.
 	
 +!deliver
-	: default::winner(_, assemble(_, JobId))
+	: default::winner(_, assemble(_, JobId, _))
 <-
 	
 	!action::deliver_job(JobId);
@@ -34,6 +34,8 @@
 //		+strategies::jobDone(JobId);
 //	}
 	-default::winner(_,_)[source(_)];
+	if ( default::hasItem(_,_) ) { !go_store(Role); }
+	if ( default::hasItem(_,_) ) { !go_dump; }
 	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!strategies::free;
@@ -74,7 +76,7 @@
 	.
 
 +!check_charge
-	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= BatteryCap div 3 & new::chargingList(CList)
+	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= math.round(BatteryCap / 2) & new::chargingList(CList)
 <-
 	.print("Running low on battery, going to charge before taking any new tasks.");
 	actions.closest(Role,CList,ClosestChargingStation);
@@ -141,7 +143,7 @@
 +!job_failed_assemble
 	: default::role(Role, _, _, _, _)
 <-
-	-default::winner(_, assemble(_, JobId))[source(_)];
+	-default::winner(_, assemble(_, JobId, _))[source(_)];
 	if ( org::goalState(JobId,job_delivered,_,_,waiting) ) { org::removeScheme(JobId); }
 	.drop_desire(org::_);
 	.abolish(org::_);
@@ -194,7 +196,7 @@
 	.print("$$$$$$$$$$$$ Job ",JobId," completed, got reward ",Reward);
 	.
 +default::job_done(JobId, _, _, _, _, _)
-	: default::winner(_, assemble(_, JobId)) & metrics::jobHaveFailed(JobsFail)
+	: default::winner(_, assemble(_, JobId, _)) & metrics::jobHaveFailed(JobsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Job ",JobId," failed!");
 	-+metrics::jobHaveFailed(JobsFail+1);
@@ -217,7 +219,7 @@
 	
 	.
 +default::job_done(JobId, _, _, _, _, Fine, _, _, _)
-	: default::winner(_, assemble(_, JobId)) & metrics::missionHaveFailed(MissionsFail)
+	: default::winner(_, assemble(_, JobId, _)) & metrics::missionHaveFailed(MissionsFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Mission ",JobId," failed, paying fine ",Fine);
 	-+metrics::missionHaveFailed(MissionsFail+1);

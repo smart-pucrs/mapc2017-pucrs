@@ -44,9 +44,9 @@
 	else { Bid = -1; Shop = null; }
 	.
 +!create_bid_task(tool(ItemId), Bid, Shop)
-	: default::role(Role, Speed, _, _, Tools) & new::shopList(SList)
+	: default::role(Role, Speed, LoadCap, _, Tools) & default::load(MyLoad) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
 <-
-	if (.member(ItemId,Tools) ) {
+	if (.member(ItemId,Tools) & LoadCap - MyLoad >= Vol) {
 		.findall(Storage,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .substring(ToolS,AvailableT) & .term2string(Storage,StorageS),StorageList);
 		if ( StorageList \== [] ) {
 			actions.closest(Role,StorageList,Facility);

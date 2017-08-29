@@ -74,7 +74,7 @@
 	.
 
 +!check_charge
-	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= BatteryCap div 3 & new::chargingList(CList)
+	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= math.round(BatteryCap / 2) & new::chargingList(CList)
 <-
 	.print("Running low on battery, going to charge before taking any new tasks.");
 	actions.closest(Role,CList,ClosestChargingStation);

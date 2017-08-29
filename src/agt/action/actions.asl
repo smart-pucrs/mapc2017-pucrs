@@ -115,13 +115,7 @@
 // Charge
 // No parameters
 +!charge
-	: default::charge(C) & not default::role(Role,_,_,C,_) & Role \== truck & Role \== car
-<-
-	!localActions::commitAction(charge);
-	!charge;
-	.
-+!charge
-	: default::charge(C) & not default::role(Role,_,_,CCap,_) & (Role == truck | Role == car) & C < CCap div 2
+	: default::charge(C) & default::role(Role,_,_,CCap,_) & (((Role == truck | Role == car) & C < math.round(CCap / 1.3)) | (Role \== truck & Role \== car & C < CCap))
 <-
 	!localActions::commitAction(charge);
 	!charge;

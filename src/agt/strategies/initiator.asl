@@ -315,11 +315,14 @@ task_id(0).
 
 		else{
 			?default::joined(org,OrgId);
-	//		.print("Creating scheme for ",JobId);		
-			!create_scheme(JobId, st, SchArtId,OrgId);
-	//		debug(inspector_gui(on))[artifact_id(SchArtId)];
-		  ?awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId,AssTaskCount);
-		  -awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId,AssTaskCount);
+//			.print("Creating scheme for ",JobId);
+			if (not initiator::awarded(_,_,_,JobId,_)) {
+				!create_scheme(JobId, oneagent, SchArtId,OrgId);
+			}
+			else { !create_scheme(JobId, st, SchArtId,OrgId); }
+//			debug(inspector_gui(on))[artifact_id(SchArtId)];
+			?awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId,AssTaskCount);
+			-awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId,AssTaskCount);
 			?initiator::free_agents(FreeAgentsA);
 			?initiator::free_trucks(FreeTrucksA);
 			.delete(AgentA,FreeTrucksA,FreeTrucksNewA);
@@ -335,15 +338,15 @@ task_id(0).
 					.delete(Agent,FreeTrucks,FreeTrucksNew);
 					-+initiator::free_trucks(FreeTrucksNew);
 				}
-		    	.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
+				.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 				-awarded(Agent,Shop,List,JobId,TaskCount);	
 //				.print(Agent," ",AgentA," ",List);
 			}
 //			.print(AgentA," ",Items);
-		.send(AgentA,tell,winner(Items,assemble(Storage,JobId,AssTaskList)));
-		if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
-		resetLoads;
-		-cnp(JobId);
+			.send(AgentA,tell,winner(Items,assemble(Storage,JobId,AssTaskList)));
+			if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
+			resetLoads;
+			-cnp(JobId);
 		}
 	}
 	else { 
@@ -361,8 +364,8 @@ task_id(0).
 	!evaluation_auction::has_set_to_free;
 	.print("Task allocation is done ",JobId);
 	.
-+!create_scheme(JobId, st, SchArtId,OrgId) <- org::createScheme(JobId, st, SchArtId)[wid(OrgId)].
--!create_scheme(JobId, st, SchArtId,OrgId) 
++!create_scheme(JobId, SchId, SchArtId,OrgId) <- org::createScheme(JobId, SchId, SchArtId)[wid(OrgId)].
+-!create_scheme(JobId, SchId, SchArtId,OrgId) 
 <-
 	resetLoads;
 	-impossible_task(JobId);

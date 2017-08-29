@@ -165,14 +165,16 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 <-
 	.print("We win auction ",JobId);
 	
-	org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
+	if (not initiator::awarded(_,_,_,JobId,_)) {
+		!initiator::create_scheme(JobId, oneagent, SchArtId,OrgId);
+	}
+	else { !initiator::create_scheme(JobId, st, SchArtId,OrgId); }
 	?initiator::awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId,AssTaskCount);
 	-initiator::awarded_assemble(AgentA,Items,Storage,AssTaskList,JobId,AssTaskCount);
 	
 	-initiator::free_trucks_auction(JobId,_);
 	-initiator::free_agents_auction(JobId,_);
 	
-	.print("For ",JobId);
 	for ( initiator::awarded(Agent,Shop,List,JobId,TaskCount) ) {
 		.send(Agent,tell,winner(List,assist(Storage,AgentA,JobId)));
 		-initiator::awarded(Agent,Shop,List,JobId,TaskCount);	

@@ -161,7 +161,6 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 	Namespace = taProcess;
 
-	+::task(JobId,StorageId);
 //	?localTask::mapIds(Tasks,MapIds);
 //	+Namespace::integration(JobId,StorageId,MapIds);
 	+Namespace::integration(JobId,StorageId,Requirements);
@@ -172,8 +171,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 		}
 		else{
 			+::int_mapIds(JobId,ParentId,item(TaskId,Qtd),TaskId);
-		}
-        
+		}        
     }
     
     ?localTask::convertTaskId(Tasks,[],ConvertedTasks);
@@ -221,17 +219,32 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 //	.print("Feitoooo");
 //	.
 +taResults::allocationProcess(ready)
-	//: ::taskBiding(JobId,_)
+	: taResults::jobAllocationStatus(allocated)
 <-
 	?Namespace::integration(JobId,StorageId,Requirements);
 	!finish_task_allocation(JobId,StorageId,Requirements);
+	!::clean_beliefs(JobId);
+	.
++taResults::allocationProcess(ready)
+<-
+	.print(JobId," was not allocated, ignoring it");
+	?Namespace::integration(JobId,StorageId,Requirements);
+	!::clean_beliefs(JobId);
+	.
+
++!clean_beliefs(JobId)
+<-
+	.print("Cleaning beliefs for ",JobId);
+	-Namespace::integration(JobId,_,_);
+	.abolish(gTaskAllocation::int_mapIds(JobId,_,_,_));
+	
+	-action::hold_action(JobId);
 	.
 
 +!finish_task_allocation(JobId,StorageId,Requirements)
-//	: taResults::jobAllocationStatus(STATUS)
 	: .my_name(Me)
 <-
-	.print("Finalysing the allocation process");
+	.print("Finalysing the allocation process for ",JobId);
 	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::int_mapIds(JobId,TuParent,TaskId,TuTask) & TuTask\==assemble),AssistList);
 	
 	
@@ -248,8 +261,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 			
 			?taResults::assemblerAgent(Assembler);
 			
-			+default::winner(AssistList, assist(StorageId,Assembler,JobId));
-			//.abolish(::taskBiding(JobId,_));
+			+default::winner(AssistList, assist(StorageId,Assembler,JobId));			
 		}
 		else {
 			.print("I won 0 tasks to assist");
@@ -259,7 +271,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	if (Me == vehicle1){
 		?default::joined(org,OrgId);
 		org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
-		-action::hold_action(JobId);
+//		-action::hold_action(JobId);
 	}
 	.
 

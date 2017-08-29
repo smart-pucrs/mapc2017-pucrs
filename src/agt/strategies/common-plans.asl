@@ -34,6 +34,10 @@
 //		+strategies::jobDone(JobId);
 //	}
 	-default::winner(_,_)[source(_)];
+	if (action::action(S)) { .wait( default::actionID(S2) & S2 \== S ); }
+	else { !action::recharge_is_new_skip; }
+	if ( default::hasItem(_,_) ) { !go_store(Role); }
+	if ( default::hasItem(_,_) ) { !go_dump; }
 	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!strategies::free;

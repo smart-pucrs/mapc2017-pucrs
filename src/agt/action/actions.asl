@@ -363,7 +363,7 @@
 // Recharge
 // No parameters
 +!recharge
-	: default::charge(C) & not default::role(_,_,_,C,_)
+	: default::charge(C) & default::role(_,_,_,CCap,_) & C < math.round(CCap / 5)
 <-
 	!localActions::commitAction(recharge);
 	!recharge;

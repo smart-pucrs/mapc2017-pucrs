@@ -23,21 +23,19 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	.
 
 +!first_analysis(Id)	
-	: default::auction(Id,_,Reward,Start,_,_,0,Time,Items) & default::step(S)
+	: default::auction(Id,_,Reward,Start,_,_,0,Time,Items)
 <-
-	.print("First analysis auction job at step ",S);	
+	.print("First analysis auction ",Id);	
 	!initiator::decompose(Items,ListItems,ListToolsNew,Id);
 
 	?default::check_price(ListToolsNew,ListItems,0,ResultP);
 	Limit = math.ceil(ResultP*1.8);	
-//	.print("Limit is ",Limit);
-//	.print("Reward is ",Reward);
+	
+	+::bidding(Id,0,0,Limit);
+	+::futurePlans(free_for_next_auction(Id),Start+Time);	
 	
 	if (Limit < Reward) {
-		+::bidding(Id,0,0,Limit);
-//		+::futurePlans(further_analysis(Id),Start+Time-1);
-		!::choose_between_auctions_at_same_step(Id,Start+Time-1);
-		+::futurePlans(free_for_next_auction(Id),Start+Time);			
+		!::choose_between_auctions_at_same_step(Id,Start+Time-1);		
 	}
 	else{
 		.print("Expected limit to bid ",Limit," is greater than the reward ",Reward);
@@ -62,20 +60,6 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	+::futurePlans(further_analysis(AuctionId),StartTime);
 	.
 
-//+!further_analysis(Id)	
-//	: default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)	& ::bidding(Id,_,BaseBid,Limit) & ::checkStillGoodAuction(Reward,Bid,BaseBid,Limit) & default::step(S)
-//<-
-//	!strategies::not_free;
-//	+action::hold_action(Id);
-//	+::hasSetFree;
-//	.print("Final analysis for ",Id," at step ",S);	
-//	
-//	!initiator::evaluate_job(Items, End, Storage, Id, Reward);
-//	.
-//+!further_analysis(Id)	
-//<-
-//	.print(Id," is not a good auctionJob anymore");	
-//	.
 +!further_analysis(Id)
 <- 
 	+action::hold_action(Id);
@@ -95,9 +79,6 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 +!check_further_analysis(Id)	
 	: default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)	& ::bidding(Id,_,BaseBid,Limit) & ::checkStillGoodAuction(Reward,Bid,BaseBid,Limit) & default::step(S)
 <-
-//	!strategies::not_free;
-//	+action::hold_action(Id);
-//	+::hasSetFree;
 	.print("Final analysis for ",Id," at step ",S);	
 	
 	!initiator::evaluate_job(Items, End, Storage, Id, Reward);
@@ -125,20 +106,21 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 +!analyse_bid_posted(Id)
 	: ::bidding(Id,0,_,Limit) & default::auction(Id,_,Reward,_,_,_,Bid,_,_)
 <-
-	.print("Someone post a initial bid ",Bid,", it decreases in ",Reward-Bid);
+	.print("Someone post a initial bid ",Bid," for ",Id,", it decreases in ",Reward-Bid);
 	-::bidding(Id,0,_,Limit);
 	+::bidding(Id,Bid,Reward-Bid,Limit);
 	.
 +!analyse_bid_posted(Id)
 	: ::bidding(Id,LastBestBid,IncreaseBid,Limit) & default::auction(Id,_,_,_,_,_,Bid,_,_)
 <-
-	.print("Someone post bid",Bid,", it decreases in ",LastBestBid-Bid);
-	if ((LastBestBid-Bid) >IncreaseBid){
-		-::bidding(Id,LastBestBid,IncreaseBid,Limit);
+	-::bidding(Id,LastBestBid,IncreaseBid,Limit);
+	.print("Someone post bid ",Bid," for ",Id,", it decreases in ",LastBestBid-Bid);
+	if ((LastBestBid-Bid) > IncreaseBid){		
 		+::bidding(Id,Bid,LastBestBid-Bid,Limit);
 	}
 	else{
 		.print("Other team has posted a better bid");
+		+::bidding(Id,Bid,IncreaseBid,Limit);
 	}
 	.
 

@@ -11,7 +11,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 +!triggerFuturePlan
 	: default::step(Step) & ::futurePlans(Event,StepFuture) & (StepFuture <= Step) 
 <-
-	.print("Triggering plan ",Event," at step ",Step);
+//	.print("Triggering plan ",Event," at step ",Step);
     !!Event;
     -::futurePlans(Event,StepFuture);
     !triggerFuturePlan;

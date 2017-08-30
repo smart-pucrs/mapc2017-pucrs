@@ -39,7 +39,7 @@ task_id(0).
 @newAuction[atomic]
 +default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
 <-
-	.wait(default::step(Start));
+//	.wait(default::step(Start));
 	.print("New auction job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," has current bid of ",Bid," time for bids ",Time);
 	.print("Items required: ",Items);
 	!evaluation_auction::first_analysis(Id);

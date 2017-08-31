@@ -38,10 +38,11 @@
 		.findall(StorageAdd,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .substring(ToolS,AvailableT) & .term2string(StorageAdd,StorageS), StorageList);
 		if ( StorageList \== [] ) {
 			actions.closest(Role,StorageList,Facility);
-			removeAvailableItem(Facility,ItemId,1);
-			+strategies::retrieveList(ItemId,1,Facility);
+			removeAvailableItem(Facility,ItemId,1,Result);
+			if (Result == "true") { +strategies::retrieveList(ItemId,1,Facility); }
 		}
-		else {
+		else { Result = "false" }
+		if (Result == "false") {
 			?default::find_shops(ItemId,SList,Shops);
 			actions.closest(Role,Shops,ClosestShop);
 			+strategies::buyList(ItemId,1,ClosestShop);
@@ -52,10 +53,11 @@
 		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop,99999);
 		if ( not .empty(StorageList) ) {
 			actions.closest(Role,StorageList,Facility);
-			removeAvailableItem(Facility,ItemId,Qty);
-			+strategies::retrieveList(ItemId,Qty,Facility);
+			removeAvailableItem(Facility,ItemId,Qty,Result);
+			if (Result == "true") { +strategies::retrieveList(ItemId,Qty,Facility); }
 		}
-		else {
+		else { Result = "false" }
+		if (Result == "false") {
 			if (strategies::buyList(ItemId,Qty2,ShopOld)) {
 				-strategies::buyList(ItemId,Qty2,ShopOld);
 				?default::find_shop_qty(item(ItemId, Qty+Qty2),SList,BuyL,99999,RouteShopL,99999,"",ShopNew,99999);

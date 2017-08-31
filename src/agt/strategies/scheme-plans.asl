@@ -89,7 +89,7 @@
 	+strategies::assembling;
 	!!action::assist_assemble(Assembler);
 	.
-+!assist_assemble <- .print("!!!!!!!!!!!!! Não deveria ter passado aqui.").
++!assist_assemble <- .print("!!!!!!!!!!!!! Should not have been here.").
 	
 +!stop_assist_assemble
 	: default::winner(_,_)

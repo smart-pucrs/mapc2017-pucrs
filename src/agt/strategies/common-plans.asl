@@ -125,22 +125,46 @@
 		}
 	}
 	.
-+!go_store(Role).	
-	
++!go_store(Role).
+
+@jobFailedAssist[atomic]
 +!job_failed_assist
+<-
+	-default::winner(_,assist(_, _, _))[source(_)];
+	.drop_desire(org::_);
+	.abolish(org::_);
+	.drop_desire(strategies::go_buy_and_retrieve(_));
+	.drop_desire(strategies::go_to_workshop(_));
+	.abolish(strategies::_);
+	.drop_desire(action::_);
+	!!job_failed;
+
+	.
+	
+@jobFailedAssemble[atomic]
++!job_failed_assemble
+<-
+	-default::winner(_, assemble(_, JobId, _))[source(_)];
+	if ( org::goalState(JobId,job_delivered,_,_,waiting) ) { org::removeScheme(JobId); }
+	.drop_desire(org::_);
+	.abolish(org::_);
+	.drop_desire(strategies::go_deliver);
+	.drop_desire(strategies::go_to_workshop(_));
+	.drop_desire(strategies::go_buy_and_retrieve(_));
+	.drop_desire(strategies::deliver);
+	.drop_desire(strategies::go_to_storage);
+	.drop_desire(action::_);
+	!!job_failed;
+	.
+	
++!job_failed
 	: default::role(Role, _, _, _, _) & .my_name(Me)
 <-
-	-default::winner(_,_)[source(_)];
-	.abolish(strategies::_);
-	.drop_desire(org::_);
-	.drop_desire(strategies::go_buy);
-	.drop_desire(strategies::go_to_workshop(_));
-	.abolish(org::_);
-	?default::actionID(S);
+	?default::step(S);
 	if (action::action(S)) {
-		.abolish(action::_);
 		.wait( default::actionID(S2) & S2 \== S );
 	}
+	.abolish(action::_);
 	if ( not default::routeLength(0) ) { !action::abort; }
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
@@ -151,30 +175,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-//	.print("Failed job, why I am not doing recharge.");
-	!!strategies::free;
-	.
-+!job_failed_assemble
-	: default::role(Role, _, _, _, _)
-<-
-	-default::winner(_, assemble(_, JobId, _))[source(_)];
-	if ( org::goalState(JobId,job_delivered,_,_,waiting) ) { org::removeScheme(JobId); }
-	.drop_desire(org::_);
-	.abolish(org::_);
-	.drop_desire(strategies::go_deliver);
-	.drop_desire(strategies::go_to_workshop(_));
-	.drop_desire(strategies::deliver);
-	.drop_desire(strategies::go_to_storage);
-	?default::actionID(S);
-	if (action::action(S)) {
-		.abolish(action::_);
-		.wait( default::actionID(S2) & S2 \== S );
-	}
-	if ( not default::routeLength(0) ) { !action::abort; }
-	
-	if ( default::hasItem(_,_) ) { !go_store(Role); }
-	if ( default::hasItem(_,_) ) { !go_dump; }
-	.send(vehicle1,achieve,initiator::add_truck_to_free);
+//	.print("Job failed, sending free.");
 	!!strategies::free;
 	.
 	
@@ -250,7 +251,6 @@
 	
 -default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
 <-
-//	.wait(default::actionID(_));
 	+action::hold_action(Id);
 	.wait(default::actionID(_));
 	.wait(100);
@@ -268,7 +268,7 @@
 	.print("$$$$$$$$$$$$ Auction ",Id," completed, got reward ",Reward);	
 	.
 +!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
-	: default::winner(_, assemble(_, Id)) & metrics::auctionHaveFailed(AuctionFail)
+	: default::winner(_, assemble(_, Id,_)) & metrics::auctionHaveFailed(AuctionFail)
 <-
 	.print("!!!!!!!!!!!!!!!!! Auction ",Id," failed, paying fine ",Fine);
 	-+metrics::auctionHaveFailed(AuctionFail+1);

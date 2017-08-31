@@ -30,6 +30,7 @@ task_id(0).
 	.
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id); !update_free; .
 
++default::auction(_, _, _, _, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
 @oldAuction[atomic]
 +default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
 	: evaluation_auction::bidding(Id,_,_,_)

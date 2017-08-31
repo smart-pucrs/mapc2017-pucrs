@@ -54,7 +54,13 @@
 		if ( not .empty(StorageList) ) {
 			actions.closest(Role,StorageList,Facility);
 			removeAvailableItem(Facility,ItemId,Qty,Result);
-			if (Result == "true") { +strategies::retrieveList(ItemId,Qty,Facility); }
+			if (Result == "true") {
+				if (strategies::retrieveList(ItemId,Qty2,Facility)) {
+					-strategies::retrieveList(ItemId,Qty2,Facility);
+					+strategies::retrieveList(ItemId,Qty+Qty2,Facility);
+				}
+				else{ +strategies::retrieveList(ItemId,Qty,Facility); }
+			}
 		}
 		else { Result = "false" }
 		if (Result == "false") {
@@ -68,7 +74,7 @@
 	}
 //	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }
 	?default::facility(InFacility);
-	if (.substring("storage",InFacility)) {  
+	if (.substring("storage",InFacility)) {
 		for ( strategies::retrieveList(ItemId,Qty,InFacility) ) {
 			-strategies::retrieveList(ItemId,Qty,InFacility);
 			!action::retrieve(ItemId,Qty);

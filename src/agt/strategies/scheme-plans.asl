@@ -38,35 +38,49 @@
 		.findall(StorageAdd,default::available_items(StorageS,AvailableT) & .term2string(ItemId,ToolS) & .substring(ToolS,AvailableT) & .term2string(StorageAdd,StorageS), StorageList);
 		if ( StorageList \== [] ) {
 			actions.closest(Role,StorageList,Facility);
-			removeAvailableItem(Facility,ItemId,1);
-			+strategies::retrieveList(ItemId,1,Facility);
+			removeAvailableItem(Facility,ItemId,1,Result);
+			if (Result == "true") { +strategies::retrieveList(ItemId,1,Facility); }
 		}
-		else {
+		else { Result = "false" }
+		if (Result == "false") {
 			?default::find_shops(ItemId,SList,Shops);
 			actions.closest(Role,Shops,ClosestShop);
 			+strategies::buyList(ItemId,1,ClosestShop);
 		}
 	}
 	for ( .member(item(ItemId,Qty),TaskList) ) {
+		.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
 		?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,RouteShop,99999,"",Shop,99999);
-		if (strategies::buyList(ItemId,Qty2,ShopOld)) {
-			-strategies::buyList(ItemId,Qty2,ShopOld);
-			?default::find_shop_qty(item(ItemId, Qty+Qty2),SList,BuyL,99999,RouteShopL,99999,"",ShopNew,99999);
-			+strategies::buyList(ItemId,Qty+Qty2,ShopNew);
-		}
-		else { +strategies::buyList(ItemId,Qty,Shop); }
-	}
-//	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }
-	!strategies::go_buy;
-	if (strategies::retrieveList(_,_,_)) {
-		for ( strategies::retrieveList(_,_,Fac) ) {
-			!action::goto(Fac);
-			for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
-				-strategies::retrieveList(ItemId,Qty,Fac);
-				!action::retrieve(ItemId,Qty);
+		if ( not .empty(StorageList) ) {
+			actions.closest(Role,StorageList,Facility);
+			removeAvailableItem(Facility,ItemId,Qty,Result);
+			if (Result == "true") {
+				if (strategies::retrieveList(ItemId,Qty2,Facility)) {
+					-strategies::retrieveList(ItemId,Qty2,Facility);
+					+strategies::retrieveList(ItemId,Qty+Qty2,Facility);
+				}
+				else{ +strategies::retrieveList(ItemId,Qty,Facility); }
 			}
 		}
+		else { Result = "false" }
+		if (Result == "false") {
+			if (strategies::buyList(ItemId,Qty2,ShopOld)) {
+				-strategies::buyList(ItemId,Qty2,ShopOld);
+				?default::find_shop_qty(item(ItemId, Qty+Qty2),SList,BuyL,99999,RouteShopL,99999,"",ShopNew,99999);
+				+strategies::buyList(ItemId,Qty+Qty2,ShopNew);
+			}
+			else { +strategies::buyList(ItemId,Qty,Shop); }
+		}
 	}
+//	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }
+	?default::facility(InFacility);
+	if (.substring("storage",InFacility)) {
+		for ( strategies::retrieveList(ItemId,Qty,InFacility) ) {
+			-strategies::retrieveList(ItemId,Qty,InFacility);
+			!action::retrieve(ItemId,Qty);
+		}
+	}
+	!strategies::go_buy_and_retrieve(Role);
 	!strategies::go_to_workshop(Storage);
 	if (Me == vehicle1) { +strategies::waiting; }
 	!!check_state;
@@ -83,6 +97,7 @@
 	+strategies::assembling;
 	!!action::assist_assemble(Assembler);
 	.
++!assist_assemble <- .print("!!!!!!!!!!!!! Should not have been here.").
 	
 +!stop_assist_assemble
 	: default::winner(_,_)

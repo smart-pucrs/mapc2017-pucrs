@@ -34,24 +34,40 @@
 //		+strategies::jobDone(JobId);
 //	}
 	-default::winner(_,_)[source(_)];
+	if ( default::hasItem(_,_) ) { !go_store(Role); }
+	if ( default::hasItem(_,_) ) { !go_dump; }
 	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!strategies::free;
 	.
-	
-+!go_buy
-	: strategies::buyList(_,_,Shop)
+
++!go_buy_and_retrieve(Role)
 <-
-//	.print("Going to shop ",Shop);
-	!action::goto(Shop);
-	for ( strategies::buyList(ItemId,Qty,Shop) ) {
-		!action::buy(ItemId,Qty);
-//		.print("Buying #",Qty," of ",ItemId);
-		-strategies::buyList(ItemId,Qty,Shop);
+	.findall(Shop,strategies::buyList(_,_,Shop),ShopList);
+	.findall(Storage,strategies::retrieveList(_,_,Storage),StorageList);
+	.concat(ShopList,StorageList,FacilityList);
+	-+facility_planning(FacilityList);
+	for ( .range(I,1,.length(FacilityList)) ) {
+		?facility_planning(FacilityListAux);
+		actions.closest(Role,FacilityListAux,Fac);
+		.delete(Fac,FacilityListAux,FacilityListAuxNew);
+		-+facility_planning(FacilityListAuxNew);
+		!action::goto(Fac);
+		if ( .substring("shop",Fac) ) {
+			for ( strategies::buyList(ItemId,Qty,Fac) ) {
+				!action::buy(ItemId,Qty);
+	//			.print("Buying #",Qty," of ",ItemId);
+				-strategies::buyList(ItemId,Qty,Fac);
+			}
+		}
+		else {
+			for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
+				!action::retrieve(ItemId,Qty);
+				-strategies::retrieveList(ItemId,Qty,Fac);
+			}
+		}
 	}
-	!go_buy
-	.
-+!go_buy.
+.
 
 +!empty_load
 	: default::role(Role, _, _, _, _) 
@@ -74,7 +90,7 @@
 	.
 
 +!check_charge
-	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= BatteryCap div 3 & new::chargingList(CList)
+	: default::role(Role,_,_,BatteryCap,_) & (Role == truck | Role == car) & default::charge(Battery) & Battery <= math.round(BatteryCap / 2) & new::chargingList(CList)
 <-
 	.print("Running low on battery, going to charge before taking any new tasks.");
 	actions.closest(Role,CList,ClosestChargingStation);
@@ -109,22 +125,46 @@
 		}
 	}
 	.
-+!go_store(Role).	
-	
++!go_store(Role).
+
+@jobFailedAssist[atomic]
 +!job_failed_assist
+<-
+	-default::winner(_,assist(_, _, _))[source(_)];
+	.drop_desire(org::_);
+	.abolish(org::_);
+	.drop_desire(strategies::go_buy_and_retrieve(_));
+	.drop_desire(strategies::go_to_workshop(_));
+	.abolish(strategies::_);
+	.drop_desire(action::_);
+	!!job_failed;
+
+	.
+	
+@jobFailedAssemble[atomic]
++!job_failed_assemble
+<-
+	-default::winner(_, assemble(_, JobId, _))[source(_)];
+	if ( org::goalState(JobId,job_delivered,_,_,waiting) ) { org::removeScheme(JobId); }
+	.drop_desire(org::_);
+	.abolish(org::_);
+	.drop_desire(strategies::go_deliver);
+	.drop_desire(strategies::go_to_workshop(_));
+	.drop_desire(strategies::go_buy_and_retrieve(_));
+	.drop_desire(strategies::deliver);
+	.drop_desire(strategies::go_to_storage);
+	.drop_desire(action::_);
+	!!job_failed;
+	.
+	
++!job_failed
 	: default::role(Role, _, _, _, _) & .my_name(Me)
 <-
-	-default::winner(_,_)[source(_)];
-	.abolish(strategies::_);
-	.drop_desire(org::_);
-	.drop_desire(strategies::go_buy);
-	.drop_desire(strategies::go_to_workshop(_));
-	.abolish(org::_);
-	?default::actionID(S);
+	?default::step(S);
 	if (action::action(S)) {
-		.abolish(action::_);
 		.wait( default::actionID(S2) & S2 \== S );
 	}
+	.abolish(action::_);
 	if ( not default::routeLength(0) ) { !action::abort; }
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
@@ -135,30 +175,7 @@
 		}
 		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
 	}
-//	.print("Failed job, why I am not doing recharge.");
-	!!strategies::free;
-	.
-+!job_failed_assemble
-	: default::role(Role, _, _, _, _)
-<-
-	-default::winner(_, assemble(_, JobId, _))[source(_)];
-	if ( org::goalState(JobId,job_delivered,_,_,waiting) ) { org::removeScheme(JobId); }
-	.drop_desire(org::_);
-	.abolish(org::_);
-	.drop_desire(strategies::go_deliver);
-	.drop_desire(strategies::go_to_workshop(_));
-	.drop_desire(strategies::deliver);
-	.drop_desire(strategies::go_to_storage);
-	?default::actionID(S);
-	if (action::action(S)) {
-		.abolish(action::_);
-		.wait( default::actionID(S2) & S2 \== S );
-	}
-	if ( not default::routeLength(0) ) { !action::abort; }
-	
-	if ( default::hasItem(_,_) ) { !go_store(Role); }
-	if ( default::hasItem(_,_) ) { !go_dump; }
-	.send(vehicle1,achieve,initiator::add_truck_to_free);
+//	.print("Job failed, sending free.");
 	!!strategies::free;
 	.
 	
@@ -231,3 +248,38 @@
 	-+metrics::missionHaveFailed(MissionsFail+1);
 	!job_failed_assist;
 	.
+	
+-default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+<-
+	+action::hold_action(Id);
+	.wait(default::actionID(_));
+	.wait(100);
+	-action::hold_action(Id);
+	!::check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items);
+	.
++!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+	: default::step(S) & (S <= (Start+Time+2))
+	.
++!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+	: jobDone(Id)
+<-
+	-jobDone(Id);
+	.send(vehicle1,achieve,initiator::auction_finished(Id)); 
+	.print("$$$$$$$$$$$$ Auction ",Id," completed, got reward ",Reward);	
+	.
++!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+	: default::winner(_, assemble(_, Id,_)) & metrics::auctionHaveFailed(AuctionFail)
+<-
+	.print("!!!!!!!!!!!!!!!!! Auction ",Id," failed, paying fine ",Fine);
+	-+metrics::auctionHaveFailed(AuctionFail+1);
+	.send(vehicle1,achieve,initiator::update_auction_failed(Fine));
+	!job_failed_assemble;
+	.
++!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
+	: default::winner(_, assist(_, _, Id)) & metrics::auctionHaveFailed(AuctionFail)
+<-
+	.print("!!!!!!!!!!!!!!!!! Auction ",Id," failed, paying fine ",Fine);
+	-+metrics::auctionHaveFailed(AuctionFail+1);
+	!job_failed_assist;
+	.
++!check_aucion_finished(_,_,_,_,_,_,_,_,_).

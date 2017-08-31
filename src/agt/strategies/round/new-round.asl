@@ -11,13 +11,16 @@
 	+metrics::money(0);
 	+metrics::completedJobs(0);
 	+metrics::failedJobs(0);
+	+metrics::failedFreeJobs(0);
 	+metrics::completedAuctions(0);
 	+metrics::failedAuctions(0);
+	+metrics::lostAuctions(0);
 	+metrics::completedMissions(0);
 	+metrics::failedMissions(0);
 	+metrics::finePaid(0);
 	+metrics::failedEvalJobs(0);
 	+metrics::noBids(0);
+	+metrics::missBidAuction(0);
 	. 
 +!add_initiator_beliefs.
 
@@ -43,6 +46,7 @@
 	+metrics::next_actions(0);
 	+metrics::jobHaveFailed(0);
 	+metrics::missionHaveFailed(0);
+	+metrics::auctionHaveFailed(0);
 	
 	+default::separateItemTool([],[],[]);
 	+default::removeDuplicateTool([],[]);

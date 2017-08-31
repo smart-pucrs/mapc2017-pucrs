@@ -15,7 +15,8 @@
 //	.print("Last action result was: ",Result);
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
-	if (Action \== recharge & Action \== continue & not .substring("assist_assemble",Action) & not .substring("buy",Action) & Result == failed) {
+		
+	if (Action \== recharge & Action \== continue & not .substring("assist_assemble",Action) & not .substring("buy",Action) & not .substring("bid_for_job",Action) & Result == failed) {
 //		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
@@ -115,13 +116,7 @@
 // Charge
 // No parameters
 +!charge
-	: default::charge(C) & not default::role(Role,_,_,C,_) & Role \== truck & Role \== car
-<-
-	!localActions::commitAction(charge);
-	!charge;
-	.
-+!charge
-	: default::charge(C) & not default::role(Role,_,_,CCap,_) & (Role == truck | Role == car) & C < CCap div 2
+	: default::charge(C) & default::role(Role,_,_,CCap,_) & (((Role == truck | Role == car) & C < math.round(CCap / 1.3)) | (Role \== truck & Role \== car & C < CCap))
 <-
 	!localActions::commitAction(charge);
 	!charge;
@@ -369,7 +364,7 @@
 // Recharge
 // No parameters
 +!recharge
-	: default::charge(C) & not default::role(_,_,_,C,_)
+	: default::charge(C) & default::role(_,_,_,CCap,_) & C < math.round(CCap / 5)
 <-
 	!localActions::commitAction(recharge);
 	!recharge;

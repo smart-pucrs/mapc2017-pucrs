@@ -11,6 +11,7 @@
 	+metrics::money(0);
 	+metrics::completedJobs(0);
 	+metrics::failedJobs(0);
+	+metrics::failedFreeJobs(0);
 	+metrics::completedAuctions(0);
 	+metrics::failedAuctions(0);
 	+metrics::lostAuctions(0);

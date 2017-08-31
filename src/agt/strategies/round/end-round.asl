@@ -55,7 +55,9 @@
 	?metrics::failedJobs(JobsFailed); // Ok
 	.print("Number of failed jobs: ",JobsFailed);
 	?metrics::failedEvalJobs(JobsEvalFailed); // Ok
-	.print("Number of jobs that failed eval: ",JobsEvalFailed); 	
+	.print("Number of jobs that failed eval: ",JobsEvalFailed);
+    ?metrics::failedFreeJobs(JobsFreeFailed); // Ok
+    .print("Number of jobs that we ignored (not enough free agents): ",JobsFreeFailed);
 	?metrics::completedAuctions(AuctionsCompleted); // Ok
 	.print("Number of completed auctions: ",AuctionsCompleted); 
 	?metrics::lostAuctions(AuctionsLost); // Ok

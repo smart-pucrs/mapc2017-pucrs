@@ -18,7 +18,7 @@ task_id(0).
 	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
 	.
 
-+default::job(_, _, _, _, _, _) : not initiator::accept_jobs.
++default::job(_, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
 @job[atomic]
 +default::job(Id, Storage, Reward, Start, End, Items)
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
@@ -28,7 +28,7 @@ task_id(0).
 	.print("Items required: ",Items);
 	!evaluate_job(Items, End, Storage, Id, Reward);
 	.
-+default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id).
++default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id); !update_free; .
 
 @oldAuction[atomic]
 +default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
@@ -151,6 +151,7 @@ task_id(0).
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items) 
 <- 	
 	-action::hold_action(Id); 
+	!update_free;
 	!evaluation_auction::has_set_to_free;
 	.print(Id," is no longer viable");
 	.
@@ -450,6 +451,13 @@ task_id(0).
 	: metrics::failedEvalJobs(C)
 <-
 	-+metrics::failedEvalJobs(C+1);
+.
+
+@upateJobFree[atomic]
++!update_free
+	: metrics::failedFreeJobs(C)
+<-
+	-+metrics::failedFreeJobs(C+1);
 .
 
 @upateJobFail[atomic]

@@ -40,20 +40,34 @@
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
 	!!strategies::free;
 	.
-	
-+!go_buy
-	: strategies::buyList(_,_,Shop)
+
++!go_buy_and_retrieve(Role)
 <-
-//	.print("Going to shop ",Shop);
-	!action::goto(Shop);
-	for ( strategies::buyList(ItemId,Qty,Shop) ) {
-		!action::buy(ItemId,Qty);
-//		.print("Buying #",Qty," of ",ItemId);
-		-strategies::buyList(ItemId,Qty,Shop);
+	.findall(Shop,strategies::buyList(_,_,Shop),ShopList);
+	.findall(Storage,strategies::retrieveList(_,_,Storage),StorageList);
+	.concat(ShopList,StorageList,FacilityList);
+	-+facility_planning(FacilityList);
+	for ( .range(I,1,.length(FacilityList)) ) {
+		?facility_planning(FacilityListAux);
+		actions.closest(Role,FacilityListAux,Fac);
+		.delete(Fac,FacilityListAux,FacilityListAuxNew);
+		-+facility_planning(FacilityListAuxNew);
+		!action::goto(Fac);
+		if ( .substring("shop",Fac) ) {
+			for ( strategies::buyList(ItemId,Qty,Fac) ) {
+				!action::buy(ItemId,Qty);
+	//			.print("Buying #",Qty," of ",ItemId);
+				-strategies::buyList(ItemId,Qty,Fac);
+			}
+		}
+		else {
+			for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
+				!action::retrieve(ItemId,Qty);
+				-strategies::retrieveList(ItemId,Qty,Fac);
+			}
+		}
 	}
-	!go_buy
-	.
-+!go_buy.
+.
 
 +!empty_load
 	: default::role(Role, _, _, _, _) 

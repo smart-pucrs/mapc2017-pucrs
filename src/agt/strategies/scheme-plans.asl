@@ -65,16 +65,14 @@
 		}
 	}
 //	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }
-	!strategies::go_buy;
-	if (strategies::retrieveList(_,_,_)) {
-		for ( strategies::retrieveList(_,_,Fac) ) {
-			!action::goto(Fac);
-			for ( strategies::retrieveList(ItemId,Qty,Fac) ) {
-				-strategies::retrieveList(ItemId,Qty,Fac);
-				!action::retrieve(ItemId,Qty);
-			}
+	?default::facility(InFacility);
+	if (.substring("storage",InFacility)) {  
+		for ( strategies::retrieveList(ItemId,Qty,InFacility) ) {
+			-strategies::retrieveList(ItemId,Qty,InFacility);
+			!action::retrieve(ItemId,Qty);
 		}
 	}
+	!strategies::go_buy_and_retrieve(Role);
 	!strategies::go_to_workshop(Storage);
 	if (Me == vehicle1) { +strategies::waiting; }
 	!!check_state;

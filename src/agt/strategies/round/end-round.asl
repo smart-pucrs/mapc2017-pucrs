@@ -95,5 +95,6 @@
 
 +default::simEnd 
 <- 
+	unsetReady;
 	!lEndRound::change_round;
 	.

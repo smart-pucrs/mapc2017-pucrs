@@ -42,6 +42,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private List<Literal> signalList = new ArrayList<Literal>();
 	private List<Literal> jobDone = new ArrayList<Literal>();
 	private int mapSet = 0;
+	private int ready = 0;
 //	private long startTime;
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
@@ -133,6 +134,16 @@ public class EISArtifact extends Artifact implements AgentListener {
 		mapSet = 0;
 	}
 	
+	@OPERATION
+	void setReady(){
+		ready = 1;
+	}
+	
+	@OPERATION
+	void unsetReady(){
+		ready = 0;
+	}
+	
 	@INTERNAL_OPERATION
 	void receiving(String agent) throws JasonException {
 		lastStep = -1;
@@ -148,6 +159,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 				try {
 //					if (ei.getAllPercepts(agent).get(agentToEntity.get(agent))) {
 						Collection<Percept> percepts = ei.getAllPercepts(agent).get(agentToEntity.get(agent));
+						while (ready == 0) { await_time(100); }
 						if (!percepts.isEmpty()) {
 //							startTime = System.nanoTime();
 	//						logger.info("***"+percepts);

@@ -51,6 +51,7 @@
 	+default::removeDuplicateTool([],[]);
 	
 	if (Me == vehicle1) { !lNewRound::add_initiator_beliefs; }
+	setReady;
 	.
 
 @shopListQty[atomic]

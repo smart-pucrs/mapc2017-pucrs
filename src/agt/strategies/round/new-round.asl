@@ -4,7 +4,6 @@
 	: true
 <-
 	+initiator::completed_jobs(0); // debugging
-	+initiator::countCenter(0);
 	+initiator::free_agents([]);
 	+initiator::free_trucks([]);
 	

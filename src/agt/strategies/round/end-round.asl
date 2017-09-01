@@ -24,22 +24,14 @@
     .drop_all_desires;
     .drop_all_events;	
 	.
-	
-@changeV1[atomic]
-+!change_round
-	: .my_name(vehicle1)
-<-
-	!end_round;
-	setMap;
-	.wait(500);
-	clearMaps;
-	!new::new_round;
-	.
+
 @change[atomic]
 +!change_round
-	: true
+	: .my_name(Me)
 <-
 	!end_round;
+	resetMap;
+	if (Me == vehicle1) { clearMaps; }
 	!new::new_round;
 	.	
 

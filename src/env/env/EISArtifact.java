@@ -41,21 +41,17 @@ public class EISArtifact extends Artifact implements AgentListener {
 	private List<Literal> percs = new ArrayList<Literal>();
 	private List<Literal> signalList = new ArrayList<Literal>();
 	private List<Literal> jobDone = new ArrayList<Literal>();
+	private int mapSet = 0;
 //	private long startTime;
 	
 	private static Set<String> agents = new ConcurrentSkipListSet<String>();
 
-//	private EnvironmentInterfaceStandard ei = null;
 	private EnvironmentInterface ei = null;
 	private boolean receiving;
 	private int lastStep = -1;
-	private int round = 0;
-//	private int acceptJobs = -2;
-	private String maps[] = new String[] { "paris", "london", "hannover" };
 	public EISArtifact() {
 		agentIds      = new ConcurrentHashMap<String, AgentId>();
 		agentToEntity = new ConcurrentHashMap<String, String>();
-		MapHelper.getInstance().init("paris", 200, 5);
 	}
 	
 	protected void init(String config) throws IOException, InterruptedException {
@@ -122,11 +118,19 @@ public class EISArtifact extends Artifact implements AgentListener {
 	}
 	
 	@OPERATION
+	void initMap(String map, double cellsize, int proximity){
+		MapHelper.getInstance().init(map, cellsize, proximity);
+		mapSet = 1;
+	}
+	
+	@OPERATION
 	void setMap(){
-		round++;
-		synchronized(MapHelper.getInstance()){
-			MapHelper.getInstance().changeMap(maps[round]);
-		}
+		mapSet = 1;
+	}
+	
+	@OPERATION
+	void resetMap(){
+		mapSet = 0;
 	}
 	
 	@INTERNAL_OPERATION
@@ -151,7 +155,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 							int currentStep = getCurrentStep(percepts);
 							if (lastStep != currentStep) { // only updates if it is a new step
 								lastStep = currentStep;
-								filterLocations(agent, percepts);
+								if (mapSet == 1) { filterLocations(agent, percepts); }
 								//logger.info("Agent "+agent);
 								updatePerception(agent, previousPercepts, percepts);
 								previousPercepts = percepts;
@@ -304,15 +308,19 @@ public class EISArtifact extends Artifact implements AgentListener {
 	}
 
 	static Set<String> match_obs_prop = new HashSet<String>( Arrays.asList(new String[] {
-//		"map",
+		"map",
 		"name",
 		"steps",
 		"item",
 		"role",
-		"minLon",
-		"maxLon",
-		"minLat",
-		"maxLat",
+		"centerLat",
+		"centerLon",
+		"cellSize",
+		"proximity",
+//		"minLon",
+//		"maxLon",
+//		"minLat",
+//		"maxLat",
 //		"team",
 	}));
 	

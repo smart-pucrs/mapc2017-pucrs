@@ -39,13 +39,12 @@ public class MapHelper {
 		initCellSetting(cellSize, proximity);
 		initMap(newMapName);
 	}
-	public void changeMap(String newMapName) {
-		initMap(newMapName);
-	}
+	
 	private void initCellSetting(double cellSize, int proximity){
 		this.cellSize 	= cellSize;
 		this.proximity 	= proximity;
 	}
+	
 	private void initMap(String newMapName){
 		if (newMapName.equals(this.mapName)) 
 			return;
@@ -65,6 +64,7 @@ public class MapHelper {
 		this.hopper.importOrLoad();
 //		logger.info("FInalizado troca mapa");
 	}
+	
 	private void clean(){
 		this.hopper.close();
 		this.hopper = null;
@@ -95,13 +95,13 @@ public class MapHelper {
 		if (from == null || to == null) {
 			return null;
 		}
-		Route route = null;
 		if (type.equals("air")) {
-			route = getNewAirRoute(from, to);
+			return getNewAirRoute(from, to);
 		} else if (type.equals("road")) {
-			route = getNewCarRoute(from, to);
+			return getNewCarRoute(from, to);
 		}
-		return route;
+		logger.info("Cannot find a route with those permissions");
+		return null;
 	}
 
 	private Route getNewAirRoute(Location from, Location to) {

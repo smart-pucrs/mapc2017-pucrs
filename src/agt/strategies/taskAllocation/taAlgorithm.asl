@@ -14,7 +14,7 @@ readyMe(false).
 @puTLtz//[atomic]
 +!run_distributed_TA_algorithm2(JobId,communication(COMMUNICATION_TYPE,AGENT_LIST),SUBTASKLIST,AVAILABLE_LOAD):true
 <- 
-.print("!run_distributed_TA_algorithm - adding believe jobrun:",JobId);
+.print("!run_distributed_TA_algorithm - adding believe jobrun :",JobId);
 +jobRun(JobId,communication(COMMUNICATION_TYPE,AGENT_LIST),SUBTASKLIST,AVAILABLE_LOAD);
 +jobIdRun(JobId,yes);
 .

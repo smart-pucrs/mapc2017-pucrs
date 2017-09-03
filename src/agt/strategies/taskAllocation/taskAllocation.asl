@@ -273,13 +273,22 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 <-
 	.print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
 	.print("Finalysing the allocation process for ",JobId);
-	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent) & gTaskAllocation::int_mapIds(JobId,TuParent,TaskId,TuTask) & TuTask\==assemble),AssistList);
+	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent,JobId) & gTaskAllocation::int_mapIds(JobId,TuParent,TaskId,TuTask) & TuTask\==assemble),AssistList);
+	
+	if (Me==vehicle1){
+		.print("createScheme for job ",JobId);
+//		?default::joined(org,OrgId);
+//		org::createScheme(JobId, st, SchArtId)[wid(OrgId)];		
+//		-action::hold_action(JobId);
+	}
+	else{
+		.print("I'm not vehicle1 - I'am:",Me);
+	}
 	
 	
-	
-	if (taResults::allocatedTasks(assemble,TuParent)){
+	if (taResults::allocatedTasks(assemble,TuParent,JobId)){
 		.print("I'm going to perform the assemble and I have the tasks ",AssistList);
-		+default::winner(Requirements,assemble(StorageId,JobId,AssistList));
+		//+default::winner(Requirements,assemble(StorageId,JobId,AssistList));
 	}
 	else{
 		.length(AssistList, SizeAssist);
@@ -287,25 +296,16 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 			.print("I won ",SizeAssist, " tasks to assist!");
 			.print("Tasks I won:",AssistList);
 			
-			?taResults::assemblerAgent(Assembler);
+			?taResults::assemblerAgent(Assembler,JobId);
 			.print("assemblerAgent:",Assembler);
 			
-			+default::winner(AssistList, assist(StorageId,Assembler,JobId));			
+			//+default::winner(AssistList, assist(StorageId,Assembler,JobId));			
 		}
 		else {
 			.print("I won 0 tasks to assist");
 		}
 	}
 	
-	if (Me==vehicle1){
-		?default::joined(org,OrgId);
-		org::createScheme(JobId, st, SchArtId)[wid(OrgId)];
-		.print("createScheme for job ",JobId);
-//		-action::hold_action(JobId);
-	}
-	else{
-		.print("I'm not vehicle1 - I'am:",Me);
-	}
 	
 	
 	//.wait(50000);

@@ -277,8 +277,8 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 	if (Me==vehicle1){
 		.print("createScheme for job ",JobId);
-//		?default::joined(org,OrgId);
-//		org::createScheme(JobId, st, SchArtId)[wid(OrgId)];		
+		?default::joined(org,OrgId);
+		org::createScheme(JobId, st, SchArtId)[wid(OrgId)];		
 //		-action::hold_action(JobId);
 	}
 	else{

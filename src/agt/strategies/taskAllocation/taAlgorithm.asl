@@ -82,7 +82,7 @@ else{
 .print("====================================================================================================================================================",JobId);
 .print("!run_distributed_TA_algorithm:",JobId);
 .print("ALg: ",SUBTASKLIST);
-.wait(10000);
+//.wait(10000);
 	//.print("ALg after time wait");
 //-taProcess::job(XX);
 +taProcess::job(JobId);

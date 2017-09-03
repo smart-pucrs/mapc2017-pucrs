@@ -288,7 +288,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 	if (taResults::allocatedTasks(assemble,TuParent,JobId)){
 		.print("I'm going to perform the assemble and I have the tasks ",AssistList);
-		//+default::winner(Requirements,assemble(StorageId,JobId,AssistList));
+		+default::winner(Requirements,assemble(StorageId,JobId,AssistList));
 	}
 	else{
 		.length(AssistList, SizeAssist);
@@ -299,7 +299,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 			?taResults::assemblerAgent(Assembler,JobId);
 			.print("assemblerAgent:",Assembler);
 			
-			//+default::winner(AssistList, assist(StorageId,Assembler,JobId));			
+			+default::winner(AssistList, assist(StorageId,Assembler,JobId));			
 		}
 		else {
 			.print("I won 0 tasks to assist");

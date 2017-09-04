@@ -6,7 +6,7 @@ checkLimit(Reward,0,Limit) 								:- (Limit < Reward).
 checkLimit(Reward,CurrentBid,Limit) 					:- (Limit < Reward) & (Limit < CurrentBid).
 checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,CurrentBid,Limit) & checkPossibleBid(Reward,CurrentBid,BaseBid,Limit).
 
-!triggerFuturePlan.
+//!triggerFuturePlan.
 
 +!triggerFuturePlan
 	: default::step(Step) & ::futurePlans(Event,StepFuture) & (StepFuture <= Step) 

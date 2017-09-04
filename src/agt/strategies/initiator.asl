@@ -2,48 +2,48 @@
 
 task_id(0).
 
-//+default::job(_, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
-//@job[atomic]
-//+default::job(Id, Storage, Reward, Start, End, Items)
-//	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
-//<- 
++default::job(_, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
+@job[atomic]
++default::job(Id, Storage, Reward, Start, End, Items)
+	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
+<- 
+	+action::hold_action(Id);
+	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
+	.print("Items required: ",Items);
+	!evaluate_job(Items, End, Storage, Id, Reward);
+	.
++default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id); !update_free; .
+
++default::auction(_, _, _, _, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
+@oldAuction[atomic]
++default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
+	: evaluation_auction::bidding(Id,_,_,_)
+<-	
+	!evaluation_auction::analyse_bid_posted(Id);
+	.
+@newAuction[atomic]
++default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
+<-
+//	.wait(default::step(Start));
+	.print("New auction job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," has current bid of ",Bid," time for bids ",Time);
+	.print("Items required: ",Items);
+	!evaluation_auction::first_analysis(Id);
+	.
++default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id,", it shoud have not passed here").
+
+
++default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now."); .
+@mission[atomic]
++default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
+	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
+<- 
 //	+action::hold_action(Id);
-//	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
-//	.print("Items required: ",Items);
-//	!evaluate_job(Items, End, Storage, Id, Reward);
-//	.
-//+default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id); !update_free; .
-//
-//+default::auction(_, _, _, _, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
-//@oldAuction[atomic]
-//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
-//	: evaluation_auction::bidding(Id,_,_,_)
-//<-	
-//	!evaluation_auction::analyse_bid_posted(Id);
-//	.
-//@newAuction[atomic]
-//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items)	
-//<-
-////	.wait(default::step(Start));
-//	.print("New auction job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," has current bid of ",Bid," time for bids ",Time);
-//	.print("Items required: ",Items);
-//	!evaluation_auction::first_analysis(Id);
-//	.
-//+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id,", it shoud have not passed here").
-//
-//
-//+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now."); .
-//@mission[atomic]
-//+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
-//	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
-//<- 
-////	+action::hold_action(Id);
-//	+mission(Id, Storage, Items, End, Reward, Fine);
-//	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
-//	.print("Items required: ",Items);
-//	!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
-//	.
-//+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
+	+mission(Id, Storage, Items, End, Reward, Fine);
+	.print("New mission ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End," or pay ",Fine);
+	.print("Items required: ",Items);
+	!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+	.
++default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
 	
 +!decompose(Items,ListItems,ListToolsNew,Id)
 <-

@@ -52,7 +52,7 @@ public class TeamArtifact extends Artifact {
 	@OPERATION void removeAvailableItem(String storage, String item, int qty, OpFeedbackParam<String> res){
 		int remove = -1;
 		String result = "false";
-		if (availableItems.get(storage).toString().contains(item)) {
+		if (availableItems.get(storage) != null && availableItems.get(storage).toString().contains(item)) {
 			for (String s: availableItems.get(storage)) {
 				if (s.contains(item)) {
 					int ind = availableItems.get(storage).indexOf(s);

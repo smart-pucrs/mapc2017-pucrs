@@ -153,11 +153,11 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 <-
 	.print("Initialising Task Allocation ",JobId);
 	?localTask::decomposeRequirements(Requirements,[],Bases);
-	.print("Itens Base: ",Bases);	
+	//.print("Itens Base: ",Bases);	
 	?localTask::generateTaskList(JobId,Bases,[],DuplicatedToolsTasks);
 //	.print("Tasks: ",DuplicatedToolsTasks);
 	?localTask::removeDuplicateTool(DuplicatedToolsTasks,Tasks);
-	.print("Tasks: ",Tasks);
+	//.print("Tasks: ",Tasks);
 	
 	Namespace = taProcess;
 
@@ -181,7 +181,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 //	!taProcess::run_distributed_TA_algorithm(communication(coalition,FreeAgents),Tasks,RoleLoad-MyLoad);
 	
-	!Namespace::run_distributed_TA_algorithm2(JobId,communication(broadcast,[]),FullTasks,RoleLoad-MyLoad);
+	!Namespace::run_distributed_TA_algorithm(JobId,communication(broadcast,[]),FullTasks,RoleLoad-MyLoad);
 	.
 
 +!allocate_job(JobId,StorageId,Requirements,FreeAgents)
@@ -189,7 +189,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	.print("I already have a job to do, ignoring:",JobId);
 	Namespace = taProcess;
 	+Namespace::integration(JobId,StorageId,Requirements);	
-	!Namespace::run_distributed_TA_algorithm2(JobId,communication(broadcast,[]),no);
+	!Namespace::run_distributed_TA_algorithm(JobId,communication(broadcast,[]),no);
 	.
 	
 {end}
@@ -230,13 +230,13 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 +taResults::allocationProcess(ready,JobId)
 	: taResults::jobAllocationStatus(allocated,JobId)
 <-
-	.print("+taResults::allocationProcess(ready,JobId):",JobId);
+	//.print("+taResults::allocationProcess(ready,JobId):",JobId);
 	//.wait(50000);
 	Namespace = taProcess;
 	
-	 if(Namespace::integration(JobId,StorageId,Requirements)){
-	 	.print("JobId:",JobId," - StorageId:", StorageId," - Requirements:",Requirements);
-	 }
+//	 if(Namespace::integration(JobId,StorageId,Requirements)){
+//	 //	.print("JobId:",JobId," - StorageId:", StorageId," - Requirements:",Requirements);
+//	 }
 	?Namespace::integration(JobId,StorageId,Requirements);
 	!finish_task_allocation(JobId,StorageId,Requirements);
 	!::clean_beliefs(JobId);
@@ -245,12 +245,13 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 
 +taResults::allocationProcess(ready,JobId)
 <-
+	.print("Job ignorado:",JobId);
 	//.print("+taResults::allocationProcess(ready,JobId):",JobId);
 	//.wait(50000);
 	Namespace = taProcess;
-	.print(JobId," was not allocated, ignoring it");
+	//.print(JobId," was not allocated, ignoring it");
 	if(Namespace::integration(JobId,StorageId,Requirements)){
-	 	.print("JobId:",JobId," - StorageId:", StorageId," - Requirements:",Requirements);
+	 	//.print("JobId:",JobId," - StorageId:", StorageId," - Requirements:",Requirements);
 	 }
 	?Namespace::integration(JobId,StorageId,Requirements);
 	//!finish_task_allocation(JobId,StorageId,Requirements);//acho que precisa isso - rever
@@ -260,7 +261,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 
 +!clean_beliefs(JobId)
 <-
-	.print("' ",JobId);
+	//.print("' ",JobId);
 	Namespace = taProcess;
 	-Namespace::integration(JobId,_,_);
 	.abolish(gTaskAllocation::int_mapIds(JobId,_,_,_));
@@ -271,20 +272,26 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 +!finish_task_allocation(JobId,StorageId,Requirements)
 	: .my_name(Me)
 <-
-	.print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+	//.print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
 	.print("Finalysing the allocation process for ",JobId);
 	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent,JobId) & gTaskAllocation::int_mapIds(JobId,TuParent,TaskId,TuTask) & TuTask\==assemble),AssistList);
 	
-	if (Me==vehicle1){
+	
+	?taResults::assemblerAgent(Assembler,JobId);
+	.print("assemblerAgent:",Assembler);
+	
+	if (taResults::allocatedTasks(assemble,TuParent,JobId)){
+	//if (Me==vehicle1){
 		.print("createScheme for job ",JobId);
 		?default::joined(org,OrgId);
 		org::createScheme(JobId, st, SchArtId)[wid(OrgId)];		
 //		-action::hold_action(JobId);
 	}
-	else{
-		.print("I'm not vehicle1 - I'am:",Me);
-	}
-	
+//	else{
+//		//.print("I'm not vehicle1 - I'am:",Me);
+//	}
+
+
 	
 	if (taResults::allocatedTasks(assemble,TuParent,JobId)){
 		.print("I'm going to perform the assemble and I have the tasks ",AssistList);
@@ -305,9 +312,29 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 			.print("I won 0 tasks to assist");
 		}
 	}
-	
-	
-	
+//.print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");	
 	//.wait(50000);
 	.
 
+//+taResults::createSchema(JobId)[source(A)]:.my_name(Me)
+//<-
+//	.print("X received createScheme for job ",JobId, "from source: ",A);
+//
+//	Namespace = taProcess;
+//	?Namespace::integration(JobId,StorageId,Requirements);
+//
+////	START !finish_task_allocation(JobId,StorageId,Requirements);
+//
+//	.print("X Finalysing the allocation process for ",JobId);
+////	.findall(TaskId,(taResults::allocatedTasks(TuTask,TuParent,JobId) & gTaskAllocation::int_mapIds(JobId,TuParent,TaskId,TuTask) & TuTask\==assemble),AssistList);
+//	
+//	.print("X createScheme for job ",JobId);
+//	?default::joined(org,OrgId);
+//	org::createScheme(JobId, st, SchArtId)[wid(OrgId)];		
+//	
+//.print("X OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");	
+////	END !finish_task_allocation(JobId,StorageId,Requirements);
+//
+//	!::clean_beliefs(JobId);
+//	-Namespace::allocationProcess(ready,JobId);
+//.

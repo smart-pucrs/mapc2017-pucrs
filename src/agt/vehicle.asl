@@ -58,6 +58,7 @@
 	}
 	!action::recharge_is_new_skip;
 	if ( Me \== vehicle1 ) { setMap; }
+	!action::recharge_is_new_skip;
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
 	if ( Me == vehicle1 ) {

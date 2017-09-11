@@ -34,7 +34,7 @@ public class farthest extends DefaultInternalAction {
 			for (Term term : ids) {
 				String to = term.toString();
 				Route route = MapHelper.getInstance().getNewRoute(from, to, type);
-				if(route.getRouteLength() > len){
+				if(route != null && route.getRouteLength() > len){
 					farthest = to;
 					len = route.getRouteLength();
 				}
@@ -46,7 +46,7 @@ public class farthest extends DefaultInternalAction {
 			for (Term term : ids) {
 				String to = term.toString();
 				Route route = MapHelper.getInstance().getNewRoute(from, to, type);
-				if(route.getRouteLength() > len){
+				if(route != null && route.getRouteLength() > len){
 					farthest = to;
 					len = route.getRouteLength();
 				}

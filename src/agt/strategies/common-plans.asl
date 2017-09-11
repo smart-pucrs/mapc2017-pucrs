@@ -160,7 +160,6 @@
 +!job_failed
 	: default::role(Role, _, _, _, _) & .my_name(Me)
 <-
-	?default::step(S);
 	if (action::action(S)) {
 		.wait( default::actionID(S2) & S2 \== S );
 	}

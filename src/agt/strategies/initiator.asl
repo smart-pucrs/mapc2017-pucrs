@@ -135,10 +135,12 @@ task_id(0).
 	.
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items) 
 <- 	
-	-action::hold_action(Id); 
+	-action::hold_action(Id);
+	if (initiator::mission(JobId, _, _, _, _, _)) { -eval(JobId); }
 	!update_free;
 	!evaluation_auction::has_set_to_free;
 	.print(Id," is no longer viable");
+	
 	.
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)

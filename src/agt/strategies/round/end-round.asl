@@ -29,9 +29,9 @@
 +!change_round
 	: .my_name(Me)
 <-
+	if (Me == vehicle1) { clearMaps; }
 	!end_round;
 	resetMap;
-	if (Me == vehicle1) { clearMaps; }
 	!new::new_round;
 	.	
 

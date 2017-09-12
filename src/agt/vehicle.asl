@@ -49,7 +49,7 @@
 	.wait( default::actionID(S) );
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
 	.wait(500);
-	!action::recharge_is_new_skip;
+//	!action::recharge_is_new_skip;
 	if ( Me == vehicle1 ) {
 		?default::map(Map);
 		?default::cellSize(CellSize);

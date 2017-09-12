@@ -20,8 +20,7 @@
 	+metrics::failedEvalJobs(0);
 	+metrics::noBids(0);
 	+metrics::missBidAuction(0);
-	. 
-+!add_initiator_beliefs.
+	.
 
 {end}
 
@@ -87,10 +86,6 @@
 <-
 	-+storageList([StorageId|List]);
 	.
-//+default::storage(StorageId, _, _, TotCap, UsedCap, Items)
-//	: .my_name(vehicle1)
-//<-
-//	.print("ZZZZZZZZZZZZZZZ Items in storage: ",Items).
 
 @chargingList[atomic]
 +default::chargingStation(ChargingId,Lat,Lon,Rate) 

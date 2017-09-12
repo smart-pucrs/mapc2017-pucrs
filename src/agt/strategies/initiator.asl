@@ -127,12 +127,12 @@ task_id(0).
 		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	.
-+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
-	: not cnp(Id) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) & NumberOfTrucks > 0 & NumberOfAgents >= 2
-<-
-	.wait(500);
-	!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
-	.
+//+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
+//	: not cnp(Id) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) & NumberOfTrucks > 0 & NumberOfAgents >= 2
+//<-
+//	.wait(500);
+//	!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+//	.
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items) 
 <- 	
 	-action::hold_action(Id);

@@ -57,6 +57,7 @@
 			for ( strategies::buyList(ItemId,Qty,Fac) ) {
 				!action::buy(ItemId,Qty);
 	//			.print("Buying #",Qty," of ",ItemId);
+				removeBuyCoordination(Fac,ItemId,Qty);
 				-strategies::buyList(ItemId,Qty,Fac);
 			}
 		}

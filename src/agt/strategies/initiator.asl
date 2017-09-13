@@ -2,6 +2,9 @@
 
 task_id(0).
 
+//debug
+//+default::buy_coordination(ShopId,List) <- .print(ShopId," : ",List).
+
 +default::job(_, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
 @job[atomic]
 +default::job(Id, Storage, Reward, Start, End, Items)

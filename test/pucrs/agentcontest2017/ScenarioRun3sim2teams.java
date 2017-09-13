@@ -8,7 +8,7 @@ import jason.JasonException;
 import massim.Server;
 
 
-public class ScenarioRun1sim2teams {
+public class ScenarioRun3sim2teams {
 
 	@Before
 	public void setUp() {
@@ -17,7 +17,7 @@ public class ScenarioRun1sim2teams {
 			@Override
 			public void run() {
 				try {
-					Server.main(new String[] {"-conf", "conf/1sim2teamsConfig.json", "--monitor"});					
+					Server.main(new String[] {"-conf", "conf/3sim2teamsConfig.json", "--monitor"});					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

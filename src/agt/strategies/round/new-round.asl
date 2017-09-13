@@ -59,6 +59,7 @@
 <-
 //	.print("Adding Shop: ",ShopId," Lat: ",Lat," Lon: ",Lon," Restock: ",Restock," Items: ",Items);
 //	-+shopList([shop(ShopId,Items)|List]);
+	createBuyCoordinationList(ShopId);
 	for (.member(item(ItemId,Price,Qty,_,_,_),Items)) {
 		addShopItem(item(ShopId,ItemId),Qty,ItemId,Price);
 	}
@@ -103,7 +104,7 @@
 
 @dumpList[atomic]
 +default::dump(DumpId,Lat,Lon) 
-	:  dumpList(List) & not .member(DumpId,List) 
+	:  dumpList(List) & not .member(DumpId,List)
 <- 
 	-+dumpList([DumpId|List]);
 	.

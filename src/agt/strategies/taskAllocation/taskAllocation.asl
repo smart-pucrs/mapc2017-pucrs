@@ -1,4 +1,7 @@
-{include("taAlgorithm.asl",algorithm)}
+//{include("taAlgorithmPFClean.asl",algorithm)}
+{include("taAlgorithmPFCleanNoClean.asl",algorithm)}
+//{include("XXtaAlgorithmClean.asl",algorithm)}
+//{include("taAlgorithmPF.asl",algorithm)}
 
 {begin namespace(localTask, local) }
 
@@ -149,7 +152,7 @@ testVetor([]).
 testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 +!allocate_job(JobId,StorageId,Requirements,FreeAgents)
-	: not default::winner(_,_) & default::role(_,_,RoleLoad,_,_) & default::load(MyLoad)
+	: not default::workingJob & not default::winner(_,_) & default::role(_,_,RoleLoad,_,_) & default::load(MyLoad)
 <-
 	.print("Initialising Task Allocation ",JobId);
 	?localTask::decomposeRequirements(Requirements,[],Bases);
@@ -301,7 +304,9 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	if (taResults::allocatedTasks(assemble,TuParent,JobId)){
 		.print("I'm going to perform the assemble and I have the tasks ",AssistList);
 		.print("Requirements:",Requirements);
+		+default::workingJob;
 		+default::winner(Requirements,assemble(StorageId,JobId,AssistList));
+		
 	}
 	else{
 		.length(AssistList, SizeAssist);
@@ -312,7 +317,8 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 			?taResults::assemblerAgent(Assembler,JobId);
 			.print("assemblerAgent:",Assembler);
 			
-			+default::winner(AssistList, assist(StorageId,Assembler,JobId));			
+			+default::workingJob;
+			+default::winner(AssistList, assist(StorageId,Assembler,JobId));
 		}
 		else {
 			.print("I won 0 tasks to assist");

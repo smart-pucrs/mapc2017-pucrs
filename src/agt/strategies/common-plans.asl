@@ -38,6 +38,7 @@
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
+	-default::workingJob;
 	!!strategies::free;
 	.
 
@@ -79,13 +80,18 @@
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!strategies::check_charge;
-	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
+	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free);
+		-default::workingJob;
+	}
 	else { 
 		.my_name(Me);
 		if (Me == vehicle1) {
 			!initiator::add_myself_to_free;
+			-default::workingJob;
 		}
-		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
+		else { .send(vehicle1,achieve,initiator::add_agent_to_free);
+			-default::workingJob;
+		}
 	}
 	!!strategies::free;
 	.
@@ -168,12 +174,17 @@
 	if ( not default::routeLength(0) ) { !action::abort; }
 	if ( default::hasItem(_,_) ) { !go_store(Role); }
 	if ( default::hasItem(_,_) ) { !go_dump; }
-	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
+	if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free);
+		-default::workingJob;
+	}
 	else { 
 		if (Me == vehicle1) {
 			!initiator::add_myself_to_free;
+			-default::workingJob;
 		}
-		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
+		else { .send(vehicle1,achieve,initiator::add_agent_to_free);
+			-default::workingJob;
+		}
 	}
 //	.print("Job failed, sending free.");
 	!!strategies::free;

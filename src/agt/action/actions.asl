@@ -1,6 +1,5 @@
 {begin namespace(localActions, local)}
 
-@commitAction[atomic]
 +!commitAction(Action)
 	: default::actionID(S) & not action::action(S) & not action::hold_action(_)
 <-
@@ -10,19 +9,8 @@
 		.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
 	}
 	action(Action);
-	!!wait_next(Action, S);
-	.
-
-+!wait_next(Action, S)
-<-
 	.wait( default::actionID(S2) & S2 \== S );
 //	.print("Got out of wait from step ",S);
-	!!commitAction_phase_two(Action, S);
-	.
-
-@commitAction2[atomic]
-+!commitAction_phase_two(Action, S)
-<-
 	?default::lastActionResult(Result);
 //	.print("Last action result was: ",Result);
 //	.wait( default::lastActionResult(Result) );

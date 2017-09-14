@@ -32,7 +32,7 @@ findParts(Qtd,[[PartName,PartQtd] | ListOfPart],Temp,Result) :- (NewQtd = Qtd*Pa
 															& 	findParts(Qtd,ListOfPart,ListItensJob,Result).
 findParts(Qtd,[[PartName,PartQtd] | ListOfPart],Temp,Result) :- (NewQtd = Qtd*PartQtd) 
 															& 	default::item(PartName,_,tools(Tools),parts(Parts)) 
-															& 	decomposeRequirements([required(PartName,PartQtd)],Temp,ListItensJob)
+															& 	decomposeRequirements([required(PartName,NewQtd)],Temp,ListItensJob)
 															& 	findParts(Qtd,ListOfPart,ListItensJob,Result).
 decomposeItem(Item,Qtd,[],[],Temp,ListItensJob) 		:- ListItensJob = [item(Item,Qtd) | Temp].
 decomposeItem(Item,Qtd,Tools,Parts,Temp,ListItensJob) 	:- findTools(Tools,Temp,NewTempTools) & findParts(Qtd,Parts,NewTempTools,NewTempParts) & ListItensJob = NewTempParts.
@@ -122,7 +122,7 @@ generateTaskList(ParentId,[compoundedItem(Item,ListItensJob)|List],Temp,Result) 
 																					.concat(ParentId,Item,NewId)
 																				&	generateSubTaskList(NewId,ListItensJob,[],Translated) 
 																				& 	.concat(Translated,Temp,NewTemp)
-																				& 	generateTaskList(NewId,List,NewTemp,Result).
+																				& 	generateTaskList(ParentId,List,NewTemp,Result).
 generateAssembleTask(JobId,StorageId,Items,Temp,Result) :- evaluateUtilityAssemble(StorageId,Items,Utility) 
 //												&	(Utility \== -1)
 												&	default::total_load(Items,0,Vol)
@@ -153,11 +153,11 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 <-
 	.print("Initialising Task Allocation ",JobId);
 	?localTask::decomposeRequirements(Requirements,[],Bases);
-	//.print("Itens Base: ",Bases);	
+	.print("Itens Base: ",Bases);	
 	?localTask::generateTaskList(JobId,Bases,[],DuplicatedToolsTasks);
 //	.print("Tasks: ",DuplicatedToolsTasks);
 	?localTask::removeDuplicateTool(DuplicatedToolsTasks,Tasks);
-	//.print("Tasks: ",Tasks);
+	.print("Tasks: ",Tasks);
 	
 	Namespace = taProcess;
 

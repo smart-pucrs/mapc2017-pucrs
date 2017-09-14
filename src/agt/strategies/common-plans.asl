@@ -251,10 +251,8 @@
 	
 -default::auction(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)
 <-
-	+action::hold_action(Id);
 	.wait(default::actionID(_));
 	.wait(100);
-	-action::hold_action(Id);
 	!::check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items);
 	.
 +!check_aucion_finished(Id,Storage,Reward,Start,End,Fine,Bid,Time,Items)

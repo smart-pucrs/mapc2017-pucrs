@@ -340,6 +340,9 @@ task_id(0).
 //			.print(AgentA," ",Items);
 			.send(AgentA,tell,winner(Items,assemble(Storage,JobId,AssTaskList)));
 			if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
+			if (default::winner(_,assist(_,_,JobId))) {
+				.drop_desire(action::commitAction(_));
+			}
 			resetLoads;
 			-cnp(JobId);
 		}

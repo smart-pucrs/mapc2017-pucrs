@@ -153,11 +153,11 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 <-
 	.print("Initialising Task Allocation ",JobId);
 	?localTask::decomposeRequirements(Requirements,[],Bases);
-	.print("Itens Base: ",Bases);	
+	//.print("Itens Base: ",Bases);	
 	?localTask::generateTaskList(JobId,Bases,[],DuplicatedToolsTasks);
 //	.print("Tasks: ",DuplicatedToolsTasks);
 	?localTask::removeDuplicateTool(DuplicatedToolsTasks,Tasks);
-	.print("Tasks: ",Tasks);
+	//.print("Tasks: ",Tasks);
 	
 	Namespace = taProcess;
 
@@ -190,6 +190,9 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	Namespace = taProcess;
 	+Namespace::integration(JobId,StorageId,Requirements);	
 	!Namespace::run_distributed_TA_algorithm(JobId,communication(broadcast,[]),no);
+	-action::hold_action(JobId);
+	
+	//!clean_beliefs(JobId);
 	.
 	
 {end}
@@ -281,6 +284,8 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	.print("assemblerAgent:",Assembler);
 	
 	if (taResults::allocatedTasks(assemble,TuParent,JobId)){
+	
+	
 	//if (Me==vehicle1){
 		.print("createScheme for job ",JobId);
 		?default::joined(org,OrgId);
@@ -295,6 +300,7 @@ testVetor([T|Lista]) :- .print("Na lista: ",T) & testVetor(Lista).
 	
 	if (taResults::allocatedTasks(assemble,TuParent,JobId)){
 		.print("I'm going to perform the assemble and I have the tasks ",AssistList);
+		.print("Requirements:",Requirements);
 		+default::winner(Requirements,assemble(StorageId,JobId,AssistList));
 	}
 	else{

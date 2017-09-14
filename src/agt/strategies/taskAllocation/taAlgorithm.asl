@@ -39,7 +39,7 @@ zero(0).
 .length(LJOBRUN,NJOBS);
 if(NJOBS>0){
 	.min(LJOBRUN,JOBTORUN);
-	//.print("JOBTORUN:",JOBTORUN);
+	//.my_name(Me);action.printFile(Me," | ","JOBTORUN:",JOBTORUN);
 	.print("JOBTORUN:",JOBTORUN);
 	if(taProcess::jobIdRun(JOBTORUN,Aloc) & Aloc==yes){
 	?taProcess::jobRun(JOBTORUN,communication(COMMUNICATION_TYPE,AGENT_LIST),SUBTASKLIST,AVAILABLE_LOAD);
@@ -54,7 +54,7 @@ if(NJOBS>0){
 
 }
 else{
-	//.print("No jobs to allocate for now.");
+	//.my_name(Me);action.printFile(Me," | ","No jobs to allocate for now.");
 	.print("No jobs on queue to allocate for now.");
 }
 .
@@ -65,7 +65,7 @@ else{
 @puTLt//[atomic]
 +!run_distributed_TA_algorithm2(JobId,communication(COMMUNICATION_TYPE,AGENT_LIST),SUBTASKLIST,AVAILABLE_LOAD):taProcess::allocating(true)
 <- 
-//.print("!run_distributed_TA_algorithm wait:",JobId);
+//.my_name(Me);action.printFile(Me," | ","!run_distributed_TA_algorithm wait:",JobId);
 //.print("!run_distributed_TA_algorithm wait:",JobId);
 //.wait(10000);
 .wait(200);
@@ -80,9 +80,11 @@ else{
 -taProcess::allocating(false);
 +taProcess::allocating(true);
 
-//.print("!run_distributed_TA_algorithm:",JobId);
+//.my_name(Me);action.printFile(Me," | ","!run_distributed_TA_algorithm:",JobId);
 .print("!run_distributed_TA_algorithm:",JobId);
-//.print("ALg: ",SUBTASKLIST);
+//.my_name(Me);action.printFile(Me," | ","ALg: ",SUBTASKLIST);
+
+!printAuxNow;
 
 !setInitialBeleives;
 .time(HH,NN,SS);
@@ -99,7 +101,7 @@ else{
 @puTL2t//[atomic]
 +!run_distributed_TA_algorithm2(JobId,communication(COMMUNICATION_TYPE,AGENT_LIST),NO):taProcess::allocating(true)
 <- 
-//.print("!run_distributed_TA_algorithm NO wait:",JobId);
+//.my_name(Me);action.printFile(Me," | ","!run_distributed_TA_algorithm NO wait:",JobId);
 //.print("!run_distributed_TA_algorithm NO wait:",JobId);
 //.wait(10000);
 .wait(200);
@@ -113,12 +115,14 @@ else{
 -taProcess::allocating(false);
 +taProcess::allocating(true);
 
-////.print("====================================================================================================================================================",JobId);
-//.print("!run_distributed_TA_algorithm NO:",JobId);
+////.my_name(Me);action.printFile(Me," | ","====================================================================================================================================================",JobId);
+//.my_name(Me);action.printFile(Me," | ","!run_distributed_TA_algorithm NO:",JobId);
 .print("!run_distributed_TA_algorithm NO:",JobId);
 //.wait(5000);
 //.wait(20000);
 +taProcess::job(JobId);
+
+!printAuxNow;
 
 !setInitialBeleives;
 .time(HH,NN,SS);
@@ -137,6 +141,42 @@ else{
 !communicateDone;
 !communicateReadyTeam;
 .
+
+
++!printAuxNow:true
+<-
+if(taProcess::taProcessStatus(STATUS)){ 
+//.my_name(Me);action.printFile(Me," | ","?taProcess::taProcessStatus(STATUS):",STATUS);
+} else {//.my_name(Me);action.printFile(Me," | ","NOT ?taProcess::taProcessStatus(STATUS):",STATUS);
+}
+
+if(taProcess::keepPreProcessingBids(TX)){
+//.my_name(Me);action.printFile(Me," | ","?taProcess::keepPreProcessingBids(TX):",TX);
+} else {//.my_name(Me);action.printFile(Me," | ","NOT ?taProcess::keepPreProcessingBids(TX):",TX);
+}
+
+if(taProcess::preprocessingBids(TX2)){ 
+//.my_name(Me);action.printFile(Me," | ","?taProcess::preprocessingBids(TX2):",TX2);
+} else {//.my_name(Me);action.printFile(Me," | ","NOT ?taProcess::preprocessingBids(TX2):",TX2);
+}
+
+if(taProcess::job(JobId)){
+//.my_name(Me);action.printFile(Me," | ","?taProcess::job(JobId):",JobId);
+} else {//.my_name(Me);action.printFile(Me," | ","NOT ?taProcess::job(JobId):",JobId);
+}
+
+if(taProcess::jobIdRun(JobId,XX)){
+//.my_name(Me);action.printFile(Me," | ","?taProcess::jobIdRun(JobId,XX):",JobId," - ",XX);
+} else {//.my_name(Me);action.printFile(Me," | ","NOT ?taProcess::jobIdRun(JobId,XX):",JobId," - ",XX);
+}
+
+if(taResults::allocationProcess(XX,JobId)){
+//.my_name(Me);action.printFile(Me," | ","?taResults::allocationProcess(XX,JobId):",XX," - ",JobId);
+} else {//.my_name(Me);action.printFile(Me," | ","NOT ?taResults::allocationProcess(XX,JobId):",XX," - ",JobId);
+}
+
+.
+
 
 @psRMe[atomic]
 +!setReadyMe(Value):true
@@ -157,7 +197,7 @@ else{
 +!setInitialBeleives:true
 <-
 ?taProcess::job(JobId);
-////.print("!setInitialBeleives");
+////.my_name(Me);action.printFile(Me," | ","!setInitialBeleives");
 .abolish(taResults::jobAllocationStatus(_,JobId));
 //.abolish(taResults::allocatedTasks(_,_));
 -taResults::allocationProcess(XX);
@@ -169,7 +209,7 @@ else{
 @puTLxa[atomic]
 +!invertUtility(SUBTASKLIST):true  
 <- 
-////.print("!invertUtility");
+////.my_name(Me);action.printFile(Me," | ","!invertUtility");
 if(taDefinitions::taUtilityGoal(UGOAL) & (UGOAL=="maximize")){
 	for (.member(subtask(SUBTASK,TASK,LOAD,UTILITY,TASKTYPE,ROLE),SUBTASKLIST)) {
 		if(UTILITY>-1){
@@ -203,7 +243,7 @@ else{
 @puTLxaw[atomic]
 +!prepareTaskList:true  
 <- 
-////.print("!prepareTaskList");
+////.my_name(Me);action.printFile(Me," | ","!prepareTaskList");
 .findall(subtask(SUBTASK2,TASK2,LOAD2,UTILITY2,TASKTYPE2,ROLE2),taProcess::subtaskReceived(SUBTASK2,TASK2,LOAD2,UTILITY2,TASKTYPE2,ROLE2),SUBTASKLIST);
 
 //for all subtasks in the task list do
@@ -248,7 +288,7 @@ for (.member(subtask(SUBTASK,TASK,LOAD,UTILITY,TASKTYPE,ROLE),SUBTASKLIST)) {
 @pSAL[atomic]
 +!setAgentList(AGLIST): .my_name(Me) 
 <-
-////.print("!setAgentList");
+////.my_name(Me);action.printFile(Me," | ","!setAgentList");
 for (.member(AGENT,AGLIST)) {
 	if(not(AGENT==Me)){
 		+taProcess::agentCommunicate(AGENT);
@@ -262,7 +302,7 @@ for (.member(AGENT,AGLIST)) {
 @pMinMax//[atomic]
 +!getMinMaxTaskType: true 
 <-
-////.print("!getMinMaxTaskType");
+////.my_name(Me);action.printFile(Me," | ","!getMinMaxTaskType");
 .findall(task(TASK,TYPE),taProcess::task(TASK,TYPE),LTASK);
 for (.member(task(TASK,TYPE),LTASK)) {
 	//count the subtasks
@@ -293,7 +333,7 @@ for (.member(task(TASK,TYPE),LTASK)) {
 @pMinMaxLoad//[atomic]
 +!getMinMaxLoadTask: true 
 <-
-////.print("!getMinMaxLoadTask");
+////.my_name(Me);action.printFile(Me," | ","!getMinMaxLoadTask");
 .findall(taskMin(TASK,MinSubTasks),taProcess::taskMin(TASK,MinSubTasks),LTASK);
 
 for (.member(taskMin(TASK,MinSubTasks),LTASK)) {
@@ -318,14 +358,14 @@ for (.member(taskMin(TASK,MinSubTasks),LTASK)) {
 !processInitialPriceValues;
 !processNetValue;
 
-//ja seta que está alocando para não cair no processamento de bids após estar pronto.
+//ja seta que estï¿½ alocando para nï¿½o cair no processamento de bids apï¿½s estar pronto.
 //assim vai fazer todo o primeiro aloc antes de processar os primeiros bids 
-//mesma crença é adicionada no inicio do allocateTasks.
+//mesma crenï¿½a ï¿½ adicionada no inicio do allocateTasks.
 //.print("setting taProcess::allocProcess(true)");
 +taProcess::allocProcess(true); 
 
 +taProcessStatus(done);
-////.print("!preparetaProcess - calling allocateTasks");
+////.my_name(Me);action.printFile(Me," | ","!preparetaProcess - calling allocateTasks");
 
 !!allocateTasks;
 .
@@ -394,7 +434,7 @@ for (.member(taskMin(TASK,MinSubTasks),LTASK)) {
 +!allocateTasks: true 
 <-
 //.print("init !allocateTasks");
-//.print("!allocateTasks");
+//.my_name(Me);action.printFile(Me," | ","!allocateTasks");
 if(taProcess::preAllocatedTasks(X1,X2,X3)){
 	.count(taProcess::preAllocatedTasks(_,_,_),QtyAllocTasks);
 	.findall(LOAD,taProcess::subtaskLoad(SUBTASK,TASK,LOAD) & taProcess::preAllocatedTasks(NVXXXX, SUBTASKalloc, TASKalloc) & (SUBTASK==SUBTASKalloc) & (TASK==TASKalloc),LLOAD);
@@ -475,7 +515,7 @@ if(taProcess::rerunAllocateTasks(true)){
 //.wait(500000);
 
 
-//.print("AllocateTasks - done");
+//.my_name(Me);action.printFile(Me," | ","AllocateTasks - done");
 -taProcess::allocProcess(true);
 
 .
@@ -746,6 +786,13 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 <-
 //.findall(preAllocatedTasks(NetValue, Subtask, Task),taProcess::preAllocatedTasks(NetValue, Subtask, Task),LAlloc3);
 //.print("Tarefas alocadas:",LAlloc3);
+//.my_name(Me);action.printFile(Me," | ","---------------------------------");
+.findall(preAllocatedTasks(NetValue, Subtask, Task),taProcess::preAllocatedTasks(NetValue, Subtask, Task),LAlloc3);
+//.sort(LAlloc,LAlloc2);
+//.reverse(LAlloc2,LAlloc3);
+//.my_name(Me);action.printFile(Me," | ","Tarefas alocadas:",LAlloc3);
+.print("Tarefas alocadas:",LAlloc3);
+
 !communicateReadyTeam;
 !checkReadyTeam;
 .
@@ -754,11 +801,11 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 @pTOtal[atomic]
 +!totalAllocated_Tulio:true
 <-
-//.print("---------------------------------");
+//.my_name(Me);action.printFile(Me," | ","---------------------------------");
 .findall(preAllocatedTasks(NetValue, Subtask, Task),taProcess::preAllocatedTasks(NetValue, Subtask, Task),LAlloc3);
 //.sort(LAlloc,LAlloc2);
 //.reverse(LAlloc2,LAlloc3);
-//.print("Tarefas alocadas:",LAlloc3);
+//.my_name(Me);action.printFile(Me," | ","Tarefas alocadas:",LAlloc3);
 .print("Tarefas alocadas:",LAlloc3);
 
 -+totalUtility(0);
@@ -772,17 +819,17 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 		LTotal=TotalX;
 		NewTotal=LTotal+UtilityA;
 		-+totalUtility(NewTotal);
-		////.print("NewTotalX:",NewTotal);
+		////.my_name(Me);action.printFile(Me," | ","NewTotalX:",NewTotal);
 		
 		?taProcess::subtaskReceivedOriginal(Subtaska, Taska,LOADORIG,UTILITYORIG,TASKTYPEORIG,ROLEORIG);
 		?taProcess::totalUtilityOriginal(TotalOrigX);
 		LTotalOrig=TotalOrigX;
 		NewTotalOrig=LTotalOrig+UTILITYORIG;
 		-+totalUtilityOriginal(NewTotalOrig);
-		////.print("NewTotalX:",NewTotalOrig);
+		////.my_name(Me);action.printFile(Me," | ","NewTotalX:",NewTotalOrig);
 	}
 	else{
-		////.print("Task SD por enquanto para nao dar erro");
+		////.my_name(Me);action.printFile(Me," | ","Task SD por enquanto para nao dar erro");
 		.findall(subtask(Subtaska2,Taska,UTILITYORIG),taProcess::subtaskReceivedOriginal(Subtaska2, Taska,LOADORIG,UTILITYORIG,TASKTYPEORIG,ROLEORIG), LSUBTASK);
 		 for (.member(subtask(SubtaskSD,TaskSD,UTILITYORIGSD),LSUBTASK)) {
 	
@@ -790,27 +837,27 @@ NewPrice = PriceLocal + NetValue - Vmax + SCL;
 			LTotalOrig=TotalOrigX;
 			NewTotalOrig=LTotalOrig+UTILITYORIGSD;
 			-+totalUtilityOriginal(NewTotalOrig);
-			////.print("NewTotalSD:",NewTotalOrig);
+			////.my_name(Me);action.printFile(Me," | ","NewTotalSD:",NewTotalOrig);
 		}
 			?taProcess::subtaskUtility(Subtaska,Taska,SubtaskUtilityX)
 			?taProcess::totalUtility(TotalX);
 			LTotal=TotalX;
 			NewTotal=LTotal+SubtaskUtilityX;
 			-+totalUtility(NewTotal);
-			////.print("NewTotalSD:",NewTotal);
+			////.my_name(Me);action.printFile(Me," | ","NewTotalSD:",NewTotal);
 	}
 	
 	}
 
 	//?total(TotXX2);
-//	//.print("Total alocado:", TotXX2);
+//	//.my_name(Me);action.printFile(Me," | ","Total alocado:", TotXX2);
 	?taProcess::totalUtility(TotXX3);
-	//.print("totalUtility alocado:", TotXX3);
+	//.my_name(Me);action.printFile(Me," | ","totalUtility alocado:", TotXX3);
 	
 	?taProcess::totalUtilityOriginal(TotalOrigX2);
-	//.print("totalUtility alocado ORIGINAL:", TotalOrigX2);
+	//.my_name(Me);action.printFile(Me," | ","totalUtility alocado ORIGINAL:", TotalOrigX2);
 
-	//.print("---------------------------------");
+	//.my_name(Me);action.printFile(Me," | ","---------------------------------");
 	!communicateReadyTeam;
 	!checkReadyTeam;
 .
@@ -826,10 +873,10 @@ if(not teamReady(JobId)){
 	.count(taProcess::readyAgent(A,JobId),NReadyAg);
 	
 	if(NAgBid>NReadyAg) {
-		////.print("Not all agents ready");
+		////.my_name(Me);action.printFile(Me," | ","Not all agents ready");
 	}
 	else {
-		//.print("TA process team ready...");
+		//.my_name(Me);action.printFile(Me," | ","TA process team ready...");
 		.print("TA process team ready...");
 		+teamReady(JobId);
 		!totalAllocatedFinal;
@@ -845,7 +892,7 @@ if(not teamReady(JobId)){
    ?taProcess::job(JobId);
    	-taProcess::readyAgent(Me,JobId);
    	+taProcess::readyAgent(Me,JobId);
-	//.print("!communicateReadyTeam");
+	//.my_name(Me);action.printFile(Me," | ","!communicateReadyTeam");
 	//.print("!communicateReadyTeam");
 	.broadcast(tell, taProcess::readyAgent(JobId));
 .
@@ -856,7 +903,7 @@ if(not teamReady(JobId)){
    ?taProcess::job(JobId);
    	-taProcess::readyAgent(Me,JobId);
    	+taProcess::readyAgent(Me,JobId);
-	//.print("!communicateReadyTeam");
+	//.my_name(Me);action.printFile(Me," | ","!communicateReadyTeam");
  	.send(AgentList, tell, taProcess::readyAgent(JobId));
 .
 
@@ -873,11 +920,11 @@ if(not teamReady(JobId)){
 @pTOtalFinal2[atomic]
 +!totalAllocatedFinal:job(JobId) & jobIdRun(JobId,no)
 <-
-//.print("JobId:",JobId);
+//.my_name(Me);action.printFile(Me," | ","JobId:",JobId);
 -taResults::allocationProcess(XX);
 +taResults::allocationProcess(closing);
 +taResults::jobAllocationStatus(notRun,JobId);
-//.print("notRun:",JobId);
+//.my_name(Me);action.printFile(Me," | ","notRun:",JobId);
 
 -taResults::allocationProcess(XX2);
 +taResults::allocationProcess(ready);
@@ -889,15 +936,15 @@ if(not teamReady(JobId)){
 .print("INITIME:",INITIME);
 .print("ENDTIME:",ENDTIME);
 
-//.print("INITIME:",INITIME);
-//.print("ENDTIME:",ENDTIME);
+//.my_name(Me);action.printFile(Me," | ","INITIME:",INITIME);
+//.my_name(Me);action.printFile(Me," | ","ENDTIME:",ENDTIME);
 !cleanFinalBelieves;
 //!printAuxFinal;	
 -taProcess::jobRun(JobId,_,_,_);
 -taProcess::jobIdRun(JobId,_);
 -taProcess::allocating(true);
 +taProcess::allocating(false);
-//.print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO:");
+//.my_name(Me);action.printFile(Me," | ","OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO:");
 //.print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO:");
 //.wait(10000);
 !!executeNextJob;
@@ -907,23 +954,21 @@ if(not teamReady(JobId)){
 +!totalAllocatedFinal:job(JobId) & jobIdRun(JobId,yes)
 <-
 //?taProcess::job(JobId);
-//.print("JobId:",JobId);
+//.my_name(Me);action.printFile(Me," | ","JobId:",JobId);
 
 -taResults::allocationProcess(XX);
 +taResults::allocationProcess(closing);
 
 
 .count(taProcess::subtaskOwner(SubTaskf1,Taskf1,Agentf1),NLOWNER);
-//.findall(taProcess::subtaskOwner(SubTaskf1,Taskf1,Agentf1),taProcess::subtaskOwner(SubTaskf1,Taskf1,Agentf1),LOWNER);
-//.length(LOWNER,NLOWNER);
 
-//.print("  LOWNER:",LOWNER);
-//.print(" NLOWNER - ",NLOWNER);
+////.my_name(Me);action.printFile(Me," | ","  LOWNER:",LOWNER);
+//.my_name(Me);action.printFile(Me," | "," NLOWNER - ",NLOWNER);
 
 .count(taProcess::subtaskReceivedOriginal(SubTaskf2,Taskf2,Xf2,X2f2,X3f2,X4f2),NLORIG);
 //.findall(taProcess::subtaskReceivedOriginal(SubTaskf2,Taskf2,Xf2,X2f2,X3f2,X4f2),taProcess::subtaskReceivedOriginal(SubTaskf2,Taskf2,Xf2,X2f2,X3f2,X4f2),LORIG);
 //.length(LORIG,NLORIG);
-//.print(" NLORIG - ",NLORIG);
+//.my_name(Me);action.printFile(Me," | "," NLORIG - ",NLORIG);
 
 .print("Job tasks: ",NLORIG);
 .print("Allocated tasks: ",NLOWNER);
@@ -932,13 +977,15 @@ if(not teamReady(JobId)){
 //only for the MAS contest
 if(NLORIG>NLOWNER) {
 	+taResults::jobAllocationStatus(ignored,JobId);
-	//.print("ignored:",JobId);
+	//.my_name(Me);action.printFile(Me," | ","ignored:",JobId);
 	.print("Ignored:",JobId);
 }
 else{
 	+taResults::jobAllocationStatus(allocated,JobId);
-	//.print("allocated:",JobId);
+	//.my_name(Me);action.printFile(Me," | ","allocated:",JobId);
 	.print("Allocated:",JobId);
+	.findall(taProcess::subtaskOwner(SubTaskf1,Taskf1,Agentf1),taProcess::subtaskOwner(SubTaskf1,Taskf1,Agentf1),LOWNER);
+	//.my_name(Me);action.printFile(Me," | ","  LOWNER:",LOWNER);
 	
 }
 
@@ -946,11 +993,11 @@ else{
 ////only for the MAS contest
 //if((taProcess::subtaskReceivedOriginal(SubTask,Task,X,X2,X3,X4)) & (not taProcess::subtaskOwner(SubTask,Task,Agent))) {
 //	+taResults::jobAllocationStatus(ignored,JobId);
-//	//.print("ignored:",JobId);
+//	//.my_name(Me);action.printFile(Me," | ","ignored:",JobId);
 //}
 //else{
 //	+taResults::jobAllocationStatus(allocated,JobId);
-//	//.print("allocated:",JobId);
+//	//.my_name(Me);action.printFile(Me," | ","allocated:",JobId);
 //	
 //}
 //.print("waitingggggg");
@@ -962,7 +1009,7 @@ if (taResults::jobAllocationStatus(allocated,JobId)){ //this IF is valid only fo
 	if(taProcess::subtaskOwner(assemble,JobId,Ag)){
 		+taResults::assemblerAgent(Ag,JobId);
 //		.my_name(MeAg);
-//		if((MeAg==Ag) & (not MeAg==vehicle1)){ //se task assemble é minha e eu não sou o agente 1
+//		if((MeAg==Ag) & (not MeAg==vehicle1)){ //se task assemble ï¿½ minha e eu nï¿½o sou o agente 1
 //		.print("ASSEMBLER PART - sending createSchema(JobId)");
 //		.send(vehicle1, tell, taResults::createSchema(JobId));
 //		}
@@ -978,21 +1025,21 @@ if (taResults::jobAllocationStatus(allocated,JobId)){ //this IF is valid only fo
 
 .findall(preAllocatedTasks(NetValue, Subtask, Task),taProcess::preAllocatedTasks(NetValue, Subtask, Task),LAlloc);
 
-////.print("preAllocatedTasks:",LAlloc);
+////.my_name(Me);action.printFile(Me," | ","preAllocatedTasks:",LAlloc);
 	for (.member(preAllocatedTasks(NetValuea, Subtaska, Taska),LAlloc)) {
 	
 	if(not Subtaska==Taska){
 		+taResults::allocatedTasks(Subtaska, Taska,JobId);
-		////.print("+taResults::allocatedTasks: Subtaska:",Subtaska," - Taska:",Taska)
+		////.my_name(Me);action.printFile(Me," | ","+taResults::allocatedTasks: Subtaska:",Subtaska," - Taska:",Taska)
 	}
 	else{
-		////.print("Task SD por enquanto para nao dar erro");
+		////.my_name(Me);action.printFile(Me," | ","Task SD por enquanto para nao dar erro");
 		.findall(subtask(Subtaska2,Taska,UTILITYORIG),taProcess::subtaskReceivedOriginal(Subtaska2,Taska,LOADORIG,UTILITYORIG,TASKTYPEORIG,ROLEORIG), LSUBTASK);
-		////.print("Taska:",Taska);
-		////.print("LSUBTASK:",LSUBTASK);
+		////.my_name(Me);action.printFile(Me," | ","Taska:",Taska);
+		////.my_name(Me);action.printFile(Me," | ","LSUBTASK:",LSUBTASK);
 		 for (.member(subtask(SubtaskSD,TaskSD,UTILITYORIGSD),LSUBTASK)) {
 			+taResults::allocatedTasks(SubtaskSD, TaskSD,JobId);
-			////.print("+taResults::allocatedTasks: SubtaskSD:",SubtaskSD," - TaskSD:",TaskSD)
+			////.my_name(Me);action.printFile(Me," | ","+taResults::allocatedTasks: SubtaskSD:",SubtaskSD," - TaskSD:",TaskSD)
 		}
 	}
 	
@@ -1015,15 +1062,15 @@ if (taResults::jobAllocationStatus(allocated,JobId)){ //this IF is valid only fo
 .concat(HH,":",NN,":",SS,ENDTIME);
 .print("INITIME:",INITIME);
 .print("ENDTIME:",ENDTIME);
-//.print("INITIME:",INITIME);
-//.print("ENDTIME:",ENDTIME);
+//.my_name(Me);action.printFile(Me," | ","INITIME:",INITIME);
+//.my_name(Me);action.printFile(Me," | ","ENDTIME:",ENDTIME);
 !cleanFinalBelieves;
 //!printAuxFinal;	
 -taProcess::jobRun(JobId,_,_,_);
 -taProcess::jobIdRun(JobId,_);
 -taProcess::allocating(true);
 +taProcess::allocating(false);
-//.print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO:");
+//.my_name(Me);action.printFile(Me," | ","OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO:");
 //.print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO:");
 //.wait(10000);
 !!executeNextJob;
@@ -1034,16 +1081,16 @@ if (taResults::jobAllocationStatus(allocated,JobId)){ //this IF is valid only fo
 @pzasas//[atomic]
 +!printAuxFinal:true
 <-
-//.print("*********************************************");
-//.print("waiting...");
+//.my_name(Me);action.printFile(Me," | ","*********************************************");
+//.my_name(Me);action.printFile(Me," | ","waiting...");
 //.wait(5000);
 .findall(preAllocatedTasks(Subtask, Task),taProcess::preAllocatedTasks(NetValue, Subtask, Task),LPreAlloc);
 .sort(LPreAlloc,LPreAlloc2);
-//.print("preAllocatedTasks:",LPreAlloc2);
+//.my_name(Me);action.printFile(Me," | ","preAllocatedTasks:",LPreAlloc2);
 .findall(allocatedTasks(Subtaskx, Taskx),taResults::allocatedTasks(Subtaskx, Taskx),LAlloc);
 .sort(LAlloc,LAlloc2);
-//.print("AllocatedTasks:",LAlloc2);
-//.print("*********************************************");
+//.my_name(Me);action.printFile(Me," | ","AllocatedTasks:",LAlloc2);
+//.my_name(Me);action.printFile(Me," | ","*********************************************");
 .
 
 
@@ -1052,7 +1099,7 @@ if (taResults::jobAllocationStatus(allocated,JobId)){ //this IF is valid only fo
 @p22n[atomic]
 +!updateGlobalPrice(Subtask,Task,PriceGlobalNew):true 
    <-
-////.print("!updateGlobalPrice");
+////.my_name(Me);action.printFile(Me," | ","!updateGlobalPrice");
 ?taProcess::priceGlobal(Subtask,Task,PriceGlobalCurrent);
 .my_name(Me);
 
@@ -1139,7 +1186,7 @@ if (taProcess::preAllocatedTasks(NetValue, Subtask, Task)){
    	  .findall(taProcess::bid(Subtask,Task,PriceGlobalNew),taProcess::toCommunicate(Subtask,Task,PriceGlobalNew),LBIDS);
    	  .broadcast(tell, taProcess::bids(LBIDS));
    	  .abolish(taProcess::toCommunicate(_,_,_));
-//.print("!communicateBids:", LBIDS);
+//.my_name(Me);action.printFile(Me," | ","!communicateBids:", LBIDS);
    	  if(not taProcess::initialBid(Me)) {
 			+taProcess::initialBid(Me);
 			+taProcess::missingBid(Me,0);
@@ -1170,7 +1217,7 @@ if (taProcess::preAllocatedTasks(NetValue, Subtask, Task)){
    	  BDNEW=BD+1;
    	  -taProcess::comBidDone(BD);
    	  +taProcess::comBidDone(BDNEW);
-	  //.print("!communicateDone:",BDNEW);
+	  //.my_name(Me);action.printFile(Me," | ","!communicateDone:",BDNEW);
    	  if(not taProcess::initialBid(Me)) {
 			+taProcess::initialBid(Me);
 			+taProcess::missingBid(Me,0);
@@ -1221,7 +1268,7 @@ if (taProcess::preAllocatedTasks(NetValue, Subtask, Task)){
 @pbidsss[atomic]
 +!updateMissingBid(A, ReceivedValue):.my_name(Me)
 <-
-//.print("!updateMissingBid:",A," - ", ReceivedValue);
+//.my_name(Me);action.printFile(Me," | ","!updateMissingBid:",A," - ", ReceivedValue);
 if(not (A==Me)){
 		?taProcess::missingBid(A,Value);
 		-taProcess::missingBid(A,XX);	
@@ -1239,27 +1286,27 @@ else{
 @pbidswes[atomic]
 +!checkReady:true
 <-
-////.print("!checkReady");
+////.my_name(Me);action.printFile(Me," | ","!checkReady");
 if (taProcess::communicateDone){
-//	//.print("existe taProcess::communicateDone");
+//	//.my_name(Me);action.printFile(Me," | ","existe taProcess::communicateDone");
 	if(not preprocessingBids(true)){
-	//	//.print("e not preprocessingBids(true)");
+	//	//.my_name(Me);action.printFile(Me," | ","e not preprocessingBids(true)");
 		if (not ((taProcess::notProcessedBid(XXA,NPB) & (NPB>0)) | taProcess::bidQueue(XNBidsNEW,XLBIDS,XA))){
-			////.print("vou comunicar bid done");
+			////.my_name(Me);action.printFile(Me," | ","vou comunicar bid done");
 			-taProcess::communicateDone;
 			!communicateDone;
-		} //else {//.print("nao posso comunicar bid done 1");}
-	} //else {//.print("nao posso comunicar bid done 2");}
+		} //else {//.my_name(Me);action.printFile(Me," | ","nao posso comunicar bid done 1");}
+	} //else {//.my_name(Me);action.printFile(Me," | ","nao posso comunicar bid done 2");}
 } 
 
 
 ?taDefinitions::agentsBid(NAgBid);
 .count(taProcess::missingBid(A,Value),NMissBid);
-////.print("NMissBid:",NMissBid);
+////.my_name(Me);action.printFile(Me," | ","NMissBid:",NMissBid);
 
 if(NAgBid>NMissBid)
 {
-//.print("!checkReady NAgBid>NMissBid");
+//.my_name(Me);action.printFile(Me," | ","!checkReady NAgBid>NMissBid");
 }
 else {
 	//.findall(notProcessedBid(AA,ANPB),taProcess::notProcessedBid(AA,ANPB),LNPB);
@@ -1271,29 +1318,29 @@ else {
 		taProcess::bidQueuePre(XNBidsNEW2,XLBIDS2,XA2) |
 		taProcess::bidQueuePro(XNBidsNEW3,XLBIDS3,XA3)  
 	){
-		//.print("!checkReady notProcessedBid > 0 | bidQueue | bidQueuePre | bidQueuePro");
+		//.my_name(Me);action.printFile(Me," | ","!checkReady notProcessedBid > 0 | bidQueue | bidQueuePre | bidQueuePro");
 	}
 	else {
 		if(taProcess::missingBid(A,Value) & (Value>0)){
-			////.print("taProcess::missingBid(A,Value) & (Value>0)");
+			////.my_name(Me);action.printFile(Me," | ","taProcess::missingBid(A,Value) & (Value>0)");
 			
 			.count(taProcess::missingBid(A,Value) & (Value>0),NLMBX);
 //			.findall(missingBid(A,Value),taProcess::missingBid(A,Value) & (Value>0),LMBX);
 //			.length(LMBX,NLMBX);
 			if(NLMBX>0){
-			//.print("!checkReady missingBid value > 0:",LMBX);
+			//.my_name(Me);action.printFile(Me," | ","!checkReady missingBid value > 0:",LMBX);
 			}
 		}
 		else {
 				if (taProcess::readyMe(false)){
-					//.print("!checkReady taProcess::readyMe(false)");
+					//.my_name(Me);action.printFile(Me," | ","!checkReady taProcess::readyMe(false)");
 			}
 			else{
 				if(preprocessingBids(true)){
-					//.print("!checkReady preprocessingBids(true)");
+					//.my_name(Me);action.printFile(Me," | ","!checkReady preprocessingBids(true)");
 				}
 				else {
-					//.print("TA process ready...");
+					//.my_name(Me);action.printFile(Me," | ","TA process ready...");
 					.print("TA process ready...");
 					!totalAllocated;
 					//!totalAllocatedFinal;
@@ -1311,7 +1358,7 @@ else {
 +!processbidDone(BDNEW,A): (taProcess::notProcessedBid(XA,NotP) & NotP>0) | (taProcess::bidQueue(XNBids,XLBIDS,XXA)) 
 | (taProcess::bidQueue(X2NBids,X2LBIDS,X2XA)) | (not taResults::allocationProcess(running))
 <-
-////.print("!processbidDone wait:",A," BD:",BDNEW);
+////.my_name(Me);action.printFile(Me," | ","!processbidDone wait:",A," BD:",BDNEW);
 .wait(200);
 !processbidDone(BDNEW,A);
 .
@@ -1320,8 +1367,8 @@ else {
 @pbidxz3[atomic]
 +!processbidDone(BDNEW,A): (not taProcess::notProcessedBid(XXA,XXX)) | (taProcess::notProcessedBid(XA,NotP) & NotP<=0) 
 <-
-////.print("!processbidDone");
-//.print("!processbidDone from:",A," BD:",BDNEW);
+////.my_name(Me);action.printFile(Me," | ","!processbidDone");
+//.my_name(Me);action.printFile(Me," | ","!processbidDone from:",A," BD:",BDNEW);
 
 if (taResults::allocationProcess(running)){
 	if(taProcess::missingBid(A,Value) & (Value>0)){
@@ -1345,7 +1392,7 @@ if (taResults::allocationProcess(running)){
 }
 else{ 
 	.findall(bid(done,XAX),taProcess::bid(done,XAX),LBD);
-	//.print("abolishing bid(done,_):",LBD);
+	//.my_name(Me);action.printFile(Me," | ","abolishing bid(done,_):",LBD);
 	.abolish(taProcess::bid(done,_)[source(A)]); 
 }
 .
@@ -1354,7 +1401,7 @@ else{
 //@pbidx2as//[atomic]
 //+taProcess::bid(done,BDNEW)[source(A)]:taProcess::allocating(false)
 //<-
-//////.print("Ignoring bid done");
+//////.my_name(Me);action.printFile(Me," | ","Ignoring bid done");
 //-taProcess::bid(done,BDNEW)[source(A)];
 //.
 
@@ -1362,14 +1409,14 @@ else{
 @pbidxz//[atomic]
 +taProcess::bid(done,BDNEW)[source(A)]:true
 <-
-////.print("+taProcess::bid(done,BDNEW) from:",A," BD:",BDNEW);
+////.my_name(Me);action.printFile(Me," | ","+taProcess::bid(done,BDNEW) from:",A," BD:",BDNEW);
 !processbidDone(BDNEW,A);
 .
 
 //@pbidxz//[atomic]
 //+taProcess::bid(done,BDNEW)[source(A)]:true
 //<-
-////.print("+taProcess::bid(done,BDNEW) 2");
+////.my_name(Me);action.printFile(Me," | ","+taProcess::bid(done,BDNEW) 2");
 //!processbidDone(BDNEW,A);
 //.
 
@@ -1386,80 +1433,124 @@ NBidsNEW=NBids+1;
 //@pbidx2ASF//[atomic]
 //+taProcess::bids(LBIDS)[source(A)]:taProcess::allocating(false)
 //<-
-//////.print("Ignoring bids");
+//////.my_name(Me);action.printFile(Me," | ","Ignoring bids");
 //-taProcess::bids(LBIDS)[source(A)];
 //.
 
-//@pbidx2s//[atomic]
-//+taProcess::bids(LBIDS)[source(A)]:job(JobId) & jobIdRun(JobId,no)
-//<-
-//.print("Not participating - Ignoring bids for jobId:",JobId);
-//.
+////@pbidx2s//[atomic]
++taProcess::bids(LBIDS)[source(A)]:job(JobId) & jobIdRun(JobId,no)
+<-
+//.my_name(Me);action.printFile(Me," | ","Not participating - Ignoring bids for jobId:",JobId," - Source:",A, " - ",LBIDS);
+X=0;
+.
 
 @pbidx2//[atomic]
 +taProcess::bids(LBIDS)[source(A)]:true //job(JobId) & jobIdRun(JobId,yes)
 <-
-////.print("+taProcess::bids(LBIDS)");
-!increaseBidsN;
-?taProcess::bidsN(NBids);
-+taProcess::bidQueuePre(NBids,LBIDS,A);
-////.print("BIDS RECEBIDOS - taProcess::NBids:",NBids," taProcess::bids:",LBIDS," SOURCE:",A);
-!!preProcessBids;
+////.my_name(Me);action.printFile(Me," | ","+taProcess::bids(LBIDS)");
+
+!addBidQueuePre(LBIDS,A);
+//!increaseBidsN;
+//?taProcess::bidsN(NBids);
+//+taProcess::bidQueuePre(NBids,LBIDS,A);
+////.my_name(Me);action.printFile(Me," | ","BIDS RECEBIDOS - taProcess::NBids:",NBids," taProcess::bids:",LBIDS," SOURCE:",A);
+
+//!printAuxNow;
+
+if ((not keepPreProcessingBids(true)) & (not preprocessingBids(true))){
+	+keepPreProcessingBids(true);
+	//.my_name(Me);action.printFile(Me," | ","+taProcess::bids chamando !!preprocessBids depois de receber bid de ",A);
+	!!preProcessBids;
+}
+else{//.my_name(Me);action.printFile(Me," | ","+taProcess::bids NAO VAI CHAMAR !!preprocessBids depois de receber bid de ",A);
+}
 .
 
 @paddnp[atomic]
 +!addNotProcessedBid(A):true
 <-
 if(not taProcess::notProcessedBid(A,XPMB)){
-	////.print("!adding new notProcessedBid:",A);
+	////.my_name(Me);action.printFile(Me," | ","!adding new notProcessedBid:",A);
 	+taProcess::notProcessedBid(A,0);
 }
 .
 
+@paddbqp[atomic]
++!addBidQueuePre(LBIDS,A):true
+<-
+!increaseBidsN;
+?taProcess::bidsN(NBids);
++taProcess::bidQueuePre(NBids,LBIDS,A);
+//.my_name(Me);action.printFile(Me," | ","BIDS RECEBIDOS - ADDED bidQueuePre: ",NBids," taProcess::bids:",LBIDS," SOURCE:",A);
+.
+
 
 @pbidx2n2//[atomic]
-+!preProcessBids: preprocessingBids(true) | not taProcess::taProcessStatus(STATUS)
++!preProcessBids: (not taProcess::taProcessStatus(STATUS)) & keepPreProcessingBids(true)
 <-
+//+keepPreProcessingBids(true);
 .wait(200);
+//.my_name(Me);action.printFile(Me," | ","wait chamando !!preprocessBids");
 !!preProcessBids;
 .
 
+//rever contexto
 @pbidx2cn//[atomic]
 +!preProcessBids: (not preprocessingBids(true)) & job(JobId) & jobIdRun(JobId,no)
 <-
+//.print("!!preprocessBids NO");
 +preprocessingBids(true);
-//.print("Not participating - Ignoring bids for jobId:",JobId);
+//.my_name(Me);action.printFile(Me," | ","Not participating - Ignoring bids for jobId:",JobId);
 .abolish(taProcess::bidQueuePre(_,_,_));
 -preprocessingBids(true);
 .
 
+
 @pbidx2Scn//[atomic]
 +!preProcessBids: (not preprocessingBids(true)) & job(JobId) & jobIdRun(JobId,yes) & taResults::allocationProcess(ready,JobId)
 <-
-//.print("Not preProcessed bid - received after close TA process for jobId::",JobId);
+//.print("!!preprocessBids abolish");
+//.my_name(Me);action.printFile(Me," | ","Not preProcessed bid - received after close TA process for jobId::",JobId);
 //.print("Not preProcessed bid - received after close TA process for jobId:",JobId);
 .abolish(taProcess::bidQueuePre(_,_,_));
 .
 
+//@pbidx2n//[atomic]
+//+!preProcessBids: (preprocessingBids(true)) & job(JobId) & jobIdRun(JobId,yes)
+//<-
+//.print("!!preprocessBids I'm preprocessing bids - do not calling !preprocessBids again...");
+////.my_name(Me);action.printFile(Me," | ","I'm preprocessing bids - do not calling !preprocessBids again...");
+//XQW=0;
+//.
 
 
-@pbidx2n//[atomic]
-+!preProcessBids: (not preprocessingBids(true)) & job(JobId) & jobIdRun(JobId,yes)
+//(taProcess::taProcessStatus(STATUS) & (STATUS==done)) & 
+//(not processingBids(true) | keepProcessingBids(true)) & 
+//(not taProcess::allocProcess(true)) & taProcess::bidLastProcessed(BIDLASTP) &
+//taProcess::bidQueuePro(BIDQUEUEc,LBIDSc,Ac)
+
+
+@pbidx2n23//[atomic]
++!preProcessBids: (keepPreProcessingBids(true) | not preprocessingBids(true)) & job(JobId) & jobIdRun(JobId,yes)
 <-
 +preprocessingBids(true);
+-keepPreProcessingBids(true);
+//.print("preprocessing bids....");
 !increaseBidLastPreProcessed;
+
 ?taProcess::bidLastPreProcessed(BIDLASTP);
+//.my_name(Me);action.printFile(Me," | ","?taProcess::bidLastPreProcessed(BIDLASTP):",BIDLASTP);
 ?taProcess::bidQueuePre(BIDLASTP,LBIDS,A);
-////.print("BIDS RECEBIDOS - !preProcessBids - BIDLASTP:",BIDLASTP," - ",LBIDS," SOURCE:",A);
+//.my_name(Me);action.printFile(Me," | ","BIDS RECEBIDOS - !preProcessBids - BIDLASTP:",BIDLASTP," - ",LBIDS," SOURCE:",A);
 
 if(not taProcess::missingBid(A,XMB)){
-	////.print("!adding new missingBid:",A);
+	////.my_name(Me);action.printFile(Me," | ","!adding new missingBid:",A);
 	+taProcess::missingBid(A,0);
 }
 
 !addNotProcessedBid(A);
 //if(not taProcess::notProcessedBid(A,XPMB)){
-//	////.print("!adding new notProcessedBid:",A);
+//	////.my_name(Me);action.printFile(Me," | ","!adding new notProcessedBid:",A);
 //	+taProcess::notProcessedBid(A,0);
 //}
 
@@ -1471,13 +1562,46 @@ if(not taProcess::missingBid(A,XMB)){
 
 
 if(not processingBids(true)){
-////.print("chamando !!processBids");
+////.my_name(Me);action.printFile(Me," | ","chamando !!processBids");
 //.print("preproc chamando !!processBids");
 !!processBids;	
 }
 
--preprocessingBids(true);
+//-preprocessingBids(true);
+
+/////////////////////////////////////////////////////////
+if (taProcess::bidQueuePre(BIDQUEUEX,LBIDSX,AX)){
+	////.my_name(Me);action.printFile(Me," | ","Entrou aqui...");
+	+taProcess::keepPreProcessingBids(true);
+	//.print("keepPreProcessingBids chamando !!preprocessBids");
+	!!preProcessBids;
+}
+else{
+	//.my_name(Me);action.printFile(Me," | ","retirar -processingBids(true) aqui");
+	-taProcess::preprocessingBids(true);
+}
+
 .
+
+//
+//@pbilixo//[atomic]
+//+!preProcessBids:true
+//<-
+//?taProcess::taProcessStatus(STATUS); 
+//.print("?taProcess::taProcessStatus(STATUS):",STATUS);
+//?taProcess::keepPreProcessingBids(TX);
+//.print("?taProcess::keepPreProcessingBids(TX):",TX);
+//?taProcess::preprocessingBids(TX2); 
+//.print("?taProcess::preprocessingBids(TX2):",TX2);
+//?taProcess::job(JobId);
+//.print("?taProcess::job(JobId):",JobId);
+//?taProcess::jobIdRun(JobId,XX);
+//.print("?taProcess::jobIdRun(JobId,XX):",JobId," - ",XX);
+//?taResults::allocationProcess(XX,JobId);
+//.print("?taResults::allocationProcess(XX,JobId):",XX," - ",JobId);
+//.wait(500000);
+//.
+
 
 @puPrePro[atomic]
 +!updateQueuePrePro(BIDLASTP,LBIDS,A):true
@@ -1494,13 +1618,14 @@ if(not processingBids(true)){
 BIDLASTP=BIDLASTP_OLD+1;
 -taProcess::bidLastPreProcessed(BIDLASTP_OLD);
 +taProcess::bidLastPreProcessed(BIDLASTP);
+//.my_name(Me);action.printFile(Me," | ","!increaseBidLastPreProcessed:",BIDLASTP);
 .
 
 @paddBidNs3[atomic]
 +!increaseNotProcessedBid(A):true
 <-
 //if(taProcess::notProcessedBid(A,XPMB)){
-	////.print("!increaseNotProcessedBid:",A);
+	////.my_name(Me);action.printFile(Me," | ","!increaseNotProcessedBid:",A);
 	?taProcess::notProcessedBid(A,XNPB);
 	XNPBNEW=XNPB+1;
 	-taProcess::notProcessedBid(A,_);
@@ -1508,7 +1633,7 @@ BIDLASTP=BIDLASTP_OLD+1;
 	//+taProcess::notProcessedBid(A,0);
 //}
 //else{
-//	//.print("!adding new notProcessedBid:",A);
+//	//.my_name(Me);action.printFile(Me," | ","!adding new notProcessedBid:",A);
 //	+taProcess::notProcessedBid(A,0);
 //}
 .
@@ -1516,7 +1641,7 @@ BIDLASTP=BIDLASTP_OLD+1;
 @paddBidNs3v2[atomic]
 +!decreaseNotProcessedBid(A):true
 <-
-////.print("!decreaseNotProcessedBid:",A);
+////.my_name(Me);action.printFile(Me," | ","!decreaseNotProcessedBid:",A);
 ?taProcess::notProcessedBid(A,XNPB);
 XNPBNEW=XNPB-1;
 -taProcess::notProcessedBid(A,_);
@@ -1536,7 +1661,7 @@ BIDLASTP=BIDLASTP_OLD+1;
 @pbidsListNt//[atomic]
 +!processBids:(not taProcess::taProcessStatus(STATUS)) | taProcess::allocProcess(true)
 <-
-////.print("waiting !processBids");
+////.my_name(Me);action.printFile(Me," | ","waiting !processBids");
 .wait(500);
 !!processBids;
 .
@@ -1544,7 +1669,7 @@ BIDLASTP=BIDLASTP_OLD+1;
 @pbidsListNtsd//[atomic]
 +!processBids: (taProcess::taProcessStatus(STATUS) & (STATUS==done)) & processingBids(true) & (not taProcess::keepProcessingBids(true)) 
 <-
-//.print("I'm processing bids - do not calling !processBids again...");
+//.my_name(Me);action.printFile(Me," | ","I'm processing bids - do not calling !processBids again...");
 XQW=0;
 .
 
@@ -1553,10 +1678,10 @@ XQW=0;
 +!setBidsToProcess:taProcess::bidLastProcessed(BIDLASTP)
 <-
 //.findall(taProcess::bidQueuePro(BIDQUEUE,LBIDS,A), taProcess::bidQueuePro(BIDQUEUE,LBIDS,A),LBIDSTOPROCx3);
-////.print(LBIDSTOPROCx3);
+////.my_name(Me);action.printFile(Me," | ",LBIDSTOPROCx3);
 //.findall(taProcess::bidQueuePro(BIDQUEUE,LBIDS,A), taProcess::bidQueuePro(BIDQUEUE,LBIDS,A) & (BIDQUEUE>BIDLASTP),LBIDSTOPROC);
 .findall(taProcess::bidQueuePro(BIDQUEUE,LBIDS,A), taProcess::bidQueuePro(BIDQUEUE,LBIDS,A),LBIDSTOPROC);
-////.print("LBIDSTOPROC:",LBIDSTOPROC);
+////.my_name(Me);action.printFile(Me," | ","LBIDSTOPROC:",LBIDSTOPROC);
 //precisa reverter se tiver q pegar os x primeiros
 for (.member(taProcess::bidQueuePro(BIDQUEUE,LBIDS,A),LBIDSTOPROC)) {
 	+taProcess::bidQueue(BIDQUEUE,LBIDS,A);
@@ -1565,9 +1690,9 @@ for (.member(taProcess::bidQueuePro(BIDQUEUE,LBIDS,A),LBIDSTOPROC)) {
 
 ////.wait(10000);
 //.findall(taProcess::bidQueuePro(BIDQUEUE2,LBIDS2,A2), taProcess::bidQueuePro(BIDQUEUE2,LBIDS2,A2) & (BIDQUEUE2>BIDLASTP),LBIDSTOPROCX2);
-////.print(LBIDSTOPROCX2);
+////.my_name(Me);action.printFile(Me," | ",LBIDSTOPROCX2);
 .findall(taProcess::bidQueue(BIDQUEUE3,LBIDS3,A3), taProcess::bidQueue(BIDQUEUE3,LBIDS3,A3),LBIDSTOPROCX);
-////.print("LBIDSTOPROCX:",LBIDSTOPROCX);
+////.my_name(Me);action.printFile(Me," | ","LBIDSTOPROCX:",LBIDSTOPROCX);
 ////.wait(15000);
 .
 
@@ -1586,24 +1711,24 @@ taProcess::bidQueuePro(BIDQUEUEc,LBIDSc,Ac) //& (BIDQUEUE==(BIDLASTP+1))
 <-
 +processingBids(true);
 -keepProcessingBids(true);
-//.print("starting !processBids");
+//.my_name(Me);action.printFile(Me," | ","starting !processBids");
 //.print("starting !processBids");
 
 !setBidsToProcess;
 
 .findall(taProcess::bidQueue(BIDQUEUEf,LBIDSf,Af), taProcess::bidQueue(BIDQUEUEf,LBIDSf,Af),LBIDSRUN);
-////.print("LBIDSRUN:",LBIDSRUN);
+////.my_name(Me);action.printFile(Me," | ","LBIDSRUN:",LBIDSRUN);
 .sort(LBIDSRUN,LBIDSRUN2);
-//.print("LBIDSRUN2:",LBIDSRUN2);
+//.my_name(Me);action.printFile(Me," | ","LBIDSRUN2:",LBIDSRUN2);
 .length(LBIDSRUN2,NLBIDSRUN2);
-//.print("length LBIDSRUN2:",NLBIDSRUN2);
+//.my_name(Me);action.printFile(Me," | ","length LBIDSRUN2:",NLBIDSRUN2);
 
 for (.member(taProcess::bidQueue(BIDQUEUE,LBIDS,A),LBIDSRUN2)) {
 !increaseBidLastProcessed;
 //?taProcess::bidLastProcessed(BIDLASTP);
 //?taProcess::bidQueue(BIDLASTP,LBIDS,A);
-////.print("BIDQUEUE:",BIDQUEUE);
-//.print("BIDS RECEBIDOS - !processBids: BIDQUEUE:",BIDQUEUE," - ",LBIDS," SOURCE:",A);
+////.my_name(Me);action.printFile(Me," | ","BIDQUEUE:",BIDQUEUE);
+//.my_name(Me);action.printFile(Me," | ","BIDS RECEBIDOS - !processBids: BIDQUEUE:",BIDQUEUE," - ",LBIDS," SOURCE:",A);
 
 -bidIgnorado(A,XX);
 +bidIgnorado(A,false);
@@ -1616,18 +1741,18 @@ if(not taProcess::initialBid(A)){
 }
 
 if(taProcess::subtask(Subtask,Task)){ //IF TASK CONHECIDA
-////.print("TASK CONHECIDA:",Subtask," - ",Task);
+////.my_name(Me);action.printFile(Me," | ","TASK CONHECIDA:",Subtask," - ",Task);
 
 ?taProcess::priceGlobal(Subtask,Task,PriceGlobal);
 
 if (VBid < PriceGlobal) {
-////.print("VBid < PriceGlobal");
+////.my_name(Me);action.printFile(Me," | ","VBid < PriceGlobal");
 -bidIgnorado(A,XX);
 +bidIgnorado(A,true);
 }
 
 if (VBid > PriceGlobal) {
- //	//.print("VBid > PriceGlobal");
+ //	//.my_name(Me);action.printFile(Me," | ","VBid > PriceGlobal");
  	if (taProcess::subtaskOwner(Subtask,Task,CurrentOwner)){
  	?taProcess::subtaskOwner(Subtask,Task,CurrentOwner);
  	!updateMissingBid(CurrentOwner,1);
@@ -1638,15 +1763,15 @@ if (VBid > PriceGlobal) {
 	!update_assign_info(Subtask, Task, VBid);	
 }
 if (VBid == PriceGlobal) {
-//	//.print("VBid == PriceGlobal");
+//	//.my_name(Me);action.printFile(Me," | ","VBid == PriceGlobal");
 	?taProcess::subtaskOwner(Subtask,Task,OName);
 	if (A < OName) {
-	////.print("A < OName");
+	////.my_name(Me);action.printFile(Me," | ","A < OName");
 	-bidIgnorado(A,XX);
 	+bidIgnorado(A,true);
 	}
 	if (A > OName) { 
-	////.print("A > OName");
+	////.my_name(Me);action.printFile(Me," | ","A > OName");
 	if (taProcess::subtaskOwner(Subtask,Task,CurrentOwnerX1)){
  	?taProcess::subtaskOwner(Subtask,Task,CurrentOwner);
  	!updateMissingBid(CurrentOwner,1);
@@ -1660,7 +1785,7 @@ if (VBid == PriceGlobal) {
 }//end IF TASK CONHECIDA
 else {
 	if(Subtask==done){ //IF DONE RECEIVED
-	//.print("!processbidDone from:",A," BD:",BDNEW, " for job: ",Task);
+	//.my_name(Me);action.printFile(Me," | ","!processbidDone from:",A," BD:",BDNEW, " for job: ",Task);
 	if (taResults::allocationProcess(running)){
 		if(taProcess::missingBid(A,Value) & (Value>0)){
 			+taProcess::doneBid(A);
@@ -1683,14 +1808,14 @@ else {
 	}
 	else{ 
 		//.findall(bid(done,XAX),taProcess::bid(done,XAX),LBD);
-		//.print("abolishing bid(done,_):",LBD);
+		//.my_name(Me);action.printFile(Me," | ","abolishing bid(done,_):",LBD);
 		.abolish(taProcess::bid(done,_)[source(A)]); 
 	}
 	}//end IF DONE RECEIVED
 
 else{ 
 	//else TASK NAO CONHECIDA
-	////.print("TASK NAO CONHECIDA:",Subtask," - ",Task);
+	////.my_name(Me);action.printFile(Me," | ","TASK NAO CONHECIDA:",Subtask," - ",Task);
 
 	if (not taProcess::priceGlobal(Subtask,Task,PriceGlobalx)){
 		?zero(ZERO);
@@ -1727,7 +1852,7 @@ if (VBid == PriceGlobal) {
 }
 }//end else TASK NAO CONHECIDA
 }//end ELSE - //IF DONE RECEIVED
-////.print("END1 BIDS RECEBIDOS - !processBids:",LBIDS," SOURCE:",A);
+////.my_name(Me);action.printFile(Me," | ","END1 BIDS RECEBIDOS - !processBids:",LBIDS," SOURCE:",A);
 }//end for BIDS
 
 if (taProcess::bidIgnorado(A,true)){
@@ -1741,45 +1866,45 @@ else{
 		
 	}	
 }
-////.print("removendo -taProcess::bidQueue(BIDQUEUE,LBIDS,A):",BIDQUEUE," - ",A);
+////.my_name(Me);action.printFile(Me," | ","removendo -taProcess::bidQueue(BIDQUEUE,LBIDS,A):",BIDQUEUE," - ",A);
 -taProcess::bidQueue(BIDQUEUE,LBIDS,A);
 
 !decreaseNotProcessedBid(A);
 
-//.print("END2 BIDS RECEBIDOS - !processBids:",LBIDS," SOURCE:",A);
+//.my_name(Me);action.printFile(Me," | ","END2 BIDS RECEBIDOS - !processBids:",LBIDS," SOURCE:",A);
 
 }//end for lista bids para processar
 
-////.print("END LISTA DE TODOS BIDS SELECIONADOS...");
+////.my_name(Me);action.printFile(Me," | ","END LISTA DE TODOS BIDS SELECIONADOS...");
 
 !checkRunAgain;
 
 .findall(taProcess::bidQueuePro(BIDQUEUE,LBIDS,A), taProcess::bidQueuePro(BIDQUEUE,LBIDS,A),LBIDSTOPROCXX);
-//.print("LBIDSTOPROCXX:",LBIDSTOPROCXX);
-//.print("FINAL processo bids disponívis - 1 vez");
-//.print("FINAL processo bids disponívis - 1 vez");
+//.my_name(Me);action.printFile(Me," | ","LBIDSTOPROCXX:",LBIDSTOPROCXX);
+//.my_name(Me);action.printFile(Me," | ","FINAL processo bids disponï¿½vis - 1 vez");
+//.print("FINAL processo bids disponï¿½vis - 1 vez");
 //.wait(15000);
 
 if(taProcess::runAllocateTasks(true)){
-	////.print("chamando !allocateTasks");
+	////.my_name(Me);action.printFile(Me," | ","chamando !allocateTasks");
 	+taProcess::allocProcess(true);
 	!!allocateTasks;
 }
 else
 { 
-  ////.print("chamando !checkready");
+  ////.my_name(Me);action.printFile(Me," | ","chamando !checkready");
   !checkReady; 
 }
 
 
 if (taProcess::bidQueuePro(BIDQUEUEX,LBIDSX,AX)){
-	////.print("Entrou aqui...");
+	////.my_name(Me);action.printFile(Me," | ","Entrou aqui...");
 	+taProcess::keepProcessingBids(true);
 	//.print("keepProcessingBids chamando !!processBids");
 	!!processBids;
 }
 else{
-	//.print("retirar -processingBids(true) aqui");
+	//.my_name(Me);action.printFile(Me," | ","retirar -processingBids(true) aqui");
 	-taProcess::processingBids(true);
 }
 
@@ -1787,16 +1912,16 @@ else{
 
 //-!processBids:(taProcess::taProcessStatus(STATUS) & (STATUS==done)) & not processingBids(true)
 //<-
-//	//.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//	//.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//	//.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//	//.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//	//.my_name(Me);action.printFile(Me," | ","$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//	//.my_name(Me);action.printFile(Me," | ","$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//	//.my_name(Me);action.printFile(Me," | ","$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//	//.my_name(Me);action.printFile(Me," | ","$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 //.findall(taProcess::priceGlobal(SB,T,PG),taProcess::priceGlobal(SB,T,PG),LPG);
 //print("-processBids:",LPG);
-//	//.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//	//.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//	//.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-//	//.print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//	//.my_name(Me);action.printFile(Me," | ","$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//	//.my_name(Me);action.printFile(Me," | ","$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//	//.my_name(Me);action.printFile(Me," | ","$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//	//.my_name(Me);action.printFile(Me," | ","$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 //	.wait(500000);
 //.
 
@@ -1810,10 +1935,10 @@ else{
 	+taProcess::subtaskOwner(Subtask,Task,Agent);	
 //.print("E !updatePriceGlobal_Owner");
 
-	////.print("Chamada:",Chamada," - Subtask:",Subtask," - Task:",Task," - VALUE:",ValueBid," - OWNER:",Agent);
+	////.my_name(Me);action.printFile(Me," | ","Chamada:",Chamada," - Subtask:",Subtask," - Task:",Task," - VALUE:",ValueBid," - OWNER:",Agent);
 //	.my_name(Me);
 //	if(A==Me){
-//		//.print("VALUE:",VBid," - OWNER:",A);
+//		//.my_name(Me);action.printFile(Me," | ","VALUE:",VBid," - OWNER:",A);
 //	}
 
 .	
@@ -1862,9 +1987,9 @@ if (taProcess::removedTask(true)){
 @pcFinalBel[atomic]
 +!cleanFinalBelieves:true
 <-  
-//.print("!cleanFinalBelieves");
-//.print("!cleanFinalBelieves");
-//.wait(5000);
+//.my_name(Me);action.printFile(Me," | ","!cleanFinalBelieves");
+.print("!cleanFinalBelieves");
+//.wait(5000000);
 //.abolish(taProcess::_);
 ?taProcess::job(JobId);
 
@@ -1908,6 +2033,12 @@ if (taProcess::removedTask(true)){
 .abolish(taProcess::subtaskReceived(_,_,_,_,_,_));
 .abolish(taProcess::subtaskReceivedOriginal(_,_,_,_,_,_));
 .abolish(taProcess::readyAgent(_,JobId));
+.abolish(taProcess::keepPreProcessingBids(_));
+.abolish(taProcess::preprocessingBids(_));
+.abolish(taProcess::bidQueue(_,_,_));
+.abolish(taProcess::bidQueuePre(_,_,_));
+.abolish(taProcess::bidQueuePro(_,_,_));
+
 -taProcess::teamReady(JobId);
 -taProcess::job(JobId);
 -+currentLoad(0);

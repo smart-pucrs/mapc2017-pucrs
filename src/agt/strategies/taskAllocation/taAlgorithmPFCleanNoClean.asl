@@ -1181,11 +1181,11 @@ if (taProcess::preAllocatedTasks(NetValue, Subtask, Task)){
 @p26ax2[atomic]
 +!communicateBids: .my_name(Me) & taProcess::communicationType(broadcast) 
    <-
-
+?taProcess::job(JobId);
    	  .findall(taProcess::bid(Subtask,Task,PriceGlobalNew),taProcess::toCommunicate(Subtask,Task,PriceGlobalNew),LBIDS);
-   	  .broadcast(tell, taProcess::bids(LBIDS));
+   	  .broadcast(tell, taProcess::bids(JobId,LBIDS));
    	  .abolish(taProcess::toCommunicate(_,_,_));
-.my_name(Me);action.printFile(Me," | ","!communicateBids:", LBIDS);
+.my_name(Me);action.printFile(Me," | ","!communicateBids for :",JobId, " - ", LBIDS);
    	  if(not taProcess::initialBid(Me)) {
 			+taProcess::initialBid(Me);
 			+taProcess::missingBid(Me,0);
@@ -1196,9 +1196,10 @@ if (taProcess::preAllocatedTasks(NetValue, Subtask, Task)){
 @p26cccxa2[atomic]
 +!communicateBids: .my_name(Me) & taProcess::communicationType(coalition) 
    <-
+?taProcess::job(JobId);
    	  .findall(taProcess::bid(Subtask,Task,PriceGlobalNew),taProcess::toCommunicate(Subtask,Task,PriceGlobalNew),LBIDS);
    	  ?taProcess::agentList(AgentList);
-	  .send(AgentList, tell, taProcess::bids(LBIDS));
+	  .send(AgentList, tell, taProcess::bids(JobId,LBIDS));
   	  .abolish(taProcess::toCommunicate(_,_,_));
    	  
    	  if(not taProcess::initialBid(Me)) {
@@ -1211,8 +1212,7 @@ if (taProcess::preAllocatedTasks(NetValue, Subtask, Task)){
 @p26aqx[atomic]
 +!communicateDone: .my_name(Me) & taProcess::communicationType(broadcast) 
    <-
-
-   	  ?taProcess::comBidDone(BD);
+	?taProcess::comBidDone(BD);
    	  BDNEW=BD+1;
    	  -taProcess::comBidDone(BD);
    	  +taProcess::comBidDone(BDNEW);
@@ -1229,8 +1229,9 @@ if (taProcess::preAllocatedTasks(NetValue, Subtask, Task)){
 //   	  .broadcast(tell, taProcess::bid(done,BDNEW));
 		  //.broadcast(tell, taProcess::bids(done));
 		  //.findall(taProcess::bid(Subtask,Task,PriceGlobalNew),taProcess::toCommunicate(Subtask,Task,PriceGlobalNew),LBIDS);
-   	  .broadcast(tell, taProcess::bids([taProcess::bid(done,JobId,BDNEW)]));
+   	  .broadcast(tell, taProcess::bids(JobId,[taProcess::bid(done,JobId,BDNEW)]));
 .
+
 
 @p26aqxas[atomic]
 +!communicateDone: .my_name(Me) & taProcess::communicationType(coalition) 
@@ -1246,10 +1247,10 @@ if (taProcess::preAllocatedTasks(NetValue, Subtask, Task)){
 	  }
 	  
    	  !updateMissingBid(Me,-1);
-   	  
+	   ?taProcess::job(JobId);   	  
    	  ?taProcess::agentList(AgentList);
    	  .time(HH,NN,SS);
-   	  .send(AgentList, tell, taProcess::bid(done,BDNEW));
+   	  .send(AgentList, tell, taProcess::bids(JobId,[taProcess::bid(done,JobId,BDNEW)]));
 .
 
 
@@ -1341,6 +1342,8 @@ else {
 				else {
 					.my_name(Me);action.printFile(Me," | ","TA process ready...");
 					.print("TA process ready...");
+					?taProcess::job(JobId);
+					+taProcess::jobInternalReady(JobId);
 					!totalAllocated;
 					//!totalAllocatedFinal;
 				}
@@ -1437,19 +1440,25 @@ NBidsNEW=NBids+1;
 //.
 
 ////@pbidx2s//[atomic]
-+taProcess::bids(LBIDS)[source(A)]:job(JobId) & jobIdRun(JobId,no)
++taProcess::bids(JobIdRec,LBIDS)[source(A)]:job(JobIdRec) & jobIdRun(JobIdRec,no)
 <-
-.my_name(Me);action.printFile(Me," | ","Not participating - Ignoring bids for jobId:",JobId," - Source:",A, " - ",LBIDS);
+.my_name(Me);action.printFile(Me," | ","Not participating - Ignoring bids for JobIdRec:",JobIdRec," - Source:",A, " - ",LBIDS);
 .
 
++taProcess::bids(JobIdRec,LBIDS)[source(A)]:job(JobIdRec) & taProcess::jobInternalReady(JobIdRec)
+<-
+.my_name(Me);action.printFile(Me," | ","Job completed - Ignoring bids for JobIdRec:",JobIdRec," - Source:",A, " - ",LBIDS);
+.
+
+
 @pbidx2//[atomic]
-+taProcess::bids(LBIDS)[source(A)]:true //job(JobId) & jobIdRun(JobId,yes)
++taProcess::bids(JobIdRec,LBIDS)[source(A)]:true //job(JobId) & jobIdRun(JobId,yes)
 <-
 
 .my_name(Me);action.printFile(Me," | ","+taProcess::bids(LBIDS)");
 
 //if ((not taProcess::firstReadyTA)){ //se nao está recebendo bid depois de processo em fase de fechamento
-!addBidQueuePre(LBIDS,A);
+!addBidQueuePre(JobIdRec,LBIDS,A);
 //!increaseBidsN;
 //?taProcess::bidsN(NBids);
 //+taProcess::bidQueuePre(NBids,LBIDS,A);
@@ -1479,12 +1488,12 @@ if(not taProcess::notProcessedBid(A,XPMB)){
 .
 
 @paddbqp[atomic]
-+!addBidQueuePre(LBIDS,A):true
++!addBidQueuePre(JobIdRec,LBIDS,A):true
 <-
 !increaseBidsN;
 ?taProcess::bidsN(NBids);
 +taProcess::bidQueuePre(NBids,LBIDS,A);
-.my_name(Me);action.printFile(Me," | ","BIDS RECEBIDOS - ADDED bidQueuePre: ",NBids," taProcess::bids:",LBIDS," SOURCE:",A);
+.my_name(Me);action.printFile(Me," | ","BIDS RECEBIDOS - ADDED bidQueuePre : ",NBids," for ",JobIdRec," taProcess::bids:",LBIDS," SOURCE:",A);
 .
 
 
@@ -1525,12 +1534,6 @@ if(not taProcess::notProcessedBid(A,XPMB)){
 //.my_name(Me);action.printFile(Me," | ","I'm preprocessing bids - do not calling !preprocessBids again...");
 //XQW=0;
 //.
-
-
-//(taProcess::taProcessStatus(STATUS) & (STATUS==done)) & 
-//(not processingBids(true) | keepProcessingBids(true)) & 
-//(not taProcess::allocProcess(true)) & taProcess::bidLastProcessed(BIDLASTP) &
-//taProcess::bidQueuePro(BIDQUEUEc,LBIDSc,Ac)
 
 
 @pbidx2n23//[atomic]

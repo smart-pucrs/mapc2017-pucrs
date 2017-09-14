@@ -3,6 +3,7 @@
 //{include("XXtaAlgorithmClean.asl",algorithm)}
 //{include("taAlgorithmPF.asl",algorithm)}
 
+
 {begin namespace(localTask, local) }
 
 //findTools([],Temp, Result) :- Result = Temp.

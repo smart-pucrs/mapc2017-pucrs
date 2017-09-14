@@ -68,8 +68,32 @@
 				-strategies::buyList(ItemId,Qty2,ShopOld);
 				?default::find_shop_qty(item(ItemId, Qty+Qty2),SList,BuyL,99999,RouteShopL,99999,"",ShopNew,99999);
 				+strategies::buyList(ItemId,Qty+Qty2,ShopNew);
+				addBuyCoordination(Shop,ItemId,Qty);
 			}
-			else { +strategies::buyList(ItemId,Qty,Shop); }
+			else { +strategies::buyList(ItemId,Qty,Shop); addBuyCoordination(Shop,ItemId,Qty); }
+			
+		}
+	}
+	for ( strategies::buyList(ItemIdAux,QtyAux,ShopAux) ) {
+		.term2string(ShopAux,ShopAuxS);
+		?default::buy_coordination(ShopAuxS,ListS);
+		?default::convertListString2Term(ListS,[],List);
+		if (.member(item(ItemIdAux,QtyAux2),List)) {
+			?default::shop(ShopAux, _, _, Restock, ListItems);
+			.member(item(ItemIdAux,_,QtyShop,_,_,_),ListItems);
+			if ((QtyAux+QtyAux2)-QtyShop > 6 - Restock) {
+				?default::find_shops(ItemIdAux,SList,ShopsAux);
+				if (not .length(ShopsAux,1)) {
+					.delete(ShopAux,ShopsAux,ShopsAlt);
+					actions.closest(Role,ShopsAlt,FacAux);
+					removeBuyCoordination(ShopAux,ItemIdAux,QtyAux);
+					-strategies::buyList(ItemIdAux,QtyAux,ShopAux);
+					+strategies::buyList(ItemIdAux,QtyAux,FacAux);
+					addBuyCoordination(FacAux,ItemIdAux,QtyAux);
+//					.print(ShopAux," >>>>>>>>>>",ItemIdAux,">>>>>>>>>> ",QtyAux+QtyAux2," < ",QtyShop);
+//					.print(">>> Alternatives: ",ShopsAlt);
+				}
+			}
 		}
 	}
 //	for ( strategies::buyList(ItemId1,Qty1,Shop1) ) { .print("Buy list for #",Qty1," of ",ItemId1," in ",Shop1); }

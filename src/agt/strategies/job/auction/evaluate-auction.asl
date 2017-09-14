@@ -60,13 +60,16 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	+::futurePlans(further_analysis(AuctionId),StartTime);
 	.
 
+@further[atomic]
 +!further_analysis(Id)
+	: not initiator::cnp(_)
 <- 
 	+action::hold_action(Id);
 	!strategies::not_free;	
 	+::hasSetFree;
 	!check_further_analysis(Id);
 	.
++!further_analysis(Id).	
 +!check_further_analysis(Id)	
 	: action::action(S) & default::step(S) & metrics::missBidAuction(M)
 <-	
@@ -94,7 +97,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	: (not default::winner(_,_) | strategies::waiting) & ::hasSetFree 
 <-
 	-::hasSetFree;
-	!strategies::free;
+	!!strategies::free;
 	.
 +!has_set_to_free
 	: ::hasSetFree 

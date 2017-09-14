@@ -36,7 +36,7 @@ public class closest extends DefaultInternalAction {
 				String to = term.toString();
 //				Route route = MapHelper.getNewRoute(from, to, type);
 				Route route = MapHelper.getInstance().getNewRoute(from, to, type);
-				if(route.getRouteLength() < len){
+				if(route != null && route.getRouteLength() < len){
 					closest = to;
 					len = route.getRouteLength();
 				}
@@ -53,7 +53,7 @@ public class closest extends DefaultInternalAction {
 				String to = term.toString();
 //				Route route = MapHelper.getNewRoute(from, to, type);
 				Route route = MapHelper.getInstance().getNewRoute(from, to, type);
-				if(route.getRouteLength() < len){
+				if(route != null && route.getRouteLength() < len){
 					closest = to;
 					len = route.getRouteLength();
 				}
@@ -71,7 +71,7 @@ public class closest extends DefaultInternalAction {
 				String to = term.toString();
 //				Route route = MapHelper.getNewRoute(from, to, type);
 				Route route = MapHelper.getInstance().getNewRoute(from, to, type);
-				if(route.getRouteLength() < len){
+				if(route != null && route.getRouteLength() < len){
 					closest = to;
 					len = route.getRouteLength();
 				}

@@ -4,7 +4,6 @@
 	: true
 <-
 	+initiator::completed_jobs(0); // debugging
-	+initiator::countCenter(0);
 	+initiator::free_agents([]);
 	+initiator::free_trucks([]);
 	
@@ -21,8 +20,7 @@
 	+metrics::failedEvalJobs(0);
 	+metrics::noBids(0);
 	+metrics::missBidAuction(0);
-	. 
-+!add_initiator_beliefs.
+	.
 
 {end}
 
@@ -52,6 +50,7 @@
 	+default::removeDuplicateTool([],[]);
 	
 	if (Me == vehicle1) { !lNewRound::add_initiator_beliefs; }
+	setReady;
 	.
 
 @shopListQty[atomic]
@@ -60,6 +59,7 @@
 <-
 //	.print("Adding Shop: ",ShopId," Lat: ",Lat," Lon: ",Lon," Restock: ",Restock," Items: ",Items);
 //	-+shopList([shop(ShopId,Items)|List]);
+	createBuyCoordinationList(ShopId);
 	for (.member(item(ItemId,Price,Qty,_,_,_),Items)) {
 		addShopItem(item(ShopId,ItemId),Qty,ItemId,Price);
 	}
@@ -87,10 +87,6 @@
 <-
 	-+storageList([StorageId|List]);
 	.
-//+default::storage(StorageId, _, _, TotCap, UsedCap, Items)
-//	: .my_name(vehicle1)
-//<-
-//	.print("ZZZZZZZZZZZZZZZ Items in storage: ",Items).
 
 @chargingList[atomic]
 +default::chargingStation(ChargingId,Lat,Lon,Rate) 
@@ -108,7 +104,7 @@
 
 @dumpList[atomic]
 +default::dump(DumpId,Lat,Lon) 
-	:  dumpList(List) & not .member(DumpId,List) 
+	:  dumpList(List) & not .member(DumpId,List)
 <- 
 	-+dumpList([DumpId|List]);
 	.

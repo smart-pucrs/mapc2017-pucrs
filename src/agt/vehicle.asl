@@ -50,14 +50,23 @@
 	.wait( default::actionID(S) );
 	if ( .member(Me,Agents) ) { .broadcast(tell,tools(Role,Tools)); }
 	.wait(500);
+//	!action::recharge_is_new_skip;
+	if ( Me == vehicle1 ) {
+		?default::map(Map);
+		?default::cellSize(CellSize);
+		?default::proximity(Proximity);
+		initMap(Map,CellSize,Proximity);
+	}
 	!action::recharge_is_new_skip;
+	if ( Me \== vehicle1 ) { setMap; }
 	!action::recharge_is_new_skip;
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
 	if ( Me == vehicle1 ) {
 		saveDuplicateLoad;
 		!initiator::add_myself_to_free;
-		?initiator::mapCenter(CLat,CLon);
+		?default::centerLat(CLat);
+		?default::centerLon(CLon);
 		?new::shopList(SList);
 		actions.farthest(Role,CLat,CLon,SList,FarthestShop);
 		actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop);

@@ -2,21 +2,8 @@
 
 task_id(0).
 
-@minLon[atomic]
-+default::minLon(Lon) : X = Lon + 0.001 & countCenter(I) <- -minLon(Lon); +minLonReal(X); -+countCenter(I+1).
-@maxLon[atomic]
-+default::maxLon(Lon) : X = Lon - 0.00001 & countCenter(I) <- -maxLon(Lon); +maxLonReal(X); -+countCenter(I+1).
-@minLat[atomic]
-+default::minLat(Lat) : X = Lat + 0.001 & countCenter(I)  <- -minLat(Lat); +minLatReal(X); -+countCenter(I+1).
-@maxLat[atomic]
-+default::maxLat(Lat) : X = Lat - 0.00001 & countCenter(I)  <- -maxLat(Lat); +maxLatReal(X); -+countCenter(I+1).
-
-+countCenter(4)
-	: minLonReal(MinLon) & maxLonReal(MaxLon) & minLatReal(MinLat) & maxLatReal(MaxLat)
-<- 
-	-countCenter(4);
-	+mapCenter(math.ceil(((MinLat+MaxLat)/2) * 100000) / 100000,math.ceil(((MinLon+MaxLon)/2) * 100000) / 100000);
-	.
+//debug
+//+default::buy_coordination(ShopId,List) <- .print(ShopId," : ",List).
 
 +default::job(_, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
 @job[atomic]
@@ -150,18 +137,20 @@ task_id(0).
 		!!announce(item(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	.
-+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
-	: not cnp(Id) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) & NumberOfTrucks > 0 & NumberOfAgents >= 2
-<-
-	.wait(500);
-	!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
-	.
+//+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
+//	: not cnp(Id) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) & NumberOfTrucks > 0 & NumberOfAgents >= 2
+//<-
+//	.wait(500);
+//	!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+//	.
 +!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items) 
 <- 	
-	-action::hold_action(Id); 
+	-action::hold_action(Id);
+	if (initiator::mission(JobId, _, _, _, _, _)) { -eval(JobId); }
 	!update_free;
 	!evaluation_auction::has_set_to_free;
 	.print(Id," is no longer viable");
+	
 	.
 
 +!announce(Task,Deadline,NumberOfAgents,JobId,TaskId,FreeAgents,FreeTrucks)
@@ -233,20 +222,22 @@ task_id(0).
 					?default::item(ItemId,Volume,_,_);
 			    	addLoad(Agent,Load-Volume);
 		//	    	.print("Awarding ",ItemId," to ",Agent," at",Shop);
+					if (Distance > 10) { NewTaskCount =  1 }
+				    else { NewTaskCount = 0 }
 					if (awarded_assemble(Agent,Items,StorageId,AssTaskList,JobId,AssTaskCount)) {
 				    	-awarded_assemble(Agent,Items,StorageId,AssTaskList,JobId,AssTaskCount);
 				    	.concat(AssTaskList,[tool(ItemId)],NewAssTaskList);
-				    	+awarded_assemble(Agent,Items,StorageId,NewAssTaskList,JobId,AssTaskCount+1);
+				    	+awarded_assemble(Agent,Items,StorageId,NewAssTaskList,JobId,AssTaskCount+NewTaskCount);
 					}
 					else {
 						if (not initiator::awarded(Agent,_,_,_,_)) {
-							+awarded(Agent,Shop,[tool(ItemId)],JobId,1);
+							+awarded(Agent,Shop,[tool(ItemId)],JobId,NewTaskCount);
 						}
 						else {
 							?awarded(Agent,_,List,JobId,TaskCount);
 				    		-awarded(Agent,_,List,JobId,TaskCount);
 				    		.concat(List,[tool(ItemId)],NewList);
-				    		+awarded(Agent,Shop,NewList,JobId,TaskCount+1);
+				    		+awarded(Agent,Shop,NewList,JobId,TaskCount+NewTaskCount);
 						}
 					}
 				}
@@ -262,20 +253,22 @@ task_id(0).
 					?default::item(ItemId,Volume,_,_);
 			    	addLoad(Agent,Load-Volume*Qty);
 		//	    	.print("Awarding #",Qty," of ",ItemId," to ",Agent," at",Shop);
+					if (Distance > 10) { NewTaskCount =  1 }
+				    else { NewTaskCount = 0 }
 					if (awarded_assemble(Agent,Items,StorageId,AssTaskList,JobId,AssTaskCount)) {
 				    	-awarded_assemble(Agent,Items,StorageId,AssTaskList,JobId,AssTaskCount);
 				    	.concat(AssTaskList,[item(ItemId,Qty)],NewAssTaskList);
-				    	+awarded_assemble(Agent,Items,StorageId,NewAssTaskList,JobId,AssTaskCount+1);
+				    	+awarded_assemble(Agent,Items,StorageId,NewAssTaskList,JobId,AssTaskCount+NewTaskCount);
 					}
 					else {
 						if (not initiator::awarded(Agent,_,_,_,_)) {
-							+awarded(Agent,Shop,[item(ItemId,Qty)],JobId,1);
+							+awarded(Agent,Shop,[item(ItemId,Qty)],JobId,NewTaskCount);
 						}
 						else {
 							?awarded(Agent,_,List,JobId,TaskCount);
 				    		-awarded(Agent,_,List,JobId,TaskCount);
 				    		.concat(List,[item(ItemId,Qty)],NewList);
-				    		+awarded(Agent,Shop,NewList,JobId,TaskCount+1);
+				    		+awarded(Agent,Shop,NewList,JobId,TaskCount+NewTaskCount);
 						}
 					}
 				}

@@ -57,6 +57,7 @@
 			for ( strategies::buyList(ItemId,Qty,Fac) ) {
 				!action::buy(ItemId,Qty);
 	//			.print("Buying #",Qty," of ",ItemId);
+				removeBuyCoordination(Fac,ItemId,Qty);
 				-strategies::buyList(ItemId,Qty,Fac);
 			}
 		}
@@ -160,7 +161,6 @@
 +!job_failed
 	: default::role(Role, _, _, _, _) & .my_name(Me)
 <-
-	?default::step(S);
 	if (action::action(S)) {
 		.wait( default::actionID(S2) & S2 \== S );
 	}

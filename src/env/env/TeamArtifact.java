@@ -20,6 +20,7 @@ public class TeamArtifact extends Artifact {
 	private static Map<String, Integer> loads = new HashMap<String, Integer>();
 	private static Map<String, Integer> duplicateLoads = new HashMap<String, Integer>();
 	private Map<String, ArrayList<String>> availableItems = new HashMap<String,ArrayList<String>>();
+	private Map<String, ArrayList<String>> buyCoordination = new HashMap<String,ArrayList<String>>();
 	
 	void init(){
 		logger.info("Team Artifact has been created!");
@@ -29,6 +30,12 @@ public class TeamArtifact extends Artifact {
 		availableItems.put(storage, new ArrayList<String>());
 		String[] itemsAux = availableItems.get(storage).toArray(new String[availableItems.get(storage).size()]);
 		this.defineObsProperty("available_items", storage, itemsAux);
+	}
+	
+	@OPERATION void createBuyCoordinationList(String shop){
+		buyCoordination.put(shop, new ArrayList<String>());
+		String[] itemsAux = buyCoordination.get(shop).toArray(new String[buyCoordination.get(shop).size()]);
+		this.defineObsProperty("buy_coordination", shop, itemsAux);
 	}
 	
 	@OPERATION void addAvailableItem(String storage, String item, int qty){
@@ -52,7 +59,7 @@ public class TeamArtifact extends Artifact {
 	@OPERATION void removeAvailableItem(String storage, String item, int qty, OpFeedbackParam<String> res){
 		int remove = -1;
 		String result = "false";
-		if (availableItems.get(storage).toString().contains(item)) {
+		if (availableItems.get(storage) != null && availableItems.get(storage).toString().contains(item)) {
 			for (String s: availableItems.get(storage)) {
 				if (s.contains(item)) {
 					int ind = availableItems.get(storage).indexOf(s);
@@ -71,6 +78,45 @@ public class TeamArtifact extends Artifact {
 			this.defineObsProperty("available_items", storage, itemsAux);
 		}
 		res.set(result);
+	}
+	
+	@OPERATION void addBuyCoordination(String shop, String item, int qty){
+		if (buyCoordination.get(shop).toString().contains(item)) {
+			for (String s: buyCoordination.get(shop)) {
+				if (s.contains(item)) {
+					int ind = buyCoordination.get(shop).indexOf(s);
+					int newqty = qty + Integer.parseInt(""+s.subSequence(s.indexOf(",")+1, s.length()-1));
+					buyCoordination.get(shop).set(ind,"item("+item+","+newqty+")");
+//					logger.info("@@@@@ List "+availableItems.get(storage)+" already contains "+item+" index "+availableItems.get(storage).indexOf(s));
+				}
+			}
+		}
+		else { buyCoordination.get(shop).add("item("+item+","+qty+")"); }
+		String[] itemsAux = buyCoordination.get(shop).toArray(new String[buyCoordination.get(shop).size()]);
+//		logger.info("@@@@@@@@@ Adding available item "+item+" to storage "+storage+". Result = "+Arrays.toString(itemsAux)+". Size = "+availableItems.get(storage).size());
+		this.removeObsPropertyByTemplate("buy_coordination", shop, null);
+		this.defineObsProperty("buy_coordination", shop, itemsAux);
+	}
+	
+	@OPERATION void removeBuyCoordination(String shop, String item, int qty){
+		int remove = -1;
+		if (buyCoordination.get(shop) != null && buyCoordination.get(shop).toString().contains(item)) {
+			for (String s: buyCoordination.get(shop)) {
+				if (s.contains(item)) {
+					int ind = buyCoordination.get(shop).indexOf(s);
+					int newqty = Integer.parseInt(""+s.subSequence(s.indexOf(",")+1, s.length()-1)) - qty;
+					if (newqty != 0) { buyCoordination.get(shop).set(ind,"item("+item+","+newqty+")"); }
+					else { remove = ind; }
+//					logger.info("@@@@@ List "+availableItems.get(storage)+" already contains "+item+" index "+availableItems.get(storage).indexOf(s));
+				}
+			}
+			if (remove != -1) { 
+				buyCoordination.get(shop).remove(remove);
+				String[] itemsAux = buyCoordination.get(shop).toArray(new String[buyCoordination.get(shop).size()]);
+				this.removeObsPropertyByTemplate("buy_coordination", shop, null);
+				this.defineObsProperty("buy_coordination", shop, itemsAux);
+			}
+		}
 	}
 	
 	@OPERATION void addServerName(String agent, String agentServer){
@@ -155,6 +201,7 @@ public class TeamArtifact extends Artifact {
 		agentNames.clear();
 		loads.clear();
 		availableItems.clear();
+		buyCoordination.clear();
 		this.init();
 	}
 	

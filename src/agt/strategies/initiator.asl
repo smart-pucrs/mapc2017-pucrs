@@ -342,6 +342,10 @@ task_id(0).
 			if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
 			if (default::winner(_,assist(_,_,JobId))) {
 				.drop_desire(action::commitAction(_));
+				?default::actionID(Step);
+				if (action::action(Step)) {
+					.wait( default::actionID(S2) & S2 \== S );
+				}
 			}
 			resetLoads;
 			-cnp(JobId);

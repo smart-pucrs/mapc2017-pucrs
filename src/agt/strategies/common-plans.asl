@@ -29,6 +29,7 @@
 <-
 	
 	!action::deliver_job(JobId);
+	?default::lastActionResult(Result);.print("Result: ",Result);
 //	?default::lastActionResult(Result);
 //	if ( not default::lastActionResult(failed_job_status) ) {
 //		+strategies::jobDone(JobId);
@@ -38,7 +39,7 @@
 	if ( default::hasItem(_,_) ) { !go_dump; }
 	!strategies::check_charge;
 	.send(vehicle1,achieve,initiator::add_truck_to_free);
-	-default::workingJob;
+	-default::workingJob;	
 	!!strategies::free;
 	.
 

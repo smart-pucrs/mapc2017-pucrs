@@ -8,13 +8,14 @@ task_id(0).
 +default::job(_, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.
 @job[atomic]
 +default::job(Id, Storage, Reward, Start, End, Items)
-	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
+	: default::check_bases(Items,Result) & Result == "false" & initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks) & not .length(FreeTrucks,0) & .length(FreeAgents,FreeAgentsN) & FreeAgentsN >= 2
 <- 
 	+action::hold_action(Id);
 	.print("New job ",Id," deliver to ",Storage," for ",Reward," starting at ",Start," to ",End);
 	.print("Items required: ",Items);
 	!evaluate_job(Items, End, Storage, Id, Reward);
 	.
++default::job(Id, Storage, Reward, Start, End, Items) : default::check_bases(Items,Result) & Result == "true".
 +default::job(Id, Storage, Reward, Start, End, Items) <- .print("Ignoring job ",Id); !update_free; .
 
 +default::auction(_, _, _, _, _, _, _, _, _) : not initiator::accept_jobs <- !update_free;.

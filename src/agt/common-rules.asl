@@ -115,3 +115,8 @@ concat_bases([item(ItemId,Qty)|ListItems],Aux,ListItemsConcat) :- not .member(it
 
 deleteall(ItemId,ListItems,ListItemsNew) :- .member(item(ItemId,_),ListItems) & .delete(item(ItemId,_),ListItems,ListItemsNewAux) & deleteall(ItemId,ListItemsNewAux,ListItemsNew).
 deleteall(ItemId,ListItems,ListItemsNew) :- not .member(item(ItemId,_),ListItems) & ListItemsNew = ListItems.
+
+check_bases([],Result) :- Result = "false".
+check_bases([required(ItemId,Qty)|Items],Result) :- default::item(ItemId,_,_,parts(Parts)) & Parts \== [] & check_bases(Items,Result).
+check_bases([required(ItemId,Qty)|Items],Result) :- default::item(ItemId,_,_,parts(Parts)) & Parts == [] & Result = "true".
+

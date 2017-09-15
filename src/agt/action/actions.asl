@@ -1,10 +1,15 @@
-{begin namespace(localActions, local)}
+	//{begin namespace(action, local)}
 
 +!commitAction(Action)
 	: default::actionID(S) & not action::action(S) & not action::hold_action(_)
 <-
 	+action::action(S);
 //	.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+//if (.substring("deliver",Action)) {
+//			.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
+////.wait(50000000);
+//}
+
 	if ( Action \== recharge & Action \== continue) {
 		.print("Doing action ",Action, " at step ",S," . Waiting for step ",S+1);
 	}
@@ -12,7 +17,9 @@
 	.wait( default::actionID(S2) & S2 \== S );
 //	.print("Got out of wait from step ",S);
 	?default::lastActionResult(Result);
-//	.print("Last action result was: ",Result);
+if ( Action \== recharge & Action \== continue) {
+	.print("Last action result was: ",Result);
+	}
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
 		
@@ -24,7 +31,7 @@
 		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId, _))) { +strategies::jobDone(JobId); }
 		if (action::next_action(Action2)) {
 			-action::next_action(Action2);
-//			.print("Removing held action ",Action2);
+			.print("Removing next action ",Action2);
 		}
 		else { 
 			if (strategies::free) { !!action::recharge_is_new_skip; }
@@ -34,23 +41,23 @@
 +!commitAction(Action) 
 	: action::hold_action(_)
 <- 
-//	.print("Holding action ",Action);
-	.wait(500);
-//	.print("Trying action ",Action," again now.");
+	.print("Holding action ",Action);
+	.wait(50);
+	.print("Trying action ",Action," again now.");
 	!commitAction(Action);
 	.
 +!commitAction(Action) : Action == recharge.
 +!commitAction(Action) 
-	: Action \== recharge & metrics::next_actions(C) & not action::next_action(_) 
+	: Action \== recharge & metrics::next_actions(C) & not action::next_action(_)
 <- 
 	+action::next_action(Action); 
 	-+metrics::next_actions(C+1); 
-//	.print("Holding next action ",Action); 
+	.print("Next action ",Action); 
 	.wait( {-action::next_action(Action) }); 
 	!commitAction(Action);
 .
 //+!commitAction(Action) <- .print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NO ",Action).
-{end}
+//{end}
 
 // Goto (option 1)
 // FacilityId must be a string
@@ -72,15 +79,15 @@
 : not .desire(action::go_charge(_)) & new::chargingList(List) & default::closest_facility(List, FacilityId, FacilityId2) & default::enough_battery(FacilityId, FacilityId2, Result)
 <-	
     if (Result == "false") { !go_charge(FacilityId); }
-    else { !localActions::commitAction(goto(FacilityId)); }
+    else { !action::commitAction(goto(FacilityId)); }
 	!goto(FacilityId);
 	.
-+!goto(FacilityId)
-	: true
-<-	
-	!localActions::commitAction(goto(FacilityId));
-	!goto(FacilityId);
-	.
+//+!goto(FacilityId)
+//	: true
+//<-	
+//	!action::commitAction(goto(FacilityId));
+//	!goto(FacilityId);
+//	.
 
 // Goto (option 2)
 // Lat and Lon must be floats
@@ -102,23 +109,23 @@
 : not .desire(go_charge(_,_)) & new::chargingList(List) & default::closest_facility(List, Lat, Lon, FacilityId2) & default::enough_battery(Lat, Lon, FacilityId2, Result)
 <-	
     if (Result == "false") { !go_charge(Lat, Lon); }
-    else { +going(Lat,Lon); !localActions::commitAction(goto(Lat,Lon)); }
+    else { +going(Lat,Lon); !action::commitAction(goto(Lat,Lon)); }
 	!goto(Lat, Lon);
 	.
-+!goto(Lat, Lon)
-	: true
-<-
-	+going(Lat,Lon);
-	!localActions::commitAction(goto(Lat,Lon));
-	!goto(Lat, Lon);
-	.
+//+!goto(Lat, Lon)
+//	: true
+//<-
+//	+going(Lat,Lon);
+//	!action::commitAction(goto(Lat,Lon));
+//	!goto(Lat, Lon);
+//	.
 	
 // Charge
 // No parameters
 +!charge
 	: default::charge(C) & default::role(Role,_,_,CCap,_) & (((Role == truck | Role == car) & C < math.round(CCap / 1.3)) | (Role \== truck & Role \== car & C < CCap))
 <-
-	!localActions::commitAction(charge);
+	!action::commitAction(charge);
 	!charge;
 	.
 -!charge.
@@ -141,19 +148,19 @@
 <-
 	if (Amount <= QtyAvailable) {
 //		.print("Trying to buy all.");
-		!localActions::commitAction(buy(ItemId,Amount));
+		!action::commitAction(buy(ItemId,Amount));
 		if ( default::lastActionResult(successful) ) { !buy_loop(ItemId, Total, Total - Amount, OldAmount); }
 		else { !buy_loop(ItemId, Total, Amount, OldAmount); }
 	}
 	else {
 		if (QtyAvailable == 0) {
-			!localActions::commitAction(recharge);
+			!action::commitAction(recharge);
 			!buy_loop(ItemId, Total, Amount, OldAmount);
 			
 		}
 		else {
 //			.print("Trying to buy available ",QtyAvailable);
-			!localActions::commitAction(buy(ItemId,QtyAvailable));
+			!action::commitAction(buy(ItemId,QtyAvailable));
 			if ( default::lastActionResult(successful) ) { !buy_loop(ItemId, Total, Amount - QtyAvailable, OldAmount); }
 			else { !buy_loop(ItemId, Total, Amount, OldAmount); }
 		}
@@ -170,13 +177,13 @@
 <-
 	getServerName(AgentName,ServerName);
 	?default::hasItem(ItemId, OldAmount);
-	!localActions::commitAction(give(ServerName,ItemId,Amount));
+	!action::commitAction(give(ServerName,ItemId,Amount));
 	!giveLoop(ServerName, ItemId, Amount, OldAmount);
 	.
 +!giveLoop(AgentId, ItemId, Amount, OldAmount)
 	: default::hasItem(ItemId,OldAmount)
 <-
-	!localActions::commitAction(give(AgentId,ItemId,Amount));
+	!action::commitAction(give(AgentId,ItemId,Amount));
 	!giveLoop(AgentId, ItemId, Amount, OldAmount);
 	.
 -!giveLoop(AgentId, ItemId, Amount, OldAmount).
@@ -187,20 +194,20 @@
 	: default::hasItem(ItemId,OldAmount)
 <-
 	-strategies::free[source(_)];
-	!localActions::commitAction(receive);
+	!action::commitAction(receive);
 	!receiveLoop(ItemId,Amount,OldAmount);
 	.
 +!receive(ItemId,Amount)
 	: true
 <-
 	-strategies::free[source(_)];
-	!localActions::commitAction(receive);
+	!action::commitAction(receive);
 	!receiveLoop(ItemId,Amount,0);
 	.
 +!receiveLoop(ItemId, Amount, OldAmount)
 	: not default::hasItem(ItemId,Amount+OldAmount)
 <-
-	!localActions::commitAction(receive);
+	!action::commitAction(receive);
 	!receiveLoop(ItemId, Amount, OldAmount);
 	.
 -!receiveLoop(ItemId,Amount,OldAmount).
@@ -211,7 +218,7 @@
 +!store(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(store(ItemId,Amount));
+	!action::commitAction(store(ItemId,Amount));
 	.
 
 // Retrieve
@@ -220,7 +227,7 @@
 +!retrieve(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(retrieve(ItemId,Amount));
+	!action::commitAction(retrieve(ItemId,Amount));
 	.
 
 // Retrieve delivered
@@ -229,7 +236,7 @@
 +!retrieve_delivered(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(
+	!action::commitAction(
 		retrieve_delivered(
 			item(ItemId),
 			amount(Amount)
@@ -243,7 +250,7 @@
 +!dump(ItemId, Amount)
 	: true
 <-
-	!localActions::commitAction(dump(ItemId,Amount));
+	!action::commitAction(dump(ItemId,Amount));
 	.
 
 // Assemble
@@ -251,19 +258,19 @@
 +!assemble(ItemId)
 	: default::hasItem(ItemId,OldAmount)
 <-
-	!localActions::commitAction(assemble(ItemId));
+	!action::commitAction(assemble(ItemId));
 	!assembleLoop(ItemId,1,OldAmount);
 	.
 +!assemble(ItemId)
 	: true
 <-
-	!localActions::commitAction(assemble(ItemId));
+	!action::commitAction(assemble(ItemId));
 	!assembleLoop(ItemId,1,0);
 	.
 +!assembleLoop(ItemId, Amount, OldAmount)
 	: not default::hasItem(ItemId,Amount+OldAmount)
 <-
-	!localActions::commitAction(assemble(ItemId));
+	!action::commitAction(assemble(ItemId));
 	!assembleLoop(ItemId, Amount, OldAmount);
 	.
 -!assembleLoop(ItemId,Amount,OldAmount).
@@ -279,7 +286,7 @@
 +!assist_assemble_loop(ServerName)
 	: strategies::assembling
 <-
-	!localActions::commitAction(assist_assemble(ServerName));
+	!action::commitAction(assist_assemble(ServerName));
 	!assist_assemble_loop(ServerName);
 	.
 +!assist_assemble_loop(ServerName).
@@ -289,7 +296,7 @@
 +!deliver_job(JobId)
 	: true
 <-
-	!localActions::commitAction(deliver_job(JobId));
+	!action::commitAction(deliver_job(JobId));
 	.
 
 // Bid for job
@@ -298,7 +305,7 @@
 +!bid_for_job(JobId, Price)
 	: true
 <-
-	!localActions::commitAction(bid_for_job(JobId,Price));
+	!action::commitAction(bid_for_job(JobId,Price));
 	.
 
 // Post job (option 1)
@@ -312,7 +319,7 @@
 +!post_job_auction(MaxPrice, Fine, ActiveSteps, AuctionSteps, StorageId, Items)
 	: true
 <-
-	!localActions::commitAction(
+	!action::commitAction(
 		post_job(
 			type(auction),
 			max_price(MaxPrice),
@@ -334,7 +341,7 @@
 +!post_job_priced(Price, ActiveSteps, StorageId, Items)
 	: true
 <-
-	!localActions::commitAction(
+	!action::commitAction(
 		post_job(
 			type(priced),
 			price(Price),
@@ -350,7 +357,7 @@
 +!continue
 	: true
 <-
-	!localActions::commitAction(continue);
+	!action::commitAction(continue);
 	.
 
 // Skip
@@ -358,7 +365,7 @@
 +!skip
 	: true
 <-
-	!localActions::commitAction(skip);
+	!action::commitAction(skip);
 	.
 	
 // Recharge
@@ -366,7 +373,7 @@
 +!recharge
 	: default::charge(C) & default::role(_,_,_,CCap,_) & C < math.round(CCap / 5)
 <-
-	!localActions::commitAction(recharge);
+	!action::commitAction(recharge);
 	!recharge;
 	.
 -!recharge <- .print("Fully recharged.").
@@ -376,7 +383,7 @@
 +!recharge_is_new_skip
 	: true
 <-
-	!localActions::commitAction(recharge);
+	!action::commitAction(recharge);
 	.
 	
 // Gather
@@ -384,7 +391,7 @@
 +!gather(Vol)
 	: default::role(_,_,LoadCap,_,_) & default::load(Load) & Load + Vol <= LoadCap
 <-
-	!localActions::commitAction(gather);
+	!action::commitAction(gather);
 	!gather(Vol);
 	.
 -!gather(Vol).
@@ -394,7 +401,7 @@
 +!abort
 	: true
 <-
-	!localActions::commitAction(abort);
+	!action::commitAction(abort);
 	.
 
 //  for verifying battery and going to charging stations
@@ -419,7 +426,7 @@
 			+impossible;
 			.print("@@@@ Impossible route, going to try anyway.");
 			+going(Flat,Flon);
-			!localActions::commitAction(goto(Flat,Flon));
+			!action::commitAction(goto(Flat,Flon));
 			!goto(Flat,Flon);
 		}
 		else {
@@ -437,7 +444,7 @@
 				+impossible;
 				.print("@@@@ Impossible route, going to try anyway and hopefully call service breakdown.");
 				+going(Flat,Flon);
-				!localActions::commitAction(goto(Flat,Flon));
+				!action::commitAction(goto(Flat,Flon));
 				!goto(Flat,Flon);
 			}
 			else {
@@ -463,7 +470,7 @@
 	-onMyWay(Aux2List);
 	if (not action::impossible) {
 		.print("**** Going to charge my battery at ", FacilityAux2);
-		!localActions::commitAction(goto(FacilityAux2));
+		!action::commitAction(goto(FacilityAux2));
 		!goto(FacilityAux2);
 		!charge;		
 	}
@@ -511,7 +518,7 @@
 		if (Result == "false") {
 			+impossible;
 			.print("@@@@ Impossible route, going to try anyway.");
-			!localActions::commitAction(goto(FacilityId));
+			!action::commitAction(goto(FacilityId));
 			!goto(FacilityId);
 		}
 		else {
@@ -528,7 +535,7 @@
 			if (Result2 == "false") {
 				+impossible;
 				.print("@@@@ Impossible route, going to try anyway and hopefully call service breakdown.");
-				!localActions::commitAction(goto(FacilityId));
+				!action::commitAction(goto(FacilityId));
 				!goto(FacilityId);
 			}
 			else {
@@ -554,7 +561,7 @@
 	-onMyWay(Aux2List);
 	if (not action::impossible) {
 		.print("**** Going to charge my battery at ", FacilityAux2);
-		!localActions::commitAction(goto(FacilityAux2));
+		!action::commitAction(goto(FacilityAux2));
 		!goto(FacilityAux2);
 		!charge;		
 	}

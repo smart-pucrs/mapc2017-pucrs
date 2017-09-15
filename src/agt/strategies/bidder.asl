@@ -81,27 +81,6 @@
 	.
 +!create_bid_task(Task, Bid, Shop) <- .wait(500); !create_bid_task(Task, Bid, Shop).
 	
-//+default::winner(TaskList, assist(Storage, Assembler, JobId))
-//	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
-//<-
-//	!strategies::not_free;
-//	-+metrics::jobHaveWorked(Jobs+1);
-//	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
-//	org::focus(SchArtId)[wid(OrgId)];
-//	.print("I won the tasks(",JobId,") ",TaskList);
-//	org::commitMission(massist)[artifact_id(SchArtId)];
-//	.
-//+default::winner(TaskList, assemble(Storage, JobId))
-//	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
-//<-
-//	!strategies::not_free;
-//	-+metrics::jobHaveWorked(Jobs+1);
-//	lookupArtifact(JobId,SchArtId)[wid(OrgId)];
-//	org::focus(SchArtId)[wid(OrgId)];
-//	.print("I won the tasks to assemble ",TaskList," and deliver to ",Storage," for ",JobId);
-//	org::commitMission(massemble)[artifact_id(SchArtId)];
-//	.	
-	
 +default::winner(TaskList, assist(Storage, Assembler, JobId))
 	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)
 <-

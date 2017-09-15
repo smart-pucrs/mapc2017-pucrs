@@ -94,7 +94,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	.
 	
 +!has_set_to_free
-	: (not default::winner(_,_) | strategies::waiting) & ::hasSetFree 
+	: (not default::winner(_,_) | strategies::waiting ) & ::hasSetFree 
 <-
 	-::hasSetFree;
 	!!strategies::free;
@@ -135,8 +135,9 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	+::futurePlans(figure_out_auction_winning(Id),Start+Time);
 	
 	.print("Posting bid of ",NewBid);
-	-action::hold_action(Id);
-	!action::bid_for_job(Id,NewBid);
+	?default::actionID(S);
+	action(bid_for_job(Id,NewBid));
+	.wait( default::actionID(S2) & S2 \== S );
 	.
 
 +!free_for_next_auction(AuctionId) 

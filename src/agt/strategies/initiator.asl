@@ -33,7 +33,8 @@ task_id(0).
 //	!evaluation_auction::first_analysis(Id);
 //	.
 //+default::auction(Id, Storage, Reward, Start, End, Fine, Bid, Time, Items) <- .print("Ignoring auction job ",Id,", it shoud have not passed here").
-
+//
+//
 //+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) : not initiator::accept_jobs <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now."); .
 //@mission[atomic]
 //+default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items)
@@ -75,15 +76,9 @@ task_id(0).
 	.length(Items,NumberOfAssemble);
 	?default::concat_bases(ListItems,[],ListItemsConcat);
 	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps+25 & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
-//		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
-		
-//		.broadcast(achieve,gTaskAllocation::allocate_job(Id,Storage,Items,[]));
-//		!gTaskAllocation::allocate_job(Id,Storage,Items,[]);
-		
+		//!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 		.broadcast(achieve,gTaskAllocation::allocate_job(Id,Storage,[required(item7,2),required(item11,2),required(item10,1)],[]));
 		!gTaskAllocation::allocate_job(Id,Storage,[required(item7,2),required(item11,2),required(item10,1)],[]);
-
-//		-initiator::accept_jobs; // só para forçar somente uma alocação de tarefas
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
@@ -347,6 +342,13 @@ task_id(0).
 //			.print(AgentA," ",Items);
 			.send(AgentA,tell,winner(Items,assemble(Storage,JobId,AssTaskList)));
 			if (initiator::mission(JobId, _, _, _, _, _)) { -initiator::mission(JobId, _, _, _, _, _); -eval(JobId); }
+			if (default::winner(_,assist(_,_,JobId))) {
+				.drop_desire(action::commitAction(_));
+				?default::actionID(Step);
+				if (action::action(Step)) {
+					.wait( default::actionID(S2) & S2 \== S );
+				}
+			}
 			resetLoads;
 			-cnp(JobId);
 		}

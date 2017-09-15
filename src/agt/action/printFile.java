@@ -74,7 +74,7 @@ public class printFile extends DefaultInternalAction {
 		try{
     	String content = data;
         //Specify the file name and path here
-    	File file =new File("//home//tbasegio//projects//MASTest//"+fileName+".txt");
+    	File file =new File("//home//robotica//projects//MASTest//"+fileName+".txt");
     	//File file =new File("C://temp//MASTest//"+fileName+".txt");
 
     	/* This logic is to create the file if the

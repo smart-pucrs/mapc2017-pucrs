@@ -1,7 +1,7 @@
 //{include("taAlgorithmPFClean.asl",algorithm)}
 {include("taAlgorithmPFCleanNoClean.asl",algorithm)}
 //{include("XXtaAlgorithmClean.asl",algorithm)}
-{include("taAlgorithm.asl",algorithm)}
+//{include("taAlgorithm.asl",algorithm)}
 
 
 {begin namespace(localTask, local) }

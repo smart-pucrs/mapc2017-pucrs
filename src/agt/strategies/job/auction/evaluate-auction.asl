@@ -26,7 +26,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	: default::auction(Id,_,Reward,Start,_,_,0,Time,Items)
 <-
 	.print("First analysis auction ",Id);	
-	!initiator::decompose(Items,ListItems,ListToolsNew,Id);
+	!initiator::decompose(Items,ListItems,ListToolsNew,ListItemsStorage,Id);
 
 	?default::check_price(ListToolsNew,ListItems,0,ResultP);
 	Limit = math.ceil(ResultP*1.1);	

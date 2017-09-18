@@ -49,9 +49,26 @@ task_id(0).
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
 	
-+!decompose(Items,ListItems,ListToolsNew,Id)
++!decompose(Items,ListItems,ListToolsNew,ListItemsStorage,Id)
 <-
-	?default::decomposeRequirements(Items,[],Bases);
+	+initiator::storage_reuse([]);
+	+initiator::items_aux(Items);
+	for ( .member(required(ItemId,Qty),Items) ) {
+		.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
+		if ( not .empty(StorageList) ) {
+			?initiator::items_aux(OldItems);
+			.delete(required(ItemId,Qty),OldItems,ItemsNew);
+			-initiator::items_aux(OldItems);
+			+initiator::items_aux(ItemsNew);
+			?initiator::storage_reuse(ListOld);
+			.concat(ListOld,[required(ItemId,Qty)],ListNew);
+			-initiator::storage_reuse(ListOld);
+			+initiator::storage_reuse(ListNew);
+		}
+	}
+	?initiator::items_aux(NewItems);
+	-initiator::items_aux(NewItems);
+	?default::decomposeRequirements(NewItems,[],Bases);
 	+bases([],Id);
 	for ( .member(Item,Bases) ) {
 		?bases(L,Id);
@@ -66,12 +83,14 @@ task_id(0).
 		?default::removeDuplicateTool(ListTools,ListToolsNew);
 	}
 	else { ListToolsNew = []; ListItems = B; }
+	?initiator::storage_reuse(ListItemsStorage);
+	-initiator::storage_reuse(ListItemsStorage);
 	.
 
 +!evaluate_job(Items, End, Storage, Id, Reward)
 	: new::vehicle_job(Role,Speed) & new::workshopList(WList) & default::steps(TotalSteps) & default::step(Step) & initiator::free_agents(FreeAgents) & default::get_roles(FreeAgents,[],Roles) & default::get_tools(Roles,[],AvailableTools) & initiator::eval_shop_route(FarthestShop,RouteShop)
 <-
-	!decompose(Items,ListItems,ListToolsNew,Id);
+	!decompose(Items,ListItems,ListToolsNew,ListItemsStorage,Id);
 	.length(ListToolsNew,NumberOfBuyTool);
 	.length(ListItems,NumberOfBuyItem);
 	.length(Items,NumberOfAssemble);
@@ -94,7 +113,7 @@ task_id(0).
 	.print("Evaluating mission ",Id," at step ",Step);
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
 		+action::hold_action(Id);
-		!decompose(Items,ListItems,ListToolsNew,Id);
+		!decompose(Items,ListItems,ListToolsNew,ListItemsStorage,Id);
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
 	}
 	else { 

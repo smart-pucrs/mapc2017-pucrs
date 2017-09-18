@@ -4,6 +4,31 @@
 //	!action::recharge_is_new_skip;
 //	.
 
++!go_resource_node(Item)
+	: .term2string(Item,StrItem) & .findall(Id,default::resNode(Id,_,_,StrItem),ListResource) & .print("RL ",ListResource) & .nth(0,ListResource,Resource) & .print("R ",Resource) & default::item(Item,Vol,_,_) & default::role(Role,_,_,_,_) 
+<-
+	.print("I am responsible for item ",Item);
+	?default::resNode(Resource,Lat,Lon,_);
+	
+	!action::goto(Lat,Lon);
+	
+	!action::gather(Vol);
+	
+	!go_store(Role);
+	
+	!go_resource_node(Item);
+	.
++!go_resource_node(Item)
+	: new::dumpList(DList) & default::role(Role,_,_,_,_) 
+<-
+	.print("Resource node not found");
+	
+	actions.farthest(Role,DList,FarthestDump);
+	!action::goto(FarthestDump);
+	
+	!go_resource_node(Item);
+	.
+
 +!go_to_workshop(Storage)
 	: new::workshopList(WList)
 <-

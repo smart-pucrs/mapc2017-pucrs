@@ -41,6 +41,14 @@
 //	!!strategies::free;
 //.
 
++default::resourceNode(ResourceId,Lat,Lon,Resource)
+	: .term2string(ResourceId,ResourceId2) & not default::resNode(ResourceId2,_,_,_)
+<- 
+	.print("Detected new resource node ",ResourceId," with resource ",Resource);
+	-default::resourceNode(ResourceId,Lat,Lon,Resource);
+	addResourceNode(ResourceId,Lat,Lon,Resource);
+	.
+
 +default::role(Role,Speed,LoadCap,_,Tools)
 	: .my_name(Me) & new::tool_types(Agents)
 <- 

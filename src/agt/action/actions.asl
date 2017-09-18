@@ -382,7 +382,7 @@
 // Gather
 // No parameters
 +!gather(Vol)
-	: default::role(_,_,LoadCap,_,_) & default::load(Load) & Load + Vol <= LoadCap
+	: default::role(_,_,LoadCap,_,_) & default::load(Load) & (Load + Vol <= (LoadCap/2))
 <-
 	!action::commitAction(gather);
 	!gather(Vol);

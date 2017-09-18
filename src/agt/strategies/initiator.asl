@@ -58,7 +58,7 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 	: .findall(Id,default::item(Id,_,tools([]),parts([])) & not .substring("tool",Id),ListItems) & .print("L: ",ListItems) 
 <-
 	.print("Defining scarce item");
-	+::cartList([vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20]);
+	
 	?evaluateScarceItem(ListItems,[],ScarceItems);
 	if (ScarceItems == []){
 		.print("There is no scarce item");
@@ -74,9 +74,16 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 		if (Cars \== []){
 			.nth(0,Cars,C);
 			.print("Send ",C," he works on ",Item," now");
-			.send(C,tell,scarceItem(Item));
+			.send(C,achieve,strategies::go_resource_node(Item));
 			.delete(C,Cars,NewCars);
 			-+::cartList(NewCars);
+			
+			?::resourceAgents(ResourceAgents);			
+			-+::resourceAgents([C|ResourceAgents]);
+			
+			?::free_agents(FreeAgents);
+			.delete(C,FreeAgents,NewFree);
+			-+initiator::free_agents(NewFree);
 		}
 	}	
 	.
@@ -417,7 +424,7 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 
 @addAgentFree[atomic]
 +!add_agent_to_free[source(Agent)]
-	: initiator::free_agents(FreeAgents)
+	: initiator::free_agents(FreeAgents) & resourceAgents(ResourceAgents) & not .member(Agent,ResourceAgents)
 <-
 	-+initiator::free_agents([Agent|FreeAgents]);
 	if (initiator::accept_jobs) {

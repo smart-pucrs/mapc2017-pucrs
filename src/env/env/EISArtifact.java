@@ -344,7 +344,7 @@ public class EISArtifact extends Artifact implements AgentListener {
 		"shop",			
 		"storage",
 		"workshop",
-//		"resourceNode",		
+		"resourceNode",		
 		"auction",
 		"dump",
 		"lat",

@@ -20,6 +20,8 @@
 	+metrics::failedEvalJobs(0);
 	+metrics::noBids(0);
 	+metrics::missBidAuction(0);
+	
+	!!evaluation_auction::triggerFuturePlan;
 	.
 
 {end}

@@ -70,6 +70,7 @@
 		actions.farthest(Role,CLat,CLon,SList,FarthestShop);
 		actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop);
 		+initiator::eval_shop_route(FarthestShop,RouteShop);
+		!initiator::add_scarce_items;
 		+initiator::accept_jobs;
 	}
 	else {

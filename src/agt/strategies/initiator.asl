@@ -2,6 +2,11 @@
 
 task_id(0).
 
+evaluateOneItem(Id,[Id]) :- new::shopList(ListShops) & default::find_shops(Id,ListShops,QtdShops) & .print("I ",Id," S ",QtdShops)& (.length(QtdShops) <= 1) & .nth(0,QtdShops,ShopId) & default::shop(ShopId,_,_,Restock,_) & (Restock >= 3).
+evaluateOneItem(Id,[]).
+evaluateScarceItem([],Temp,Result) :- Result = Temp.
+evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .concat(I,Temp,NewList) & evaluateScarceItem(Items,NewList,Result).
+
 //debug
 //+default::buy_coordination(ShopId,List) <- .print(ShopId," : ",List).
 
@@ -48,6 +53,34 @@ task_id(0).
 	!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
+	
++!add_scarce_items
+	: .findall(Id,default::item(Id,_,tools([]),parts([])) & not .substring("tool",Id),ListItems) & .print("L: ",ListItems) 
+<-
+	.print("Defining scarce item");
+	+::cartList([vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20]);
+	?evaluateScarceItem(ListItems,[],ScarceItems);
+	if (ScarceItems == []){
+		.print("There is no scarce item");
+	}else{
+		+::scarceItems(ScarceItems);
+		!tell_car_gather_item(ScarceItems);
+	}
+	.	
++!tell_car_gather_item(ScarceItems)
+<-
+	for(.member(Item,ScarceItems)){
+		?::cartList(Cars);
+		if (Cars \== []){
+			.nth(0,Cars,C);
+			.print("Send ",C," he works on ",Item," now");
+			.send(C,tell,scarceItem(Item));
+			.delete(C,Cars,NewCars);
+			-+::cartList(NewCars);
+		}
+	}	
+	.
+	
 	
 +!decompose(Items,ListItems,ListToolsNew,Id)
 <-

@@ -29,7 +29,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	!initiator::decompose(Items,ListItems,ListToolsNew,Id);
 
 	?default::check_price(ListToolsNew,ListItems,0,ResultP);
-	Limit = math.ceil(ResultP+3000);	
+	Limit = math.ceil(ResultP*1.8);	
 	
 	+::bidding(Id,0,0,Limit);
 	+::futurePlans(free_for_next_auction(Id),Start+Time);	

@@ -29,7 +29,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	!initiator::decompose(Items,ListItems,ListToolsNew,Id);
 
 	?default::check_price(ListToolsNew,ListItems,0,ResultP);
-	Limit = math.ceil(ResultP*1.8);	
+	Limit = math.ceil(ResultP*1.1);	
 	
 	+::bidding(Id,0,0,Limit);
 	+::futurePlans(free_for_next_auction(Id),Start+Time);	
@@ -71,11 +71,11 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	.
 +!further_analysis(Id).	
 +!check_further_analysis(Id)	
-	: action::action(S) & default::step(S) & metrics::missBidAuction(M)
+	: action::action(S) & metrics::missBidAuction(M)
 <-	
 	-action::hold_action(Id);
 	!::has_set_to_free;
-	
+		
 	.print("¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬ We lost the action at step ",S," we cannot bid for ",Id," anymore");	
 	-+metrics::missBidAuction(M+1);
 	.

@@ -87,9 +87,8 @@
 	}
 	else { Bid = -1; Shop = null; }
 	.
-+!create_bid_task(Task, Bid, Shop) <- .wait(500); !create_bid_task(Task, Bid, Shop).
 +!create_bid_task(required(ItemId, Qty), Bid, Shop)
-	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList) 
+	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, _) & default::item(ItemId,Vol,_,_) & new::storageList(SList) 
 <-
 	if (LoadCap - MyLoad >= Vol * Qty) {
 		.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
@@ -108,6 +107,8 @@
 	}
 	else { Bid = -1; Shop = null; }
 	.
++!create_bid_task(Task, Bid, Shop) <- .wait(500); !create_bid_task(Task, Bid, Shop).
+
 	
 +default::winner(TaskList, assist(Storage, Assembler, JobId))
 	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)

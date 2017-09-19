@@ -71,7 +71,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	.
 +!further_analysis(Id).	
 +!check_further_analysis(Id)	
-	: action::action(S) & metrics::missBidAuction(M)
+	: action::actionID(S) & action::action(S) & metrics::missBidAuction(M)
 <-	
 	-action::hold_action(Id);
 	!::has_set_to_free;

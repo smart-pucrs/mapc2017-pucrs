@@ -78,8 +78,7 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 			.delete(C,Cars,NewCars);
 			-+::cartList(NewCars);
 			
-			?::resourceAgents(ResourceAgents);			
-			-+::resourceAgents([C|ResourceAgents]);
+			!add_resource_agent(C);			
 			
 			?::free_agents(FreeAgents);
 			.delete(C,FreeAgents,NewFree);
@@ -87,7 +86,12 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 		}
 	}	
 	.
-	
+@addResourceAgent[atomic]
++!add_resource_agent(Agent)
+	: ::resourceAgents(ResourceAgents)
+<-
+	-+::resourceAgents([Agent|ResourceAgents]);
+	.
 	
 +!decompose(Items,ListItems,ListToolsNew,Id)
 <-
@@ -422,7 +426,18 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 	-action::hold_action(JobId);
 	.
 
-@addAgentFree[atomic]
+@addAgentFree1[atomic]
++!add_agent_to_free[source(Agent)]
+	: default::step(S) & S>=100 & initiator::free_agents(FreeAgents)
+<-
+	-+initiator::free_agents([Agent|FreeAgents]);
+	if (initiator::accept_jobs) {
+		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
+			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+		}
+	}
+	.
+@addAgentFree2[atomic]
 +!add_agent_to_free[source(Agent)]
 	: initiator::free_agents(FreeAgents) & resourceAgents(ResourceAgents) & not .member(Agent,ResourceAgents)
 <-

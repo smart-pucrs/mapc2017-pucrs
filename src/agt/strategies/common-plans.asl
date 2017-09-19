@@ -5,7 +5,7 @@
 //	.
 
 +!go_resource_node(Item)
-	: .term2string(Item,StrItem) & .findall(Id,default::resNode(Id,_,_,StrItem),ListResource) & .print("RL ",ListResource) & .nth(0,ListResource,Resource) & .print("R ",Resource) & default::item(Item,Vol,_,_) & default::role(Role,_,_,_,_) 
+	: .term2string(Item,StrItem) & .findall(Id,default::resNode(Id,_,_,StrItem),ListResource) & (.length(ListResource) > 0) & .print("RL ",ListResource) & .nth(0,ListResource,Resource) & .print("R ",Resource) & default::item(Item,Vol,_,_) & default::role(Role,_,_,_,_) 
 <-
 	.print("I am responsible for item ",Item);
 	?default::resNode(Resource,Lat,Lon,_);
@@ -14,12 +14,13 @@
 	
 	!action::gather(Vol);
 	
-	!go_store(Role);
+	?new::storageList(SList);
+	!go_store_center(Role,SList);
 	
 	!go_resource_node(Item);
 	.
 +!go_resource_node(Item)
-	: new::dumpList(DList) & default::role(Role,_,_,_,_) 
+	: new::dumpList(DList) & default::role(Role,_,_,_,_) & default::step(S) & (S < 100)
 <-
 	.print("Resource node not found");
 	
@@ -28,6 +29,36 @@
 	
 	!go_resource_node(Item);
 	.
++!go_resource_node(Item)
+<-
+	.print("Going back to free");
+	.send(vehicle1,achieve,initiator::add_agent_to_free);
+	.
++!go_store_center(Role,[]).
++!go_store_center(Role,SList)
+	: default::centerLat(CLat) & default::centerLon(CLon) & actions.closest(Role,CLat,CLon,SList,_,Facility) & default::storage(Facility, _, _, TotCap, UsedCap, _) & default::load(Load)
+<-
+	if(UsedCap + Load < TotCap){
+		!action::goto(Facility);
+		?default::storage(Facility, _, _, TotCap2, UsedCap2, _);
+		if ( UsedCap2 + Load < TotCap2 ) {
+			for ( default::hasItem(ItemId,Qty) ) {
+	//			.print("Trying to store #",Qty," of ",ItemId);
+				?default::storage(Facility, _, _, TotCapL, UsedCapL, _);
+				if ( default::load(LoadL) & UsedCapL + LoadL < TotCapL ) {
+					!action::store(ItemId,Qty);
+					addAvailableItem(Facility,ItemId,Qty);
+				}
+			}
+		}	
+	}
+	else{
+		.delete(Facility,SList,NewList);
+		!go_store_center(Role,NewList);
+	}
+	.
++!go_store_center(Role,SList).	
+
 
 +!go_to_workshop(Storage)
 	: new::workshopList(WList)

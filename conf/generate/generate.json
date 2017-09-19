@@ -11,8 +11,8 @@
     },
     "shops" : {
       "density" : 0.8,
-      "minProd" : 3,
-      "maxProd" : 10,
+      "minProd" : 1,
+      "maxProd" : 3,
       "amountMin" : 5,
       "amountMax" : 20,
       "priceAddMin" : 100,

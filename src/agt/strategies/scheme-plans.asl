@@ -30,7 +30,12 @@
 	}
 	!!strategies::go_deliver;
 	.
-
++!buy_items
+	: default::myResourceNode(_,_,_,_) & default::winner(_,assist(Storage,_,_))
+<-	
+	!strategies::go_to_workshop(Storage);
+	!!check_state;
+	.
 +!buy_items
 	: default::role(Role, _, _, _, _) & new::shopList(SList) & (default::winner(TaskList, assist(Storage, _, _)) | default::winner(_, assemble(Storage, _, TaskList))) & .my_name(Me)
 <-
@@ -129,6 +134,10 @@
 	-strategies::assembling;
 	-default::winner(_,_)[source(_)];
 //	for ( default::hasItem(ItemId,Qty) ) { .print(">>>>>>>>> Assist assemble ended, I have #",Qty," of ",ItemId); }
-	!!strategies::empty_load;
+	if (default::myResourceNode(_,_,_,_)){
+		!!strategies::go_resource_node;
+	}else{
+		!!strategies::empty_load;
+	}	
 	.
 +!stop_assist_assemble <- .print("!!!!!!!!!!!!! Received stop assist from scheme but did not have the winner belief anymore.").

@@ -4,6 +4,48 @@
 //	!action::recharge_is_new_skip;
 //	.
 
++!go_resource_node
+	: default::myResourceNode(Resource,Lat,Lon,Item) & default::item(Item,Vol,_,_)
+<-
+	.print("I am going to ",Resource);
+	!strategies::check_charge;
+	!action::goto(Lat,Lon);
+	.send(vehicle1,achieve,initiator::add_agent_to_free);
+	!action::gather(Vol);
+	
+//	?new::storageList(SList);
+//	!go_store_center(Role,SList);
+	
+//	!go_resource_node;
+	.	
++!go_resource_node
+	: .findall(Id,default::resNode(Id,_,_,_),ListResource) & (.length(ListResource) > 0) & .print("RL ",ListResource) & .nth(0,ListResource,Resource) & .print("R ",Resource) & default::role(Role,_,_,_,_) 
+<-
+	.print("Add belief ",Resource);
+	?default::resNode(Resource,Lat,Lon,Item);
+	
+//	!action::goto(Lat,Lon);
+	
+	.term2string(TItem,Item);
+	+default::myResourceNode(Resource,Lat,Lon,TItem);
+//	.send(vehicle1,achieve,initiator::add_agent_to_free);
+	
+	!go_resource_node;
+	.
++!go_resource_node
+	: new::shopList(SList) & default::role(Role,_,_,_,_)
+<-
+	.print("Resource node not found");
+	
+	actions.farthest(Role,SList,FarthestShop);
+	!action::goto(FarthestShop);
+	
+	if (default::resNode(Resource,Lat,Lon,_)){
+		!go_resource_node;
+	} else{
+		.send(vehicle1,achieve,initiator::add_agent_to_free);
+	}
+	.
 +!go_resource_node(Item)
 	: .term2string(Item,StrItem) & .findall(Id,default::resNode(Id,_,_,StrItem),ListResource) & (.length(ListResource) > 0) & .print("RL ",ListResource) & .nth(0,ListResource,Resource) & .print("R ",Resource) & default::item(Item,Vol,_,_) & default::role(Role,_,_,_,_) 
 <-
@@ -213,9 +255,18 @@
 	.drop_desire(action::_);
 	!!job_failed;
 	.
-	
+
 +!job_failed
-	: default::role(Role, _, _, _, _) & .my_name(Me)
+	: default::myResourceNode(_,_,_,_)
+<-
+	if (action::action(S)) {
+		.wait( default::actionID(S2) & S2 \== S );
+	}
+	.abolish(action::_);
+	!go_resource_node;
+	.	
++!job_failed
+	: default::role(Role, _, _, _, _) & .my_name(Me) 
 <-
 	if (action::action(S)) {
 		.wait( default::actionID(S2) & S2 \== S );

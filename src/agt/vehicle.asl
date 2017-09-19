@@ -83,17 +83,30 @@
 		actions.farthest(Role,CLat,CLon,SList,FarthestShop);
 		actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop);
 		+initiator::eval_shop_route(FarthestShop,RouteShop);
-		!initiator::add_scarce_items;
+//		!initiator::add_scarce_items;
 		+initiator::accept_jobs;
 	}
 	else {
 		if ( Role == truck ) { .send(vehicle1,achieve,initiator::add_truck_to_free); }
-		else { .send(vehicle1,achieve,initiator::add_agent_to_free); }
+		else { 
+//			.send(vehicle1,achieve,initiator::add_agent_to_free);
+			!explore_resource_node;
+		}
 	}
 	for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
 		!!initiator::evaluate_mission(Items, End, Storage, Id, Reward, Fine);
 	}
 	!!strategies::free;
     .
+    
++!explore_resource_node
+	: new::carList(L) & .my_name(Me)
+<-
+	if (.member(Me,L)){
+		!strategies::go_resource_node;
+	}else{
+		.send(vehicle1,achieve,initiator::add_agent_to_free);
+	}
+	.
     
 +tools(Role,Tools) : default::role(Role,_,_,_,_) <- -tools(Role,Tools)[source(_)].

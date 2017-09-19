@@ -6,7 +6,7 @@
 	+initiator::completed_jobs(0); // debugging
 	+initiator::free_agents([]);
 	+initiator::free_trucks([]);
-	+initiator::cartList([vehicle13,vehicle14,vehicle15,vehicle16]);
+//	+initiator::cartList([vehicle13,vehicle14,vehicle15,vehicle16]);
 	+initiator::resourceAgents([]);
 	
 	+metrics::money(0);
@@ -42,6 +42,8 @@
 	+tool_types([vehicle1,vehicle5,vehicle13,vehicle21]);
 	+vehicle_job(truck,2);
 	+noActionCount(0);
+	
+	+::carList([vehicle13,vehicle14,vehicle15,vehicle16]);
 	
 	+metrics::noAction(0);
 	+metrics::jobHaveWorked(0);

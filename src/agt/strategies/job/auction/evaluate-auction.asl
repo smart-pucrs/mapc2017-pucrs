@@ -139,6 +139,7 @@ checkStillGoodAuction(Reward,CurrentBid,BaseBid,Limit) 	:- checkLimit(Reward,Cur
 	action(bid_for_job(Id,NewBid));
 	.wait( default::actionID(S2) & S2 \== S );
 	.
+-!send_a_bid(Id).
 
 +!free_for_next_auction(AuctionId) 
 	: ::bidding(AuctionId,_,_,_) 

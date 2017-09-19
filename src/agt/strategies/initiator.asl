@@ -54,44 +54,44 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 	.
 +default::mission(Id, Storage, Reward, Start, End, Fine, _, _, Items) <- +mission(Id, Storage, Items, End, Reward, Fine); .print("Ignoring mission ",Id," for now.").
 	
-+!add_scarce_items
-	: .findall(Id,default::item(Id,_,tools([]),parts([])) & not .substring("tool",Id),ListItems) & .print("L: ",ListItems) 
-<-
-	.print("Defining scarce item");
-	
-	?evaluateScarceItem(ListItems,[],ScarceItems);
-	if (ScarceItems == []){
-		.print("There is no scarce item");
-	}else{
-		+::scarceItems(ScarceItems);
-		!tell_car_gather_item(ScarceItems);
-	}
-	.	
-+!tell_car_gather_item(ScarceItems)
-<-
-	for(.member(Item,ScarceItems)){
-		?::cartList(Cars);
-		if (Cars \== []){
-			.nth(0,Cars,C);
-			.print("Send ",C," he works on ",Item," now");
-			.send(C,achieve,strategies::go_resource_node(Item));
-			.delete(C,Cars,NewCars);
-			-+::cartList(NewCars);
-			
-			!add_resource_agent(C);			
-			
-			?::free_agents(FreeAgents);
-			.delete(C,FreeAgents,NewFree);
-			-+initiator::free_agents(NewFree);
-		}
-	}	
-	.
-@addResourceAgent[atomic]
-+!add_resource_agent(Agent)
-	: ::resourceAgents(ResourceAgents)
-<-
-	-+::resourceAgents([Agent|ResourceAgents]);
-	.
+//+!add_scarce_items
+//	: .findall(Id,default::item(Id,_,tools([]),parts([])) & not .substring("tool",Id),ListItems) & .print("L: ",ListItems) 
+//<-
+//	.print("Defining scarce item");
+//	
+//	?evaluateScarceItem(ListItems,[],ScarceItems);
+//	if (ScarceItems == []){
+//		.print("There is no scarce item");
+//	}else{
+//		+::scarceItems(ScarceItems);
+//		!tell_car_gather_item(ScarceItems);
+//	}
+//	.	
+//+!tell_car_gather_item(ScarceItems)
+//<-
+//	for(.member(Item,ScarceItems)){
+//		?::cartList(Cars);
+//		if (Cars \== []){
+//			.nth(0,Cars,C);
+//			.print("Send ",C," he works on ",Item," now");
+//			.send(C,achieve,strategies::go_resource_node(Item));
+//			.delete(C,Cars,NewCars);
+//			-+::cartList(NewCars);
+//			
+//			!add_resource_agent(C);			
+//			
+//			?::free_agents(FreeAgents);
+//			.delete(C,FreeAgents,NewFree);
+//			-+initiator::free_agents(NewFree);
+//		}
+//	}	
+//	.
+//@addResourceAgent[atomic]
+//+!add_resource_agent(Agent)
+//	: ::resourceAgents(ResourceAgents)
+//<-
+//	-+::resourceAgents([Agent|ResourceAgents]);
+//	.
 	
 +!decompose(Items,ListItems,ListToolsNew,Id)
 <-
@@ -426,9 +426,9 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 	-action::hold_action(JobId);
 	.
 
-@addAgentFree1[atomic]
+@addAgentFree[atomic]
 +!add_agent_to_free[source(Agent)]
-	: default::step(S) & S>=100 & initiator::free_agents(FreeAgents)
+	: initiator::free_agents(FreeAgents)
 <-
 	-+initiator::free_agents([Agent|FreeAgents]);
 	if (initiator::accept_jobs) {
@@ -437,17 +437,28 @@ evaluateScarceItem([Item|Items],Temp,Result) :- evaluateOneItem(Item,I) & .conca
 		}
 	}
 	.
-@addAgentFree2[atomic]
-+!add_agent_to_free[source(Agent)]
-	: initiator::free_agents(FreeAgents) & resourceAgents(ResourceAgents) & not .member(Agent,ResourceAgents)
-<-
-	-+initiator::free_agents([Agent|FreeAgents]);
-	if (initiator::accept_jobs) {
-		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
-			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
-		}
-	}
-	.
+//@addAgentFree1[atomic]
+//+!add_agent_to_free[source(Agent)]
+//	: default::step(S) & S>=100 & initiator::free_agents(FreeAgents)
+//<-
+//	-+initiator::free_agents([Agent|FreeAgents]);
+//	if (initiator::accept_jobs) {
+//		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
+//			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+//		}
+//	}
+//	.
+//@addAgentFree2[atomic]
+//+!add_agent_to_free[source(Agent)]
+//	: initiator::free_agents(FreeAgents) & resourceAgents(ResourceAgents) & not .member(Agent,ResourceAgents)
+//<-
+//	-+initiator::free_agents([Agent|FreeAgents]);
+//	if (initiator::accept_jobs) {
+//		for (initiator::mission(Id, Storage, Items, End, Reward, Fine)) {
+//			!evaluate_mission(Items, End, Storage, Id, Reward, Fine);
+//		}
+//	}
+//	.
 @addTruckFree[atomic]
 +!add_truck_to_free[source(Agent)]
 	: initiator::free_agents(FreeAgents) & initiator::free_trucks(FreeTrucks)

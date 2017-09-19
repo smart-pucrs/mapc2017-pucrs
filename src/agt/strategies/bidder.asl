@@ -1,11 +1,25 @@
 +default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)]
+	: default::myResourceNode(_,_,_,ResourceItem) & .my_name(Me)
+<- 	
+	-default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)];
+    !create_bid_task(item(ItemId, Qty), Bid, Shop, ResourceItem);
+//    .print("T ",ItemId," ",Qty," Bid ",Bid);
+    bid(Me, Bid, Shop, item(ItemId, Qty), TaskId)[artifact_name(CNPBoard)];
+  	.
++default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
 	-default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)];
     !create_bid_task(item(ItemId, Qty), Bid, Shop);
     bid(Me, Bid, Shop, item(ItemId, Qty), TaskId)[artifact_name(CNPBoard)];
-  	.
 -default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)].
+
++default::task(tool(ItemId), CNPBoard, TaskId)[source(X)]
+	: default::myResourceNode(_,_,_,_) & .my_name(Me)
+<- 
+	-default::task(tool(ItemId), CNPBoard, TaskId)[source(X)];
+	bid(Me, -1, null, tool(ItemId), TaskId)[artifact_name(CNPBoard)];
+	.
 +default::task(tool(ItemId), CNPBoard, TaskId)[source(X)]
 	: .my_name(Me)
 <- 
@@ -22,6 +36,8 @@
 	bid(Me, Bid, Shop, assemble(StorageId), TaskId)[artifact_name(CNPBoard)];
 	.
 -default::task(assemble(StorageId, Items), CNPBoard, TaskId)[source(X)].
+
+
 
 +!create_bid_task(item(ItemId, Qty), Bid, Shop)
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList) 
@@ -80,6 +96,29 @@
 	else { Bid = -1; Shop = null; }
 	.
 +!create_bid_task(Task, Bid, Shop) <- .wait(500); !create_bid_task(Task, Bid, Shop).
+
++!create_bid_task(item(ItemId, Qty), Bid, Shop, ResourceItem)
+	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList)
+<-
+	if (ItemId == ResourceItem){
+		if (default::hasItem(ItemId,TempQtd) & (TempQtd >= Qty)) {
+//			.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
+//
+//			if ( not .empty(StorageList) ) {
+//				actions.closest(Role,StorageList,Facility);
+//				actions.route(Role,Speed,Facility,Route);
+//			}
+//			else {
+//				?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,Route,99999,"",Facility,99999);
+//			}
+//			Bid = Route;
+//			Shop = Facility;
+			Bid  = -2;
+			Shop = null;
+		}
+		else { Bid = -1; Shop = null; }	
+	}else { Bid = -1; Shop = null; }
+	.
 	
 +default::winner(TaskList, assist(Storage, Assembler, JobId))
 	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)

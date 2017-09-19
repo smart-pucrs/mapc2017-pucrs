@@ -16,7 +16,7 @@
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
 		
-	if (Action \== recharge & Action \== continue & not .substring("deliver",Action) & not .substring("assist_assemble",Action) & not .substring("buy",Action) & not .substring("bid_for_job",Action) & Result \== successful) {
+	if (Action \== gather & Action \== recharge & Action \== continue & not .substring("deliver",Action) & not .substring("assist_assemble",Action) & not .substring("buy",Action) & not .substring("bid_for_job",Action) & Result \== successful) {
 //		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
@@ -383,7 +383,8 @@
 // Gather
 // No parameters
 +!gather(Vol)
-	: default::role(_,_,LoadCap,_,_) & default::load(Load) & (Load + Vol <= (LoadCap/2))
+//	: default::role(_,_,LoadCap,_,_) & default::load(Load) & (Load + Vol <= (LoadCap/2)) & not default::winner(_,_)
+	: not default::winner(_,_)
 <-
 	!action::commitAction(gather);
 	!gather(Vol);

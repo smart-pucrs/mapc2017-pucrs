@@ -95,15 +95,15 @@ task_id(0).
 	.length(ListItems,NumberOfBuyItem);
 	.length(Items,NumberOfAssemble);
 	?default::concat_bases(ListItems,[],ListItemsConcat);
-	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps+25 & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
+//	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps+25 & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
 		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, ListItemsStorage, Items);
-	}
-	else { 
-		.print("Job ",Id," failed evaluation, ignoring it.");
-		!update_eval;
-		-action::hold_action(Id);
-		!evaluation_auction::has_set_to_free;
-	}
+//	}
+//	else { 
+//		.print("Job ",Id," failed evaluation, ignoring it.");
+//		!update_eval;
+//		-action::hold_action(Id);
+//		!evaluation_auction::has_set_to_free;
+//	}
 	.
 	
 +!evaluate_mission(Items, End, Storage, Id, Reward, Fine)
@@ -132,8 +132,8 @@ task_id(0).
 <-
 	+cnp(Id);
 	+job(Id, Items);
-	.print("@@@@@@@@@@ ",ListItemsStorage);
-	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
+//	.print("@@@@@@@@@@ ",ListItemsStorage);
+	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+.length(ListItemsStorage)+1,Id);
 	?task_id(TaskIdA);
 	-+task_id(TaskIdA+1);
 //	.print("Creating cnp for assemble task ",Storage," free trucks[",NumberOfTrucks,"]: ",FreeTrucks);
@@ -143,6 +143,12 @@ task_id(0).
 		-+task_id(TaskId+1);
 //		.print("Creating cnp for tool task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
 		!!announce(tool(ItemId),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
+	}
+	for ( .member(required(ItemId,Qty),ListItemsStorage) ) {
+		?task_id(TaskId);
+		-+task_id(TaskId+1);
+//		.print("Creating cnp for buy task ",ItemId," free agents[",NumberOfAgents,"]: ",FreeAgents);
+		!!announce(required(ItemId,Qty),Deadline,NumberOfAgents,Id,TaskId,FreeAgents,FreeTrucks);
 	}
 	for ( .member(item(ItemId,Qty),ListItems) ) {
 		?task_id(TaskId);

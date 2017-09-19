@@ -22,6 +22,14 @@
 	bid(Me, Bid, Shop, assemble(StorageId), TaskId)[artifact_name(CNPBoard)];
 	.
 -default::task(assemble(StorageId, Items), CNPBoard, TaskId)[source(X)].
++default::task(required(ItemId, Qty), CNPBoard, TaskId)[source(X)]
+	: .my_name(Me)
+<- 
+	-default::task(required(ItemId, Qty), CNPBoard, TaskId)[source(X)];
+    !create_bid_task(required(ItemId, Qty), Bid, Shop);
+    bid(Me, Bid, Shop, required(ItemId, Qty), TaskId)[artifact_name(CNPBoard)];
+  	.
+-default::task(item(ItemId, Qty), CNPBoard, TaskId)[source(X)].
 
 +!create_bid_task(item(ItemId, Qty), Bid, Shop)
 	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList) 
@@ -80,6 +88,26 @@
 	else { Bid = -1; Shop = null; }
 	.
 +!create_bid_task(Task, Bid, Shop) <- .wait(500); !create_bid_task(Task, Bid, Shop).
++!create_bid_task(required(ItemId, Qty), Bid, Shop)
+	: default::load(MyLoad) & default::role(Role, Speed, LoadCap, _, Tools) & default::item(ItemId,Vol,_,_) & new::shopList(SList) 
+<-
+	if (LoadCap - MyLoad >= Vol * Qty) {
+		.findall(Storage,default::available_items(StorageS,AvailableItemsS) & not .empty(AvailableItemsS) & default::convertListString2Term(AvailableItemsS,[],AvailableItems) & .member(item(ItemId,AvailableQty),AvailableItems) & AvailableQty >= Qty & .term2string(Storage,StorageS),StorageList);
+//		.print(StorageList," for task #",Qty," of ",ItemId);
+		if ( not .empty(StorageList) ) {
+			actions.closest(Role,StorageList,Facility);
+			actions.route(Role,Speed,Facility,Route);
+		}
+		else {
+			?default::find_shop_qty(item(ItemId, Qty),SList,Buy,99999,Route,99999,"",Facility,99999);
+		}
+//		.print("The lowest amount of buy actions that I need to buy ",Qty,"# of",ItemId," is ",Buy," in ",Shop);
+//		.print("####### Route: ",Route," role ",Role);
+		Bid = Route;
+		Shop = Facility;
+	}
+	else { Bid = -1; Shop = null; }
+	.
 	
 +default::winner(TaskList, assist(Storage, Assembler, JobId))
 	: default::joined(org,OrgId) & metrics::jobHaveWorked(Jobs)

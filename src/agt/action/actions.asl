@@ -16,11 +16,12 @@
 //	.wait( default::lastActionResult(Result) );
 	-action::action(S);
 		
-	if (Action \== recharge & Action \== continue & not .substring("assist_assemble",Action) & not .substring("buy",Action) & not .substring("bid_for_job",Action) & Result \== successful) {
+	if (Action \== recharge & Action \== continue & not .substring("deliver",Action) & not .substring("assist_assemble",Action) & not .substring("buy",Action) & not .substring("bid_for_job",Action) & Result \== successful) {
 //		.print("Failed to execute action ",Action," at step ",S," due to the 1% random error. Executing it again.");
 		!commitAction(Action);
 	}
 	else {
+		if (.substring("deliver",Action) & Result == failed ) { !commitAction(Action); }
 		if (.substring("deliver",Action) & Result \== failed_job_status & default::winner(_, assemble(_, JobId, _))) { +strategies::jobDone(JobId); }
 		if (action::next_action(Action2)) {
 			-action::next_action(Action2);

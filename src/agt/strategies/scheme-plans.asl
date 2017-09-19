@@ -68,7 +68,7 @@
 				-strategies::buyList(ItemId,Qty2,ShopOld);
 				?default::find_shop_qty(item(ItemId, Qty+Qty2),SList,BuyL,99999,RouteShopL,99999,"",ShopNew,99999);
 				+strategies::buyList(ItemId,Qty+Qty2,ShopNew);
-				addBuyCoordination(Shop,ItemId,Qty);
+				addBuyCoordination(ShopNew,ItemId,Qty);
 			}
 			else { +strategies::buyList(ItemId,Qty,Shop); addBuyCoordination(Shop,ItemId,Qty); }
 			

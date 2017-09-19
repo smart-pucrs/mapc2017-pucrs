@@ -96,7 +96,7 @@ task_id(0).
 	.length(Items,NumberOfAssemble);
 	?default::concat_bases(ListItems,[],ListItemsConcat);
 	if ( default::check_tools(ListToolsNew,AvailableTools,ResultT) & ResultT == "true" & default::check_buy_list(ListItemsConcat,ResultB) & ResultB == "true" & default::check_multiple_buy(ListItemsConcat,AddSteps) & default::check_price(ListToolsNew,ListItems,0,ResultP) & .print("Estimated cost ",ResultP * 1.1," reward ",Reward) & ResultP * 1.1 < Reward & actions.closest(Role,WList,Storage,ClosestWorkshop) & actions.route(Role,Speed,FarthestShop,ClosestWorkshop,RouteWorkshop) & actions.route(Role,Speed,ClosestWorkshop,Storage,RouteStorage) & Estimate = RouteShop+RouteWorkshop+RouteStorage+NumberOfBuyTool+NumberOfBuyItem+NumberOfAssemble+AddSteps+25 & .print("Estimate ",Estimate+Step," < ",End) & Estimate + Step < End & Step + Estimate < TotalSteps ) {
-		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, ListItemsStorage, Items);
 	}
 	else { 
 		.print("Job ",Id," failed evaluation, ignoring it.");
@@ -114,7 +114,7 @@ task_id(0).
 	if ( Step + 40 < TotalSteps & Step + 40 < End ) {
 		+action::hold_action(Id);
 		!decompose(Items,ListItems,ListToolsNew,ListItemsStorage,Id);
-		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items);
+		!!separate_tasks(Id, Storage, ListItems, ListToolsNew, ListItemsStorage, Items);
 	}
 	else { 
 		.print("Mission ",Id," failed evaluation, ignoring it.");
@@ -127,11 +127,12 @@ task_id(0).
 +!evaluate_mission(Items, End, Storage, Id, Reward, Fine) <- .print("Mission is already being evaluated").
 
 @sep_task[atomic]
-+!separate_tasks(Id, Storage, ListItems, ListToolsNew, Items)
++!separate_tasks(Id, Storage, ListItems, ListToolsNew, ListItemsStorage, Items)
 	: not cnp(_) & new::max_bid_time(Deadline) & initiator::free_trucks(FreeTrucks) & .length(FreeTrucks,NumberOfTrucks) & initiator::free_agents(FreeAgents) & .length(FreeAgents,NumberOfAgents) & NumberOfTrucks > 0 & NumberOfAgents >= 2
 <-
 	+cnp(Id);
 	+job(Id, Items);
+	.print("@@@@@@@@@@ ",ListItemsStorage);
 	+number_of_tasks(.length(ListItems)+.length(ListToolsNew)+1,Id);
 	?task_id(TaskIdA);
 	-+task_id(TaskIdA+1);

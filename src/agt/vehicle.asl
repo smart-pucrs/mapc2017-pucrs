@@ -69,12 +69,17 @@
 	!action::recharge_is_new_skip;
 	if ( default::hasItem(_,_) ) { !strategies::go_store(Role) }
 	if ( default::hasItem(_,_) ) { !strategies::go_dump }
+	
+	?new::shopList(SList);
+	actions.closest(Role, SList, Facility);
+	!action::goto(Facility);
+	
 	if ( Me == vehicle1 ) {
 		saveDuplicateLoad;
 		!initiator::add_myself_to_free;
 		?default::centerLat(CLat);
 		?default::centerLon(CLon);
-		?new::shopList(SList);
+//		?new::shopList(SList);
 		actions.farthest(Role,CLat,CLon,SList,FarthestShop);
 		actions.route(Role,Speed,CLat,CLon,FarthestShop,_,RouteShop);
 		+initiator::eval_shop_route(FarthestShop,RouteShop);

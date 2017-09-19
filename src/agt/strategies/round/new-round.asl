@@ -6,7 +6,7 @@
 	+initiator::completed_jobs(0); // debugging
 	+initiator::free_agents([]);
 	+initiator::free_trucks([]);
-	+initiator::cartList([vehicle13,vehicle14,vehicle15,vehicle16,vehicle17,vehicle18,vehicle19,vehicle20]);
+	+initiator::cartList([vehicle13,vehicle14,vehicle15,vehicle16]);
 	+initiator::resourceAgents([]);
 	
 	+metrics::money(0);

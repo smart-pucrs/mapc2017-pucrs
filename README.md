@@ -1,4 +1,4 @@
-# PUCRS code for the MAPC of 2017
+# PUCRS code for the MAPC of 2017 ([paper here](https://link.springer.com/article/10.1007/s10472-018-9584-z))
 
 To start developing and contributing to this repository, open Eclipse, and select from the toolbar:
 
@@ -25,3 +25,11 @@ To run the simulation with one round and two teams, right-click test/pucrs.agent
 To watch the match click [this link](http://localhost:8000/).
 
 To start the match, press enter on the Eclipse console.
+
+### Contributors
+- Rafael C. Cardoso
+- Tabajara Krausburg
+- Túlio Baségio
+- Débora C. Engelmann
+- Jomi F. Hübner
+- Rafael H. Bordini 
